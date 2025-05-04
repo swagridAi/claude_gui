@@ -44,6 +44,12 @@ response_timeout: 60
 delay_between_prompts: 3
 debug: false
 
+# Retry settings
+retry_delay: 2         # Initial delay between retries in seconds
+max_retry_delay: 30    # Maximum delay between retries in seconds
+retry_jitter: 0.5      # Random jitter factor (0.5 means ±50%)
+retry_backoff: 1.5     # Exponential backoff multiplier
+
 # OCR settings
 ocr:
   preprocess: true

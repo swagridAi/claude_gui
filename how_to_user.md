@@ -12,17 +12,17 @@ This implementation uses an image recognition-based approach rather than fixed c
 
 - **Image Recognition**: Uses template matching to locate UI elements rather than fixed coordinates
 - **Self-Calibration**: Automatically detects UI elements and adjusts to different screen sizes
-- **State Management**: Robust state machine for reliable automation flow
-- **Enhanced OCR**: Advanced text extraction with preprocessing for better accuracy
+- **Simplified State Machine**: Streamlined automation flow focused on reliable prompt delivery
+- **Smart Retry Mechanism**: Intelligent error recovery with exponential backoff, jitter, and failure-specific strategies
 - **Visual Debugging**: Comprehensive logging with screenshots for troubleshooting
-- **Adaptive Timing**: Waits for visual changes rather than fixed delays
+- **Reliable Browser Management**: Ensures proper browser startup and shutdown
 
 ### Use Cases
 
 - Batch processing of multiple prompts
-- Automated data collection from Claude responses
+- Automated testing of Claude's responses
 - Research workflows that require consistent question patterns
-- Comparative analysis of responses to similar prompts
+- Data collection tasks requiring repeated inputs
 
 ## Installation & Setup
 
@@ -53,7 +53,7 @@ This implementation uses an image recognition-based approach rather than fixed c
 
 4. Create reference images directory:
    ```bash
-   mkdir -p assets/reference_images/{prompt_box,send_button,thinking_indicator,response_complete}
+   mkdir -p assets/reference_images/{prompt_box,send_button,thinking_indicator}
    ```
 
 ## Usage Guide
@@ -78,6 +78,28 @@ This implementation uses an image recognition-based approach rather than fixed c
    python src/main.py
    ```
 
+The system will:
+- Launch Chrome and navigate to Claude
+- Wait for you to complete login if needed
+- Automatically send your prompts with configured delays between them
+- Handle any errors encountered and retry as needed
+- Close the browser when complete
+
+### Command-Line Arguments
+
+The following command-line arguments are available:
+
+```bash
+python src/main.py [OPTIONS]
+
+Options:
+  --config PATH         Path to config file (default: config/user_config.yaml)
+  --debug               Enable debug mode with verbose logging
+  --calibrate           Run calibration before starting
+  --max-retries NUMBER  Override maximum retry attempts
+  --retry-delay NUMBER  Override initial delay between retries (seconds)
+```
+
 ### Capturing Reference Images
 
 To create your own reference images for UI elements:
@@ -91,7 +113,6 @@ To create your own reference images for UI elements:
    - The prompt input box
    - The send button
    - The "thinking" indicator (if visible)
-   - A sample response area
 
 ### Configuration Options
 
@@ -100,7 +121,7 @@ Edit `config/user_config.yaml` to customize:
 - Browser profile location
 - Prompt list
 - Timeout settings
-- OCR configuration
+- Retry mechanism settings
 - Debug settings
 
 Example configuration:
@@ -118,57 +139,88 @@ prompts:
 
 # Runtime settings
 max_retries: 3
-response_timeout: 60
 delay_between_prompts: 3
-debug: true
+debug: false
+
+# Retry settings
+retry_delay: 2          # Initial delay between retries in seconds
+max_retry_delay: 30     # Maximum delay between retries in seconds
+retry_jitter: 0.5       # Random jitter factor (0.5 means ±50%)
+retry_backoff: 1.5      # Exponential backoff multiplier
 ```
+
+## Retry Mechanism
+
+The system includes a sophisticated retry mechanism that improves reliability when sending prompts:
+
+### Failure Types
+
+The system detects and handles different types of failures:
+
+- **UI Not Found**: When elements like prompt box can't be located
+- **Network Error**: Connection issues with Claude's website
+- **Browser Error**: Chrome crashes or freezes
+- **Unknown Error**: Fallback category for other issues
+
+### Recovery Strategies
+
+Each failure type triggers a specific recovery approach:
+
+- **UI issues**: Refreshes the page and checks login status
+- **Network issues**: Waits longer before refreshing
+- **Browser crashes**: Completely restarts the browser
+- **Unknown issues**: Starts with simple fixes, escalates to restart if needed
+
+### Exponential Backoff with Jitter
+
+The system uses smart timing between retries:
+- Each retry waits progressively longer (exponential backoff)
+- Random variation in timing prevents synchronization issues
+- Maximum delay cap prevents excessive waits
+
+### Recommended Settings
+
+- **For stable connections**: Default settings (3 retries, 2-second initial delay)
+- **For unreliable networks**: Increase max_retries to 5 and retry_delay to 5
+- **For complex prompts**: Increase delay_between_prompts to 5 or higher
 
 ## File Structure Explanation
 
 ### Core Components
 
 #### `src/main.py`
-The entry point to the application that parses command-line arguments, sets up logging, loads configuration, and initializes the state machine. It handles the overall execution flow and graceful shutdown.
+The entry point that parses command-line arguments, sets up logging, loads configuration, and initializes the state machine.
 
-#### `src/automation/state_machine.py`
-The heart of the application that implements a robust state machine controlling the automation flow. It manages transitions between states like browser launch, login, sending prompts, waiting for responses, and error recovery.
+#### `src/automation/simplified_state_machine.py`
+The streamlined state machine controlling the automation flow. It focuses specifically on sending prompts reliably with enhanced error recovery.
 
 #### `src/automation/recognition.py`
-Contains the core image recognition functionality using both PyAutoGUI's built-in functions and advanced OpenCV methods. This module is responsible for finding UI elements on screen using reference images.
+Contains the core image recognition functionality using both PyAutoGUI's built-in functions and advanced OpenCV methods.
 
 #### `src/automation/interaction.py`
-Handles all user interface interactions including mouse clicks, keyboard input, and text entry. It abstracts the low-level PyAutoGUI commands into higher-level functions.
-
-#### `src/automation/ocr.py`
-Implements enhanced OCR capabilities with image preprocessing to improve text extraction accuracy. It handles adaptive thresholding, contrast enhancement, and noise reduction before passing images to Tesseract.
+Handles all user interface interactions including mouse clicks, keyboard input, and text entry.
 
 #### `src/automation/browser.py`
-Manages the browser launch process, profile handling, and navigation to Claude's website. It ensures proper startup and environment preparation.
+Manages the browser launch process, profile handling, navigation, and ensures proper browser closure.
 
 ### Utilities
 
 #### `src/utils/calibration.py`
-Automatically detects UI elements and saves their positions to the configuration file. This module makes the automation tool resilient to different screen sizes and UI layouts.
+Automatically detects UI elements and saves their positions to the configuration file.
 
 #### `src/utils/logging_utils.py`
-Provides enhanced logging with screenshot capture to help troubleshoot automation issues. It creates timestamped log directories with both text logs and visual evidence.
+Provides enhanced logging with screenshot capture to help troubleshoot automation issues.
 
 #### `src/utils/image_processing.py`
-Contains computer vision utilities for preprocessing images before recognition or OCR. This includes contrast enhancement, noise reduction, and edge detection.
+Contains computer vision utilities for preprocessing images before recognition.
 
 #### `src/utils/config_manager.py`
-Handles loading, validation, and saving of configuration files. It provides a clean interface for accessing and modifying configuration values.
+Handles loading, validation, and saving of configuration files.
 
 ### Models
 
 #### `src/models/ui_element.py`
-Defines the UIElement class that represents a clickable or recognizable element on screen, with properties like reference images, search region, and confidence threshold.
-
-#### `src/models/prompt.py`
-Represents a prompt to be sent to Claude, with methods for validation and preprocessing.
-
-#### `src/models/response.py`
-Encapsulates Claude's responses with metadata and processing methods.
+Defines the UIElement class that represents a clickable or recognizable element on screen.
 
 ### Tools
 
@@ -179,7 +231,7 @@ A utility script for capturing reference images of UI elements for use in image 
 A standalone tool that runs the UI calibration process to detect and save UI element positions.
 
 #### `tools/visual_debugger.py`
-An interactive debugging tool that visualizes the detected UI elements and search regions for troubleshooting.
+An interactive debugging tool that visualizes the detected UI elements and search regions.
 
 ## Troubleshooting
 
@@ -206,26 +258,21 @@ If the tool fails to recognize UI elements:
        confidence: 0.6  # Lower value = more lenient matching
    ```
 
-#### OCR Issues
+#### Retry Loop Issues
 
-If text extraction produces incorrect results:
+If the system gets stuck in a retry loop:
 
-1. Enable OCR preprocessing in your config:
-   ```yaml
-   ocr:
-     preprocess: true
-     contrast_enhance: true
-     denoise: true
+1. Enable debug mode to see detailed logs:
+   ```bash
+   python src/main.py --debug
    ```
 
-2. Try different Tesseract configuration:
-   ```yaml
-   ocr:
-     engine: "tesseract"
-     config: "--psm 6 --oem 1"
-   ```
+2. Check the screenshots in logs/screenshots to see what's happening during retries
 
-3. Ensure the response area is correctly defined to capture only the text.
+3. Adjust retry settings for your specific environment:
+   ```bash
+   python src/main.py --max-retries 5 --retry-delay 5
+   ```
 
 #### Browser Launch Failures
 
@@ -261,7 +308,7 @@ display.stop()
 To add new functionality, extend the `AutomationState` enum and add corresponding handler methods:
 
 ```python
-# In state_machine.py
+# In simplified_state_machine.py
 class AutomationState(Enum):
     # Existing states...
     CUSTOM_ACTION = auto()
@@ -287,7 +334,9 @@ Use cron (Linux/Mac) or Task Scheduler (Windows) to run the tool on a schedule:
 2. **Avoid excessive automation** that might trigger anti-bot measures.
 3. **Keep reference images up to date** as Claude's UI evolves.
 4. **Run in debug mode** when setting up to catch issues early.
-5. **Back up your config files** before making changes.
+5. **Use reasonable delays between prompts** (3-5 seconds minimum recommended).
+6. **Adjust retry settings** based on your network stability and use case.
+7. **Back up your config files** before making changes.
 
 ## Contributing Guidelines
 

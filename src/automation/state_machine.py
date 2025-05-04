@@ -1,10 +1,10 @@
 from enum import Enum, auto
 import logging
 import time
-from src.automation.browser import launch_browser
-from src.automation.recognition import find_element, wait_for_visual_change
+import random
+from src.automation.browser import launch_browser, close_browser, refresh_page
+from src.automation.recognition import find_element
 from src.automation.interaction import click_element, send_text
-from src.automation.ocr import extract_text_from_region
 from src.models.ui_element import UIElement
 from src.utils.logging_utils import log_with_screenshot
 
@@ -12,28 +12,45 @@ class AutomationState(Enum):
     INITIALIZE = auto()
     BROWSER_LAUNCH = auto()
     WAIT_FOR_LOGIN = auto()
-    READY_FOR_PROMPT = auto()
-    SEND_PROMPT = auto()
-    WAIT_FOR_RESPONSE = auto()
-    CAPTURE_RESPONSE = auto()
+    SEND_PROMPTS = auto()
     COMPLETE = auto()
     ERROR = auto()
+    RETRY = auto()  # New state for handling retries
 
-class AutomationStateMachine:
+class FailureType(Enum):
+    """Types of failures that can occur during automation"""
+    UI_NOT_FOUND = auto()     # UI element not found
+    NETWORK_ERROR = auto()    # Network or connectivity issue
+    BROWSER_ERROR = auto()    # Browser crashed or not responding
+    UNKNOWN = auto()          # Unknown error type
+
+class SimpleAutomationMachine:
     def __init__(self, config):
         self.config = config
         self.state = AutomationState.INITIALIZE
         self.prompts = config.get("prompts", [])
         self.current_prompt_index = 0
-        self.results = []
         self.max_retries = config.get("max_retries", 3)
         self.retry_count = 0
         self.ui_elements = {}
+        self.delay_between_prompts = config.get("delay_between_prompts", 3)
+        self.failure_type = None
+        self.last_error = None
+        self.retry_delay = config.get("retry_delay", 2)
+        self.max_retry_delay = config.get("max_retry_delay", 30)
+        self.retry_jitter = config.get("retry_jitter", 0.5)  # Random jitter percentage
+        self.retry_backoff = config.get("retry_backoff", 1.5)  # Exponential backoff multiplier
     
     def run(self):
         """Run the automation state machine until completion or error."""
-        while self.state != AutomationState.COMPLETE and self.state != AutomationState.ERROR:
+        while self.state not in [AutomationState.COMPLETE, AutomationState.ERROR]:
             self._execute_current_state()
+        
+        # Final log message
+        if self.state == AutomationState.COMPLETE:
+            logging.info(f"Automation completed successfully. Sent {self.current_prompt_index} prompts.")
+        else:
+            logging.error(f"Automation stopped with errors after sending {self.current_prompt_index} prompts.")
     
     def _execute_current_state(self):
         """Execute the current state and transition to the next state."""
@@ -47,20 +64,15 @@ class AutomationStateMachine:
             elif self.state == AutomationState.WAIT_FOR_LOGIN:
                 self._handle_wait_for_login()
             
-            elif self.state == AutomationState.READY_FOR_PROMPT:
-                self._handle_ready_for_prompt()
+            elif self.state == AutomationState.SEND_PROMPTS:
+                self._handle_send_prompts()
+                
+            elif self.state == AutomationState.RETRY:
+                self._handle_retry()
             
-            elif self.state == AutomationState.SEND_PROMPT:
-                self._handle_send_prompt()
-            
-            elif self.state == AutomationState.WAIT_FOR_RESPONSE:
-                self._handle_wait_for_response()
-            
-            elif self.state == AutomationState.CAPTURE_RESPONSE:
-                self._handle_capture_response()
-            
-            # Reset retry count on successful state execution
-            self.retry_count = 0
+            # Reset retry count on successful state execution (only for non-retry states)
+            if self.state != AutomationState.RETRY:
+                self.retry_count = 0
             
         except Exception as e:
             self._handle_error(e)
@@ -77,6 +89,9 @@ class AutomationStateMachine:
                 region=element_config.get("region"),
                 confidence=element_config.get("confidence", 0.8)
             )
+        
+        logging.info(f"Loaded {len(self.ui_elements)} UI elements")
+        logging.info(f"Prepared {len(self.prompts)} prompts to send")
         
         self.state = AutomationState.BROWSER_LAUNCH
     
@@ -95,103 +110,211 @@ class AutomationStateMachine:
         
         if logged_in_element:
             logging.info("Already logged in")
-            self.state = AutomationState.READY_FOR_PROMPT
+            self.state = AutomationState.SEND_PROMPTS
         else:
             input("Please complete login/CAPTCHA and press Enter to continue...")
-            self.state = AutomationState.READY_FOR_PROMPT
+            self.state = AutomationState.SEND_PROMPTS
     
-    def _handle_ready_for_prompt(self):
-        """Prepare to send the next prompt."""
+    def _handle_send_prompts(self):
+        """Send all prompts in sequence."""
         if self.current_prompt_index >= len(self.prompts):
-            logging.info("All prompts processed")
+            logging.info("All prompts have been sent")
             self.state = AutomationState.COMPLETE
+            # Close browser when all prompts are sent
+            self.close_browser()
             return
         
-        # Find the prompt box
-        prompt_box = find_element(self.ui_elements["prompt_box"])
-        if not prompt_box:
-            raise Exception("Prompt box not found")
-        
-        log_with_screenshot("Ready to send prompt", region=prompt_box)
-        self.state = AutomationState.SEND_PROMPT
-    
-    def _handle_send_prompt(self):
-        """Send the current prompt to Claude."""
         current_prompt = self.prompts[self.current_prompt_index]
-        logging.info(f"Sending prompt: {current_prompt}")
+        logging.info(f"Sending prompt {self.current_prompt_index + 1}/{len(self.prompts)}: {current_prompt[:50]}...")
         
-        # Find and click the prompt box
-        prompt_box = find_element(self.ui_elements["prompt_box"])
-        click_element(prompt_box)
-        
-        # Send the prompt text
-        send_text(current_prompt)
-        
-        # Find and click the send button or press Enter
-        send_button = find_element(self.ui_elements["send_button"])
-        if send_button:
-            click_element(send_button)
-        else:
-            from pyautogui import press
-            press("enter")
-        
-        log_with_screenshot("Prompt sent")
-        self.state = AutomationState.WAIT_FOR_RESPONSE
-    
-    def _handle_wait_for_response(self):
-        """Wait for Claude to finish responding."""
-        logging.info("Waiting for Claude's response")
-        
-        # Set a timeout for response
-        timeout = self.config.get("response_timeout", 60)
-        start_time = time.time()
-        
-        # Look for visual indicators that Claude is thinking
-        thinking_indicator = find_element(self.ui_elements["thinking_indicator"])
-        if thinking_indicator:
-            # Wait for thinking indicator to disappear
-            while find_element(self.ui_elements["thinking_indicator"]):
-                if time.time() - start_time > timeout:
-                    raise Exception("Response timeout")
-                time.sleep(0.5)
+        try:
+            # Find and click the prompt box
+            prompt_box = find_element(self.ui_elements["prompt_box"])
+            if not prompt_box:
+                self.failure_type = FailureType.UI_NOT_FOUND
+                raise Exception("Prompt box not found")
             
-            # Extra delay to ensure response is complete
-            time.sleep(1)
-        else:
-            # Wait for visual change in response area
-            response_area = self.ui_elements["response_area"].region
-            if not wait_for_visual_change(response_area, timeout):
-                raise Exception("No response detected")
+            click_element(prompt_box)
+            
+            # Send the prompt text
+            send_text(current_prompt)
+            
+            # Find and click the send button or press Enter
+            send_button = find_element(self.ui_elements["send_button"])
+            if send_button:
+                click_element(send_button)
+            else:
+                from pyautogui import press
+                press("enter")
+            
+            log_with_screenshot("Prompt sent")
+            
+            # Move to next prompt
+            self.current_prompt_index += 1
+            
+            # Wait between prompts if there are more to send
+            if self.current_prompt_index < len(self.prompts):
+                logging.info(f"Waiting {self.delay_between_prompts} seconds before sending next prompt...")
+                time.sleep(self.delay_between_prompts)
         
-        log_with_screenshot("Response received")
-        self.state = AutomationState.CAPTURE_RESPONSE
-    
-    def _handle_capture_response(self):
-        """Capture and process Claude's response."""
-        logging.info("Capturing response")
-        
-        # Extract text from response area
-        response_area = self.ui_elements["response_area"].region
-        response_text = extract_text_from_region(response_area)
-        
-        # Store the result
-        self.results.append({
-            "prompt": self.prompts[self.current_prompt_index],
-            "response": response_text
-        })
-        
-        logging.info(f"Response captured: {response_text[:100]}...")
-        
-        # Move to next prompt
-        self.current_prompt_index += 1
-        self.state = AutomationState.READY_FOR_PROMPT
+        except Exception as e:
+            logging.error(f"Error sending prompt: {e}")
+            # Set failure type if not already set
+            if not self.failure_type:
+                self.failure_type = FailureType.UNKNOWN
+            self.last_error = str(e)
+            raise
     
     def _handle_error(self, error):
-        """Handle errors in the automation process."""
+        """Handle errors and decide whether to retry."""
         logging.error(f"Error in state {self.state}: {error}")
         log_with_screenshot(f"Error: {error}")
         
+        # Analyze error and set failure type if not already set
+        if not self.failure_type:
+            self.failure_type = self._classify_error(error)
+        
+        self.last_error = str(error)
         self.retry_count += 1
-        if self.retry_count >= self.max_retries:
+        
+        if self.retry_count <= self.max_retries:
+            logging.info(f"Retry {self.retry_count}/{self.max_retries}")
+            self.state = AutomationState.RETRY
+        else:
             logging.error(f"Max retries reached, stopping automation")
             self.state = AutomationState.ERROR
+    
+    def _handle_retry(self):
+        """Handle the retry logic based on the failure type."""
+        logging.info(f"Handling retry attempt {self.retry_count} for {self.failure_type}")
+        
+        # Calculate exponential backoff with jitter
+        current_delay = min(
+            self.retry_delay * (self.retry_backoff ** (self.retry_count - 1)),
+            self.max_retry_delay
+        )
+        
+        # Add some random jitter to avoid thundering herd problem
+        jitter_factor = 1 + random.uniform(-self.retry_jitter, self.retry_jitter)
+        delay = current_delay * jitter_factor
+        
+        logging.info(f"Waiting {delay:.2f} seconds before retry...")
+        time.sleep(delay)
+        
+        # Apply recovery strategy based on failure type
+        if self.failure_type == FailureType.UI_NOT_FOUND:
+            self._recover_from_ui_not_found()
+        elif self.failure_type == FailureType.NETWORK_ERROR:
+            self._recover_from_network_error()
+        elif self.failure_type == FailureType.BROWSER_ERROR:
+            self._recover_from_browser_error()
+        else:
+            self._recover_from_unknown_error()
+        
+        # Reset failure type
+        self.failure_type = None
+        
+        # Go back to sending prompts
+        self.state = AutomationState.SEND_PROMPTS
+    
+    def _recover_from_ui_not_found(self):
+        """Recovery strategy for UI element not found."""
+        logging.info("Recovering from UI element not found...")
+        
+        # Try refreshing the page
+        logging.info("Refreshing page...")
+        refresh_page()
+        time.sleep(5)  # Wait for page to reload
+        
+        # Check if we're still logged in
+        logged_in_element = find_element(self.ui_elements["prompt_box"])
+        if not logged_in_element:
+            logging.warning("Not logged in after refresh, waiting for login...")
+            self.state = AutomationState.WAIT_FOR_LOGIN
+    
+    def _recover_from_network_error(self):
+        """Recovery strategy for network errors."""
+        logging.info("Recovering from network error...")
+        
+        # Try refreshing the page
+        logging.info("Refreshing page...")
+        refresh_page()
+        time.sleep(7)  # Wait longer for network issues
+    
+    def _recover_from_browser_error(self):
+        """Recovery strategy for browser errors."""
+        logging.info("Recovering from browser error...")
+        
+        # Close and relaunch browser
+        self.close_browser()
+        time.sleep(2)
+        logging.info("Relaunching browser...")
+        launch_browser(self.config.get("claude_url"))
+        time.sleep(5)
+        
+        # Wait for login
+        self.state = AutomationState.WAIT_FOR_LOGIN
+    
+    def _recover_from_unknown_error(self):
+        """Recovery strategy for unknown errors."""
+        logging.info("Recovering from unknown error...")
+        
+        # Try a page refresh first
+        refresh_page()
+        time.sleep(5)
+        
+        # If that doesn't work after a couple of tries, restart the browser
+        if self.retry_count > 2:
+            logging.info("Multiple failures, restarting browser...")
+            self.close_browser()
+            time.sleep(2)
+            launch_browser(self.config.get("claude_url"))
+            time.sleep(5)
+            self.state = AutomationState.WAIT_FOR_LOGIN
+    
+    def _classify_error(self, error):
+        """Classify the type of error based on the exception."""
+        error_str = str(error).lower()
+        
+        if "not found" in error_str or "element" in error_str:
+            return FailureType.UI_NOT_FOUND
+        elif "network" in error_str or "connection" in error_str or "timeout" in error_str:
+            return FailureType.NETWORK_ERROR
+        elif "browser" in error_str or "chrome" in error_str or "crashed" in error_str:
+            return FailureType.BROWSER_ERROR
+        else:
+            return FailureType.UNKNOWN
+    
+    def cleanup(self):
+        """Clean up resources before exit."""
+        logging.info("Cleaning up resources")
+        self.close_browser()
+        
+    def close_browser(self):
+        """Close browser with verification and retry."""
+        logging.info("Closing browser...")
+        
+        # First attempt
+        if close_browser():
+            logging.info("Browser closed successfully")
+            return True
+            
+        # Retry if first attempt fails
+        logging.warning("First attempt to close browser failed, retrying...")
+        time.sleep(2)
+        
+        # Second attempt with force
+        from pyautogui import hotkey
+        try:
+            # Try to use Alt+F4 to force close
+            hotkey('alt', 'f4')
+            time.sleep(1)
+            
+            # One more try with browser close function
+            if close_browser():
+                logging.info("Browser closed successfully on second attempt")
+                return True
+        except Exception as e:
+            logging.error(f"Error during forced browser close: {e}")
+        
+        logging.warning("Could not verify browser closure")

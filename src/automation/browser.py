@@ -111,6 +111,7 @@ def close_browser():
         True if successful, False otherwise
     """
     try:
+        logging.info("Attempting to close browser")
         system = platform.system()
         
         if system == "Windows":
@@ -124,10 +125,50 @@ def close_browser():
         
         # Allow time for browsers to close
         time.sleep(2)
-        return True
+        
+        # Verify browser is closed
+        is_closed = verify_browser_closed()
+        if is_closed:
+            logging.info("Browser closed successfully")
+        else:
+            logging.warning("Browser may not have closed properly")
+            
+        return is_closed
     
     except Exception as e:
         logging.error(f"Failed to close browser: {e}")
+        return False
+
+def verify_browser_closed():
+    """
+    Verify that Chrome browser is no longer running.
+    
+    Returns:
+        True if browser is closed, False if still running
+    """
+    try:
+        system = platform.system()
+        
+        if system == "Windows":
+            # Check for chrome.exe process on Windows
+            result = subprocess.run(
+                ["tasklist", "/FI", "IMAGENAME eq chrome.exe"], 
+                capture_output=True, 
+                text=True
+            )
+            return "chrome.exe" not in result.stdout
+        else:
+            # Check for chrome process on Unix systems
+            result = subprocess.run(
+                ["pgrep", "-f", "chrome"], 
+                capture_output=True, 
+                text=True
+            )
+            return result.stdout.strip() == ""
+    
+    except Exception as e:
+        logging.error(f"Error verifying browser closure: {e}")
+        # If verification fails, assume browser may still be running
         return False
 
 def check_browser_ready(ui_element, timeout=30):

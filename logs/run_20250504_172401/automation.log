@@ -1,0 +1,12 @@
+2025-05-04 17:24:01,936 - INFO - Logging initialized in logs\run_20250504_172401
+2025-05-04 17:24:01,936 - INFO - Starting Claude automation
+2025-05-04 17:24:01,952 - ERROR - Error loading user configuration: could not determine a constructor for the tag 'tag:yaml.org,2002:python/tuple'
+  in "config/user_config.yaml", line 26, column 13
+2025-05-04 17:24:01,952 - INFO - Starting UI calibration
+2025-05-04 17:24:01,952 - INFO - Screen dimensions: 2560x1440
+2025-05-04 17:24:01,968 - INFO - Calibrating prompt box
+2025-05-04 17:24:01,968 - WARNING - No prompt box reference images found
+2025-05-04 17:24:01,968 - INFO - Starting reference image capture
+2025-05-04 17:24:30,807 - INFO - Please move your mouse to the prompt box and press Enter
+2025-05-04 17:25:00,539 - INFO - Saved prompt box reference image
+2025-05-04 17:25:00,539 - INFO - Please move your mouse to the send button and press Enter

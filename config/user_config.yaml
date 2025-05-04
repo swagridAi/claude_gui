@@ -22,7 +22,7 @@ ui_elements:
   prompt_box:
     confidence: 0.7
     reference_paths:
-    - assets/reference_images/prompt_box\prompt_box_1746341446.png
+    - assets/reference_images/prompt_box\prompt_box_1746343792.png
     region: !!python/tuple
     - !!python/object/apply:numpy.core.multiarray.scalar
       - &id001 !!python/object/apply:numpy.dtype
@@ -40,13 +40,13 @@ ui_elements:
         - -1
         - 0
       - !!binary |
-        7P////////8=
+        agYAAAAAAAA=
     - !!python/object/apply:numpy.core.multiarray.scalar
       - *id001
       - !!binary |
-        7P////////8=
-    - 340
-    - 100
+        hgQAAAAAAAA=
+    - 434
+    - 186
   response_area:
     confidence: 0.7
     reference_paths: []
@@ -57,31 +57,34 @@ ui_elements:
     - !!python/object/apply:numpy.core.multiarray.scalar
       - *id001
       - !!binary |
-        zv////////8=
+        aAQAAAAAAAA=
   send_button:
     confidence: 0.7
     reference_paths:
-    - assets/reference_images/send_button\send_button_1746341454.png
+    - assets/reference_images/send_button\send_button_1746343937.png
     region: !!python/tuple
-    - 1868
     - !!python/object/apply:numpy.core.multiarray.scalar
       - *id001
       - !!binary |
-        eQIAAAAAAAA=
+        /wEAAAAAAAA=
+    - !!python/object/apply:numpy.core.multiarray.scalar
+      - *id001
+      - !!binary |
+        NQQAAAAAAAA=
     - 80
     - 80
   thinking_indicator:
     confidence: 0.6
     reference_paths:
-    - assets/reference_images/thinking_indicator\thinking_1746341482.png
+    - assets/reference_images/thinking_indicator\thinking_1746343973.png
     region: !!python/tuple
     - !!python/object/apply:numpy.core.multiarray.scalar
       - *id001
       - !!binary |
-        zv////////8=
+        tggAAAAAAAA=
     - !!python/object/apply:numpy.core.multiarray.scalar
       - *id001
       - !!binary |
-        zv////////8=
+        MQAAAAAAAAA=
     - 200
     - 160

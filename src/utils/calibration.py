@@ -194,11 +194,18 @@ def capture_reference_images(config, element_type=None, region=None):
     
     if element_type is None or element_type == "prompt_box":
         # Capture prompt box
-        logging.info("Please move your mouse to the prompt box and press Enter")
-        input("Position mouse and press Enter...")
-        mouse_pos = pyautogui.position()
+        print("\n===== CAPTURE PROMPT BOX =====")
+        print("1. Position your mouse over Claude's prompt box in the Chrome window")
+        print("2. Switch back to this command window and press Enter")
+        print("3. You will have 3 seconds to switch back to Chrome and position your mouse over the prompt box")
+        print("4. Stay still until the capture is complete\n")
+        
+        input("Position mouse over prompt box, then come back here and press Enter...")
+        print("Switching windows - GO BACK TO CHROME NOW! (3 seconds)")
+        time.sleep(3)  # Give user time to switch windows and position mouse
         
         # Capture a region around the mouse position
+        mouse_pos = pyautogui.position()
         region = (mouse_pos.x - 150, mouse_pos.y - 30, 300, 60)
         screenshot = pyautogui.screenshot(region=region)
         
@@ -207,14 +214,22 @@ def capture_reference_images(config, element_type=None, region=None):
         timestamp = int(time.time())
         screenshot.save(f"assets/reference_images/prompt_box/prompt_box_{timestamp}.png")
         logging.info(f"Saved prompt box reference image")
+        print("\n✓ Prompt box captured successfully!")
     
     if element_type is None or element_type == "send_button":
         # Capture send button
-        logging.info("Please move your mouse to the send button and press Enter")
-        input("Position mouse and press Enter...")
-        mouse_pos = pyautogui.position()
+        print("\n===== CAPTURE SEND BUTTON =====")
+        print("1. Position your mouse over the send button in the Chrome window")
+        print("2. Switch back to this command window and press Enter")
+        print("3. You will have 3 seconds to switch back to Chrome and position your mouse over the send button")
+        print("4. Stay still until the capture is complete\n")
+        
+        input("Position mouse over send button, then come back here and press Enter...")
+        print("Switching windows - GO BACK TO CHROME NOW! (3 seconds)")
+        time.sleep(3)  # Give user time to switch windows and position mouse
         
         # Capture a region around the mouse position
+        mouse_pos = pyautogui.position()
         region = (mouse_pos.x - 30, mouse_pos.y - 30, 60, 60)
         screenshot = pyautogui.screenshot(region=region)
         
@@ -223,14 +238,23 @@ def capture_reference_images(config, element_type=None, region=None):
         timestamp = int(time.time())
         screenshot.save(f"assets/reference_images/send_button/send_button_{timestamp}.png")
         logging.info(f"Saved send button reference image")
+        print("\n✓ Send button captured successfully!")
     
     if element_type is None or element_type == "thinking_indicator":
         # Capture thinking indicator
-        logging.info("Please send a message to Claude, then immediately move your mouse to the thinking indicator and press Enter")
-        input("Position mouse and press Enter...")
-        mouse_pos = pyautogui.position()
+        print("\n===== CAPTURE THINKING INDICATOR =====")
+        print("1. Send a message to Claude in the Chrome window to see the thinking indicator")
+        print("2. When the thinking indicator appears, position your mouse over it")
+        print("3. Switch back to this command window and press Enter")
+        print("4. You will have 3 seconds to switch back to Chrome and position your mouse again")
+        print("5. Stay still until the capture is complete\n")
+        
+        input("Position mouse over thinking indicator, then come back here and press Enter...")
+        print("Switching windows - GO BACK TO CHROME NOW! (3 seconds)")
+        time.sleep(3)  # Give user time to switch windows and position mouse
         
         # Capture a region around the mouse position
+        mouse_pos = pyautogui.position()
         region = (mouse_pos.x - 50, mouse_pos.y - 30, 100, 60)
         screenshot = pyautogui.screenshot(region=region)
         
@@ -239,6 +263,11 @@ def capture_reference_images(config, element_type=None, region=None):
         timestamp = int(time.time())
         screenshot.save(f"assets/reference_images/thinking_indicator/thinking_{timestamp}.png")
         logging.info(f"Saved thinking indicator reference image")
+        print("\n✓ Thinking indicator captured successfully!")
+    
+    print("\n===== CALIBRATION IMAGE CAPTURE COMPLETE =====")
+    print("All reference images have been captured successfully.")
+    print("You can now return to the main calibration process.")
 
 def show_calibration_results(calibrated_elements):
     """

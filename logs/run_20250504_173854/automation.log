@@ -1,0 +1,22 @@
+2025-05-04 17:38:54,243 - INFO - Logging initialized in logs\run_20250504_173854
+2025-05-04 17:38:54,243 - INFO - Starting Claude automation
+2025-05-04 17:38:54,249 - ERROR - Error loading user configuration: could not determine a constructor for the tag 'tag:yaml.org,2002:python/tuple'
+  in "config/user_config.yaml", line 26, column 13
+2025-05-04 17:38:54,249 - INFO - Initializing automation
+2025-05-04 17:38:54,263 - INFO - Loaded 4 UI elements
+2025-05-04 17:38:54,266 - INFO - Prepared 3 prompts to send
+2025-05-04 17:38:54,280 - INFO - Launching browser
+2025-05-04 17:38:54,299 - INFO - Launching browser: C:\Program Files\Google\Chrome\Application\chrome.exe
+2025-05-04 17:38:54,304 - INFO - Using profile: C:\Users\User\ClaudeProfile
+2025-05-04 17:38:54,309 - INFO - Navigating to: https://claude.ai
+2025-05-04 17:38:54,344 - INFO - Waiting 10 seconds for browser to initialize
+2025-05-04 17:39:04,346 - INFO - Waiting for login completion
+2025-05-04 17:39:04,346 - WARNING - Reference image not found: assets/reference_images/prompt_box/prompt_box_1.png
+2025-05-04 17:39:04,357 - WARNING - Reference image not found: assets/reference_images/prompt_box/prompt_box_2.png
+2025-05-04 17:41:33,239 - INFO - Automation stopped by user
+2025-05-04 17:41:33,241 - INFO - Cleaning up resources
+2025-05-04 17:41:33,250 - INFO - Closing browser...
+2025-05-04 17:41:33,255 - INFO - Attempting to close browser
+2025-05-04 17:41:35,613 - INFO - Browser closed successfully
+2025-05-04 17:41:35,613 - INFO - Browser closed successfully
+2025-05-04 17:41:35,618 - INFO - Automation complete

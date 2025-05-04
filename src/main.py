@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-from src.automation.simplified_state_machine import SimpleAutomationMachine
+from src.automation.state_machine import SimpleAutomationMachine
 from src.utils.config_manager import ConfigManager
-from src.utils.logging_utils import setup_visual_logging
+from src.utils.logging_util import setup_visual_logging
 import argparse
 import logging
 

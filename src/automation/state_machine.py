@@ -6,7 +6,7 @@ from src.automation.browser import launch_browser, close_browser, refresh_page
 from src.automation.recognition import find_element
 from src.automation.interaction import click_element, send_text
 from src.models.ui_element import UIElement
-from src.utils.logging_utils import log_with_screenshot
+from src.utils.logging_util import log_with_screenshot
 
 class AutomationState(Enum):
     INITIALIZE = auto()

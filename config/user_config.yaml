@@ -1,64 +1,16 @@
 browser_profile: C:\Temp\ClaudeProfile
 claude_url: https://claude.ai
 debug: false
-delay_between_prompts: 3
-max_retries: 3
-max_retry_delay: 30
-ocr:
-  config: --psm 6
-  contrast_enhance: true
-  denoise: true
-  engine: tesseract
-  preprocess: true
 prompts:
 - Summarize the latest AI trends.
 - Explain how reinforcement learning works.
 - Write a Python function that reverses a string.
-response_timeout: 60
-retry_backoff: 1.5
-retry_delay: 2
-retry_jitter: 0.5
 ui_elements:
-  prompt_box:
-    confidence: 0.7
-    reference_paths:
-    - assets/reference_images/prompt_box/prompt_box_1.png
-    - assets/reference_images/prompt_box/prompt_box_2.png
-    relative_region:
-    - 0.31640625
-    - 0.4736111111111111
-    - 0.62734375
-    - 0.4708333333333333
-  response_area:
+  prompt_region:
     confidence: 0.7
     reference_paths: []
-    region:
-    - 300
-    - 100
-    - 800
-    - 600
-  send_button:
-    confidence: 0.7
-    reference_paths:
-    - assets/reference_images/send_button/send_button_1.png
-    - assets/reference_images/send_button/send_button_2.png
-    region:
-    - 900
-    - 700
-    - 300
-    - 300
-    relative_region:
-    - 0.85390625
-    - 0.6152777777777778
-    - 0.048828125
-    - 0.09166666666666666
-  thinking_indicator:
-    confidence: 0.6
-    reference_paths:
-    - assets/reference_images/thinking_indicator/thinking_1.png
-    - assets/reference_images/thinking_indicator/thinking_2.png
-    region:
-    - 500
-    - 400
-    - 400
-    - 200
+    region: !!python/tuple
+    - 536
+    - 722
+    - 1615
+    - 634

@@ -3,6 +3,26 @@ import os
 import logging
 from pathlib import Path
 import copy
+import numpy as np
+
+# Define custom YAML handlers for tuples
+def represent_tuple(dumper, data):
+    """Custom representer for Python tuples in YAML."""
+    return dumper.represent_sequence('tag:yaml.org,2002:seq', list(data))
+
+def construct_tuple(loader, node):
+    """Custom constructor for Python tuples from YAML."""
+    return tuple(loader.construct_sequence(node))
+
+# Define handlers for numpy scalars if you're using them
+def represent_numpy_scalar(dumper, data):
+    """Convert numpy scalar to regular Python int/float."""
+    return dumper.represent_scalar('tag:yaml.org,2002:int', str(int(data)))
+
+def construct_numpy_scalar(loader, node):
+    """Construct a regular Python int from YAML."""
+    value = loader.construct_scalar(node)
+    return int(value)
 
 class ConfigManager:
     """Configuration manager that handles loading and saving YAML config files."""
@@ -18,6 +38,15 @@ class ConfigManager:
         self.config_path = config_path
         self.default_config_path = default_config_path
         self.config = {}
+        
+        # Register YAML handlers for tuples and numpy objects
+        yaml.add_representer(tuple, represent_tuple)
+        yaml.add_constructor('tag:yaml.org,2002:python/tuple', construct_tuple)
+        
+        # Add numpy scalar handlers if you're using numpy
+        if hasattr(np, 'int64'):
+            yaml.add_representer(np.int64, represent_numpy_scalar)
+            yaml.add_constructor('tag:yaml.org,2002:numpy.int64', construct_numpy_scalar)
         
         # Load default configuration if it exists
         if os.path.exists(default_config_path):
@@ -42,6 +71,33 @@ class ConfigManager:
             os.makedirs(os.path.dirname(config_path), exist_ok=True)
             logging.info(f"User configuration not found, creating empty file at {config_path}")
             self.save()
+    
+    # [Rest of the ConfigManager class remains the same]
+
+    def save(self, path=None):
+        """
+        Save configuration to file.
+        
+        Args:
+            path: Optional path to save to (defaults to config_path)
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        save_path = path or self.config_path
+        try:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            
+            # Save configuration
+            with open(save_path, 'w') as f:
+                yaml.dump(self.config, f, default_flow_style=False)
+            
+            logging.debug(f"Configuration saved to {save_path}")
+            return True
+        except Exception as e:
+            logging.error(f"Error saving configuration: {e}")
+            return False
     
     def get(self, key, default=None):
         """
@@ -159,3 +215,10 @@ class ConfigManager:
         except Exception as e:
             logging.error(f"Error resetting configuration: {e}")
             return False
+    def represent_tuple(dumper, data):
+        """Custom representer for Python tuples in YAML."""
+        return dumper.represent_sequence('tag:yaml.org,2002:seq', list(data))
+
+    def construct_tuple(loader, node):
+        """Custom constructor for Python tuples from YAML."""
+        return tuple(loader.construct_sequence(node))

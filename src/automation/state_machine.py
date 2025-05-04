@@ -7,6 +7,8 @@ from src.automation.recognition import find_element
 from src.automation.interaction import click_element, send_text
 from src.models.ui_element import UIElement
 from src.utils.logging_util import log_with_screenshot
+from src.utils.reference_manager import ReferenceImageManager
+from src.utils.region_manager import RegionManager
 
 class AutomationState(Enum):
     INITIALIZE = auto()
@@ -40,6 +42,12 @@ class SimpleAutomationMachine:
         self.max_retry_delay = config.get("max_retry_delay", 30)
         self.retry_jitter = config.get("retry_jitter", 0.5)  # Random jitter percentage
         self.retry_backoff = config.get("retry_backoff", 1.5)  # Exponential backoff multiplier
+        self.reference_manager = ReferenceImageManager()
+        # Initialize region manager
+        self.region_manager = RegionManager()
+        
+        # Add a new stage for detecting window positioning
+        self.detected_window = False
     
     def run(self):
         """Run the automation state machine until completion or error."""
@@ -83,12 +91,22 @@ class SimpleAutomationMachine:
         
         # Load UI elements from config
         for element_name, element_config in self.config.get("ui_elements", {}).items():
+            # Support both relative and absolute regions
+            region = element_config.get("region")
+            relative_region = element_config.get("relative_region")
+            parent = element_config.get("parent")
+            
             self.ui_elements[element_name] = UIElement(
                 name=element_name,
                 reference_paths=element_config.get("reference_paths", []),
-                region=element_config.get("region"),
+                region=region,
+                relative_region=relative_region,
+                parent=parent,
                 confidence=element_config.get("confidence", 0.8)
             )
+        
+        # Register UI elements with region manager
+        self.region_manager.set_ui_elements(self.ui_elements)
         
         logging.info(f"Loaded {len(self.ui_elements)} UI elements")
         logging.info(f"Prepared {len(self.prompts)} prompts to send")
@@ -99,6 +117,20 @@ class SimpleAutomationMachine:
         """Launch the browser and navigate to Claude."""
         logging.info("Launching browser")
         launch_browser(self.config.get("claude_url"))
+        
+        # Wait for browser to launch and detect window position
+        time.sleep(5)
+        
+        # Try to detect window position
+        window_rect = self.region_manager.detect_window_position("Claude")
+        if window_rect:
+            logging.info(f"Detected Claude window at {window_rect}")
+            # Set an anchor point at the top-left corner of the window
+            self.region_manager.set_anchor_point("window_top_left", (window_rect[0], window_rect[1]))
+            self.detected_window = True
+        else:
+            logging.warning("Could not detect Claude window position, using full screen")
+            
         self.state = AutomationState.WAIT_FOR_LOGIN
     
     def _handle_wait_for_login(self):
@@ -176,6 +208,16 @@ class SimpleAutomationMachine:
         
         self.last_error = str(error)
         self.retry_count += 1
+        
+        # If the failure is due to UI element not found, try refreshing references
+        if self.failure_type == FailureType.UI_NOT_FOUND:
+            element_name = self._extract_element_name_from_error(str(error))
+            if element_name and element_name in self.ui_elements:
+                logging.info(f"Attempting to refresh reference for {element_name}")
+                self.reference_manager.update_stale_references(
+                    self.ui_elements[element_name], 
+                    self.config
+                )
         
         if self.retry_count <= self.max_retries:
             logging.info(f"Retry {self.retry_count}/{self.max_retries}")
@@ -284,6 +326,24 @@ class SimpleAutomationMachine:
             return FailureType.BROWSER_ERROR
         else:
             return FailureType.UNKNOWN
+        
+    def _extract_element_name_from_error(self, error_str):
+        """Extract element name from error message."""
+        if "not found" in error_str.lower():
+            # Common error patterns
+            patterns = [
+                r"(\w+) not found",
+                r"Could not find element (\w+)",
+                r"Element (\w+) not found"
+            ]
+            
+            import re
+            for pattern in patterns:
+                match = re.search(pattern, error_str)
+                if match:
+                    return match.group(1)
+        
+        return None
     
     def cleanup(self):
         """Clean up resources before exit."""

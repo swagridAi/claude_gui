@@ -4,6 +4,8 @@ from src.utils.config_manager import ConfigManager
 from src.utils.logging_util import setup_visual_logging
 import argparse
 import logging
+from src.utils.region_manager import RegionManager
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Claude GUI Automation")
@@ -12,7 +14,11 @@ def parse_arguments():
     parser.add_argument("--calibrate", help="Run calibration before starting", action="store_true")
     parser.add_argument("--max-retries", type=int, help="Maximum retry attempts", default=None)
     parser.add_argument("--retry-delay", type=float, help="Initial delay between retries (seconds)", default=None)
+    parser.add_argument("--skip-preprocessing", action="store_true", 
+                      help="Skip reference image preprocessing")
     return parser.parse_args()
+
+from src.utils.reference_manager import ReferenceImageManager
 
 def main():
     # Parse command line arguments
@@ -24,6 +30,25 @@ def main():
     
     # Load configuration
     config = ConfigManager(args.config)
+    
+    # Initialize reference image manager
+    reference_manager = ReferenceImageManager()
+    
+    # Preprocess existing reference images
+    if not args.skip_preprocessing:
+        logging.info("Preprocessing reference images...")
+        ui_elements_config = config.get("ui_elements", {})
+        for element_name, element_config in ui_elements_config.items():
+            if "reference_paths" in element_config:
+                # Get enhanced references with preprocessing
+                enhanced_paths = reference_manager.preprocess_reference_images(
+                    element_config["reference_paths"]
+                )
+                # Update configuration with enhanced paths
+                element_config["reference_paths"] = enhanced_paths
+        
+        # Save configuration with enhanced references
+        config.save()
     
     # Override config with command line arguments if provided
     if args.max_retries is not None:
@@ -40,8 +65,27 @@ def main():
         run_calibration(config)
         config.save()
     
-    # Initialize state machine
+    # Initialize region manager
+    region_manager = RegionManager()
+    
+    # Parse config for UI elements with both absolute and relative regions
+    ui_elements = {}
+    for element_name, element_config in config.get("ui_elements", {}).items():
+        ui_elements[element_name] = UIElement(
+            name=element_name,
+            reference_paths=element_config.get("reference_paths", []),
+            region=element_config.get("region"),
+            relative_region=element_config.get("relative_region"),
+            parent=element_config.get("parent"),
+            confidence=element_config.get("confidence", 0.7)
+        )
+    
+    # Register UI elements with region manager
+    region_manager.set_ui_elements(ui_elements)
+    
+    # Initialize state machine with region manager
     state_machine = SimpleAutomationMachine(config)
+    state_machine.region_manager = region_manager
     
     # Start automation
     try:

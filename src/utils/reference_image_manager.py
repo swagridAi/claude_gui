@@ -341,6 +341,90 @@ class ReferenceImageManager:
                 
         return False
     
+    def images_need_preprocessing(self, paths, preprocessing_options=None):
+        """
+        Check if reference images need preprocessing.
+        
+        Args:
+            paths: List of paths to reference images
+            preprocessing_options: Dictionary of preprocessing options
+            
+        Returns:
+            True if any images need preprocessing, False otherwise
+        """
+        if not preprocessing_options:
+            preprocessing_options = {
+                "grayscale": True,
+                "contrast_enhance": True,
+                "edge_detection": False,
+                "threshold": True
+            }
+        
+        for path in paths:
+            if not os.path.exists(path):
+                continue
+            
+            # Only check original images (not variant images)
+            if any(x in path for x in ['_gray', '_edge', '_contrast', '_thresh']):
+                continue
+                
+            basename = os.path.splitext(os.path.basename(path))[0]
+            parent_dir = os.path.dirname(path)
+            
+            # Check for each preprocessing type
+            if preprocessing_options.get("grayscale"):
+                gray_path = os.path.join(parent_dir, f"{basename}_gray.png")
+                if not os.path.exists(gray_path) or (time.time() - os.path.getmtime(gray_path) >= 86400):
+                    return True
+            
+            if preprocessing_options.get("contrast_enhance"):
+                contrast_path = os.path.join(parent_dir, f"{basename}_contrast.png")
+                if not os.path.exists(contrast_path) or (time.time() - os.path.getmtime(contrast_path) >= 86400):
+                    return True
+            
+            if preprocessing_options.get("edge_detection"):
+                edge_path = os.path.join(parent_dir, f"{basename}_edge.png")
+                if not os.path.exists(edge_path) or (time.time() - os.path.getmtime(edge_path) >= 86400):
+                    return True
+            
+            if preprocessing_options.get("threshold"):
+                thresh_path = os.path.join(parent_dir, f"{basename}_thresh.png")
+                if not os.path.exists(thresh_path) or (time.time() - os.path.getmtime(thresh_path) >= 86400):
+                    return True
+        
+        # If we get here, all preprocessing variants exist and are recent
+        return False
+
+    def ensure_preprocessing(self, ui_elements_config, config=None):
+        """
+        Ensure all reference images have been preprocessed.
+        Only processes images that need it.
+        
+        Args:
+            ui_elements_config: Dictionary of UI element configurations
+            config: ConfigManager instance for saving updates
+            
+        Returns:
+            True if any preprocessing was done, False otherwise
+        """
+        any_preprocessing_done = False
+        
+        for element_name, element_config in ui_elements_config.items():
+            if "reference_paths" in element_config and element_config["reference_paths"]:
+                paths = element_config["reference_paths"]
+                if self.images_need_preprocessing(paths):
+                    logging.info(f"Preprocessing images for {element_name}...")
+                    enhanced_paths = self.preprocess_reference_images(paths)
+                    element_config["reference_paths"] = enhanced_paths
+                    any_preprocessing_done = True
+        
+        # Save configuration if changes were made and config is provided
+        if any_preprocessing_done and config:
+            config.save()
+            logging.info("Saved updated configuration with preprocessed image paths")
+        
+        return any_preprocessing_done
+
     def refresh_all_references(self, ui_elements, config):
         """
         Refresh all reference images for all UI elements.

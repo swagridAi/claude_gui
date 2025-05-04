@@ -36,16 +36,11 @@ def main():
     
     # Preprocess existing reference images
     if not args.skip_preprocessing:
-        logging.info("Preprocessing reference images...")
         ui_elements_config = config.get("ui_elements", {})
-        for element_name, element_config in ui_elements_config.items():
-            if "reference_paths" in element_config:
-                # Get enhanced references with preprocessing
-                enhanced_paths = reference_manager.preprocess_reference_images(
-                    element_config["reference_paths"]
-                )
-                # Update configuration with enhanced paths
-                element_config["reference_paths"] = enhanced_paths
+        if reference_manager.ensure_preprocessing(ui_elements_config, config):
+            logging.info("Completed automatic preprocessing of reference images")
+        else:
+            logging.info("Reference images already preprocessed, skipping preprocessing")
         
         # Save configuration with enhanced references
         config.save()

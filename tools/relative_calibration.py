@@ -21,6 +21,47 @@ from src.models.ui_element import UIElement
 from src.utils.reference_manager import ReferenceImageManager
 from src.utils.region_manager import RegionManager
 
+
+def display_usage_guide():
+    """Display usage information and best practices for the relative calibration tool."""
+    print("\n=====================================================")
+    print("          RELATIVE CALIBRATION TOOL GUIDE           ")
+    print("=====================================================\n")
+    
+    print("WHAT IS RELATIVE CALIBRATION?")
+    print("The relative calibration tool helps you define UI elements based")
+    print("on their relationships to each other, making the automation more")
+    print("resilient to UI changes and screen resolution differences.\n")
+    
+    print("BASIC USAGE INSTRUCTIONS:")
+    print("1. Select an element from the dropdown or create a new one")
+    print("2. Choose a parent element (or 'screen' for absolute positioning)")
+    print("3. Click 'Take Screenshot' to capture your screen")
+    print("4. Click 'Capture Region' and drag on the screenshot to define the element")
+    print("5. Save your configuration when done\n")
+    
+    print("BEST PRACTICES:")
+    print("- Define hierarchical relationships: Position child elements relative")
+    print("  to their logical parents (e.g., send button relative to prompt box)")
+    print("- Use screen-relative positioning for major containers and parent elements")
+    print("- Keep reference chains short: Avoid deep nesting of relative elements")
+    print("- Calibrate in your normal usage environment: Use the same screen resolution,")
+    print("  browser size, and zoom level you'll use during automation")
+    print("- Test after calibration: Run a simple prompt test to verify all elements")
+    print("  are correctly recognized")
+    print("- Start with key elements: Focus on the essential elements first\n")
+    
+    print("COMMON PITFALLS TO AVOID:")
+    print("- Selecting regions that are too small or precise")
+    print("- Creating circular parent-child relationships")
+    print("- Nesting elements too deeply (more than 2-3 levels)")
+    print("- Forgetting to save your configuration")
+    print("- Relying on highly variable UI elements as parents")
+    print("=====================================================\n")
+    
+    # Prompt user to continue
+    input("Press Enter to start the interactive calibration tool...")
+
 def setup_logging():
     """Set up logging."""
     logging.basicConfig(
@@ -512,10 +553,15 @@ def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Relative region calibration for Claude GUI Automation")
     parser.add_argument("--config", help="Path to config file", default="config/user_config.yaml")
+    parser.add_argument("--skip-guide", action="store_true", help="Skip the usage guide")
     args = parser.parse_args()
     
     # Set up logging
     setup_logging()
+    
+    # Display usage guide unless skipped
+    if not args.skip_guide:
+        display_usage_guide()
     
     # Load configuration
     config = ConfigManager(args.config)

@@ -22,69 +22,43 @@ ui_elements:
   prompt_box:
     confidence: 0.7
     reference_paths:
-    - assets/reference_images/prompt_box\prompt_box_1746343792.png
-    region: !!python/tuple
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - &id001 !!python/object/apply:numpy.dtype
-        args:
-        - i8
-        - false
-        - true
-        state: !!python/tuple
-        - 3
-        - <
-        - null
-        - null
-        - null
-        - -1
-        - -1
-        - 0
-      - !!binary |
-        agYAAAAAAAA=
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - *id001
-      - !!binary |
-        hgQAAAAAAAA=
-    - 434
-    - 186
+    - assets/reference_images/prompt_box/prompt_box_1.png
+    - assets/reference_images/prompt_box/prompt_box_2.png
+    relative_region:
+    - 0.31640625
+    - 0.4736111111111111
+    - 0.62734375
+    - 0.4708333333333333
   response_area:
     confidence: 0.7
     reference_paths: []
-    region: !!python/tuple
-    - 0
-    - 0
-    - 2560
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - *id001
-      - !!binary |
-        aAQAAAAAAAA=
+    region:
+    - 300
+    - 100
+    - 800
+    - 600
   send_button:
     confidence: 0.7
     reference_paths:
-    - assets/reference_images/send_button\send_button_1746343937.png
-    region: !!python/tuple
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - *id001
-      - !!binary |
-        /wEAAAAAAAA=
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - *id001
-      - !!binary |
-        NQQAAAAAAAA=
-    - 80
-    - 80
+    - assets/reference_images/send_button/send_button_1.png
+    - assets/reference_images/send_button/send_button_2.png
+    region:
+    - 900
+    - 700
+    - 300
+    - 300
+    relative_region:
+    - 0.85390625
+    - 0.6152777777777778
+    - 0.048828125
+    - 0.09166666666666666
   thinking_indicator:
     confidence: 0.6
     reference_paths:
-    - assets/reference_images/thinking_indicator\thinking_1746343973.png
-    region: !!python/tuple
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - *id001
-      - !!binary |
-        tggAAAAAAAA=
-    - !!python/object/apply:numpy.core.multiarray.scalar
-      - *id001
-      - !!binary |
-        MQAAAAAAAAA=
+    - assets/reference_images/thinking_indicator/thinking_1.png
+    - assets/reference_images/thinking_indicator/thinking_2.png
+    region:
+    - 500
+    - 400
+    - 400
     - 200
-    - 160

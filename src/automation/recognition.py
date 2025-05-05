@@ -106,27 +106,40 @@ def find_element_cv(ui_element, confidence=0.7):
     
     return None
 
-def find_element(ui_element, confidence_override=None, use_advanced=True):
+import pyautogui
+import cv2
+import numpy as np
+import logging
+import glob
+import os
+import time
+import psutil
+from src.utils.logging_util import log_with_screenshot
+from src.models.ui_element import UIElement
+
+# Global debugging flag
+DEBUG_SAVE_IMAGES = True  # Set to False in production
+
+def find_element(ui_element, confidence_override=None, use_advanced=True, timeout=60):
     """
-    Enhanced version of find_element that finds all possible matches and
-    selects the one with the highest confidence score.
+    Enhanced version of find_element with improved logging and timeout support.
     
     Args:
         ui_element: UIElement object
         confidence_override: Optional override for confidence threshold
         use_advanced: Whether to use advanced recognition techniques
+        timeout: Maximum time in seconds to spend searching
         
     Returns:
-        Location object or None if not found
+        Location object or None if not found or timed out
     """
-    from src.models.ui_element import UIElement
-    import pyautogui
-    import cv2
-    import numpy as np
-    import logging
-    import glob
-    import os
-    from src.utils.logging_util import log_with_screenshot
+    # Timer for overall process
+    overall_start = time.time()
+    
+    # Log memory usage at start
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    logging.info(f"Memory usage at start: {memory_info.rss / 1024 / 1024:.2f} MB")
     
     # Log beginning of search
     log_with_screenshot(
@@ -138,17 +151,52 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
     min_confidence = max(0.4, confidence - 0.2)  # Set a minimum confidence threshold
     region = ui_element.region
     
+    # Log search parameters
+    logging.info(f"Search parameters for {ui_element.name}: confidence={confidence}, min_confidence={min_confidence}")
+    logging.info(f"Search region: {region}")
+    
+    # Count reference images
+    total_refs = len(ui_element.reference_paths)
+    logging.info(f"Starting search for {ui_element.name} with {total_refs} reference images")
+    
+    # Limit number of reference images for performance
+    if total_refs > 10:
+        logging.warning(f"Too many reference images for {ui_element.name}, using only first 10 for performance")
+        reference_paths = ui_element.reference_paths[:10]
+    else:
+        reference_paths = ui_element.reference_paths
+    
     # Get a screenshot for analysis
+    screenshot_start = time.time()
     if region:
+        logging.info(f"Taking screenshot of region {region}")
         screenshot = pyautogui.screenshot(region=region)
         x_offset, y_offset = region[0], region[1]
     else:
+        logging.info("Taking full screen screenshot")
         screenshot = pyautogui.screenshot()
         x_offset, y_offset = 0, 0
     
+    screenshot_end = time.time()
+    logging.info(f"Screenshot taken in {screenshot_end - screenshot_start:.2f} seconds")
+    
     # Convert screenshot to CV2 format
+    convert_start = time.time()
     screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     screenshot_gray = cv2.cvtColor(screenshot_cv, cv2.COLOR_BGR2GRAY)
+    convert_end = time.time()
+    logging.info(f"Screenshot conversion completed in {convert_end - convert_start:.2f} seconds")
+    
+    # Log screenshot dimensions
+    screenshot_h, screenshot_w = screenshot_cv.shape[:2]
+    logging.info(f"Screenshot dimensions: {screenshot_w}x{screenshot_h} pixels")
+    
+    # Save debug screenshot if enabled
+    if DEBUG_SAVE_IMAGES:
+        debug_dir = "logs/debug_images"
+        os.makedirs(debug_dir, exist_ok=True)
+        timestamp = int(time.time())
+        cv2.imwrite(f"{debug_dir}/search_{ui_element.name}_{timestamp}_screenshot.png", screenshot_cv)
     
     # Store all potential matches
     all_matches = []
@@ -159,8 +207,28 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
         img_h, img_w = img.shape[:2]
         return h <= img_h and w <= img_w
     
-    # Try reference images
-    for reference_path in ui_element.reference_paths:
+    # Process each reference image
+    for i, reference_path in enumerate(reference_paths):
+        # Check timeout
+        if time.time() - overall_start > timeout:
+            logging.warning(f"Search for {ui_element.name} timed out after {timeout} seconds")
+            if all_matches:
+                logging.info(f"Returning best match found before timeout ({len(all_matches)} matches)")
+                all_matches.sort(key=lambda x: x['score'], reverse=True)
+                best_match = all_matches[0]
+                return best_match['location']
+            return None
+        
+        # Periodic memory and time logging
+        if i % 3 == 0 and i > 0:
+            elapsed = time.time() - overall_start
+            memory_info = process.memory_info()
+            logging.info(f"Progress: {i}/{len(reference_paths)} references processed in {elapsed:.2f} seconds")
+            logging.info(f"Current memory usage: {memory_info.rss / 1024 / 1024:.2f} MB")
+        
+        ref_start = time.time()
+        logging.info(f"Processing reference image {i+1}/{len(reference_paths)}: {os.path.basename(reference_path)}")
+        
         if not os.path.exists(reference_path):
             logging.warning(f"Reference image not found: {reference_path}")
             continue
@@ -171,22 +239,36 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                 logging.warning(f"Failed to load reference image: {reference_path}")
                 continue
             
+            # Log template dimensions
+            h, w = template.shape[:2]
+            logging.info(f"Reference image dimensions: {w}x{h} pixels")
+            
             # Skip if template is larger than screenshot
             if not template_fits(template, screenshot_cv):
-                logging.warning(f"Template too large for region: {reference_path}")
+                logging.warning(f"Template too large for region: {reference_path} - {w}x{h} > {screenshot_w}x{screenshot_h}")
                 continue
             
+            # Save template if debugging enabled
+            if DEBUG_SAVE_IMAGES:
+                timestamp = int(time.time())
+                cv2.imwrite(f"{debug_dir}/search_{ui_element.name}_{timestamp}_template_{i}.png", template)
+            
             # Try standard PyAutoGUI method first - often fastest
+            pyautogui_start = time.time()
             try:
+                logging.debug(f"Trying PyAutoGUI locate with min_confidence={min_confidence}")
                 location = pyautogui.locate(
                     reference_path,
                     screenshot,
                     confidence=min_confidence
                 )
                 
+                pyautogui_end = time.time()
+                
                 if location:
+                    logging.info(f"PyAutoGUI found match in {pyautogui_end - pyautogui_start:.2f} seconds")
+                    
                     # Create a match_info without trying to access .confidence
-                    # This is the key fix for the 'Box' object has no attribute 'confidence' error
                     match_info = {
                         'location': (
                             location.left + x_offset,
@@ -199,8 +281,12 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                         'template': reference_path
                     }
                     all_matches.append(match_info)
+                    logging.debug(f"Added match: {match_info}")
+                else:
+                    logging.debug(f"PyAutoGUI locate found no matches in {pyautogui_end - pyautogui_start:.2f} seconds")
             except Exception as e:
-                logging.debug(f"PyAutoGUI locate failed: {e}")
+                pyautogui_end = time.time()
+                logging.debug(f"PyAutoGUI locate failed in {pyautogui_end - pyautogui_start:.2f} seconds: {e}")
             
             # If advanced methods enabled, try them too
             if use_advanced:
@@ -215,9 +301,27 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                 ]
                 
                 for method in methods:
+                    # Check timeout
+                    if time.time() - overall_start > timeout:
+                        logging.warning(f"Method loop timed out after {timeout} seconds")
+                        break
+                    
+                    method_start = time.time()
+                    method_name = method.__str__().split('.')[-1]
+                    logging.debug(f"Trying CV2 method {method_name}")
+                    
                     try:
                         # Try original images
                         result = cv2.matchTemplate(screenshot_gray, template_gray, method)
+                        
+                        # Save match results visualization if debugging enabled
+                        if DEBUG_SAVE_IMAGES:
+                            timestamp = int(time.time())
+                            # Normalize result for visualization
+                            norm_result = cv2.normalize(result, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+                            # Apply color map for better visualization
+                            heatmap = cv2.applyColorMap(norm_result, cv2.COLORMAP_JET)
+                            cv2.imwrite(f"{debug_dir}/search_{ui_element.name}_{timestamp}_heatmap_{i}_{method_name}.png", heatmap)
                         
                         # Different handling based on method
                         if method == cv2.TM_SQDIFF_NORMED:
@@ -225,6 +329,10 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                             # Find all matches above threshold (below 1-threshold for SQDIFF)
                             threshold = 1.0 - min_confidence
                             loc = np.where(result <= threshold)
+                            
+                            match_count = len(loc[0]) if len(loc) > 0 and len(loc[0]) > 0 else 0
+                            method_end = time.time()
+                            logging.debug(f"Method {method_name} found {match_count} potential matches in {method_end - method_start:.2f} seconds")
                             
                             # Convert similarity score (smaller is better for SQDIFF)
                             for pt in zip(*loc[::-1]):
@@ -239,7 +347,7 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                                             h
                                         ),
                                         'score': score,
-                                        'method': 'cv2.TM_SQDIFF_NORMED',
+                                        'method': f'cv2.{method_name}',
                                         'template': reference_path
                                     }
                                     all_matches.append(match_info)
@@ -247,6 +355,10 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                             # For other methods, larger values are better matches
                             threshold = min_confidence
                             loc = np.where(result >= threshold)
+                            
+                            match_count = len(loc[0]) if len(loc) > 0 and len(loc[0]) > 0 else 0
+                            method_end = time.time()
+                            logging.debug(f"Method {method_name} found {match_count} potential matches in {method_end - method_start:.2f} seconds")
                             
                             for pt in zip(*loc[::-1]):
                                 score = result[pt[1], pt[0]]
@@ -260,89 +372,31 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                                             h
                                         ),
                                         'score': score,
-                                        'method': 'cv2.' + method.__str__().split('.')[-1],
+                                        'method': f'cv2.{method_name}',
                                         'template': reference_path
                                     }
                                     all_matches.append(match_info)
-                        
-                        # Try with multi-scale template matching
-                        scales = [0.8, 0.9, 1.1, 1.2]
-                        for scale in scales:
-                            # Resize template
-                            h, w = template_gray.shape
-                            new_h, new_w = int(h * scale), int(w * scale)
-                            
-                            # Skip if resized template is too large
-                            if new_h > screenshot_gray.shape[0] or new_w > screenshot_gray.shape[1]:
-                                continue
-                            
-                            resized_template = cv2.resize(template_gray, (new_w, new_h))
-                            
-                            # Match with resized template
-                            result = cv2.matchTemplate(screenshot_gray, resized_template, method)
-                            
-                            # Get results for this scale
-                            if method == cv2.TM_SQDIFF_NORMED:
-                                threshold = 1.0 - min_confidence
-                                loc = np.where(result <= threshold)
-                                
-                                for pt in zip(*loc[::-1]):
-                                    score = 1.0 - result[pt[1], pt[0]]
-                                    if score >= min_confidence:
-                                        match_info = {
-                                            'location': (
-                                                pt[0] + x_offset,
-                                                pt[1] + y_offset,
-                                                new_w,
-                                                new_h
-                                            ),
-                                            'score': score,
-                                            'method': f'cv2.TM_SQDIFF_NORMED (scale: {scale})',
-                                            'template': reference_path
-                                        }
-                                        all_matches.append(match_info)
-                            else:
-                                threshold = min_confidence
-                                loc = np.where(result >= threshold)
-                                
-                                for pt in zip(*loc[::-1]):
-                                    score = result[pt[1], pt[0]]
-                                    if score >= min_confidence:
-                                        match_info = {
-                                            'location': (
-                                                pt[0] + x_offset,
-                                                pt[1] + y_offset,
-                                                new_w,
-                                                new_h
-                                            ),
-                                            'score': score,
-                                            'method': f'cv2.{method.__str__().split(".")[-1]} (scale: {scale})',
-                                            'template': reference_path
-                                        }
-                                        all_matches.append(match_info)
-                                        
+                                    
                     except Exception as e:
-                        logging.debug(f"Method {method} failed for {reference_path}: {e}")
-                        
+                        method_end = time.time()
+                        logging.warning(f"Method {method_name} failed in {method_end - method_start:.2f} seconds: {e}")
+        
         except Exception as e:
             logging.warning(f"Error processing reference {reference_path}: {e}")
+            
+        # Log completion of this reference image
+        ref_end = time.time()
+        logging.info(f"Finished processing reference {i+1}/{len(reference_paths)} in {ref_end - ref_start:.2f} seconds")
     
-    if all_matches:
-        all_matches.sort(key=lambda x: x['score'], reverse=True)
-        best_match = all_matches[0]
-        log_with_screenshot(
-            f"Found {ui_element.name} with score {best_match['score']:.2f}", 
-            stage_name=f"FOUND_{ui_element.name}",
-            region=best_match['location']
-        )
-        return best_match['location']
-    else:
-        log_with_screenshot(
-            f"Element {ui_element.name} not found", 
-            level=logging.WARNING,
-            stage_name=f"NOT_FOUND_{ui_element.name}"
-        )
-
+    # Log final memory usage
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    logging.info(f"Final memory usage: {memory_info.rss / 1024 / 1024:.2f} MB")
+    
+    # Total elapsed time
+    total_time = time.time() - overall_start
+    logging.info(f"Total search time for {ui_element.name}: {total_time:.2f} seconds")
+    
     # If we found any matches, return the best one
     if all_matches:
         # Sort by score, highest first
@@ -387,7 +441,6 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                 )
             
             # Save the debug image
-            import time
             timestamp = int(time.time())
             debug_path = f"{debug_dir}/{ui_element.name}_matches_{timestamp}.png"
             cv2.imwrite(debug_path, debug_img)
@@ -395,12 +448,27 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
         except Exception as e:
             logging.error(f"Error saving debug image: {e}")
         
-        logging.debug(f"Best match for {ui_element.name}: score={best_match['score']:.2f}, "
+        # Log best match
+        logging.info(f"Best match for {ui_element.name}: score={best_match['score']:.2f}, "
                      f"method={best_match['method']}, location={best_match['location']}")
+        
+        # Log success with screenshot
+        log_with_screenshot(
+            f"Found {ui_element.name} with score {best_match['score']:.2f}", 
+            stage_name=f"FOUND_{ui_element.name}",
+            region=best_match['location']
+        )
         
         return best_match['location']
     
-    # If no match was found, return None
+    # If no match was found, log failure
+    log_with_screenshot(
+        f"Element {ui_element.name} not found", 
+        level=logging.WARNING,
+        stage_name=f"NOT_FOUND_{ui_element.name}"
+    )
+    
+    logging.warning(f"No matches found for {ui_element.name} after {total_time:.2f} seconds")
     return None
 
 def wait_for_visual_change(region, timeout=60, check_interval=0.5, threshold=0.1):

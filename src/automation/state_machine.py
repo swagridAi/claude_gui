@@ -186,6 +186,7 @@ class SimpleAutomationMachine:
         
         try:
             # If this is the first prompt, click the search_options_button first
+            # If this is the first prompt, click the search_options_button first
             if self.current_prompt_index == 0:
                 logging.info("First prompt - clicking search options button")
                 search_options_button = find_element(self.ui_elements.get("search_options_button"))
@@ -195,10 +196,23 @@ class SimpleAutomationMachine:
                     log_with_screenshot("After clicking search options button", stage_name="AFTER_SEARCH_OPTIONS_CLICK")
                     # Wait a moment for any UI changes after clicking search options
                     time.sleep(1)
+                    
+                    # After clicking search options, click the extended_thought button
+                    logging.info("Clicking extended thought button")
+                    extended_thought = find_element(self.ui_elements.get("extended_thought"))
+                    if extended_thought:
+                        log_with_screenshot("Extended thought button found", stage_name="EXTENDED_THOUGHT_FOUND", region=extended_thought)
+                        click_element(extended_thought)
+                        log_with_screenshot("After clicking extended thought button", stage_name="AFTER_EXTENDED_THOUGHT_CLICK")
+                        # Wait a moment for any UI changes after clicking
+                        time.sleep(1)
+                    else:
+                        logging.warning("Extended thought button not found, continuing without it")
+                        log_with_screenshot("Extended thought button not found", stage_name="EXTENDED_THOUGHT_NOT_FOUND")
                 else:
                     logging.warning("Search options button not found, continuing without search options")
                     log_with_screenshot("Search options button not found", stage_name="SEARCH_OPTIONS_NOT_FOUND")
-            
+                        
             # Find and click the prompt box
             prompt_box = find_element(self.ui_elements["prompt_box"])
             if not prompt_box:

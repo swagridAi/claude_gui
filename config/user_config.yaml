@@ -16,9 +16,7 @@ ocr:
   engine: tesseract
   preprocess: true
 prompts:
-- Summarize the latest AI trends.
-- Explain how reinforcement learning works.
-- Write a Python function that reverses a string.
+- Identify functions or files that are overly complex or too long.
 response_timeout: 60
 retry_backoff: 1.5
 retry_delay: 2

@@ -2,9 +2,9 @@ browser_profile: C:\Temp\ClaudeProfile
 claude_url: https://claude.ai
 debug: true
 debug_settings:
-  save_screenshots: true
   log_clicks: true
   log_recognition: true
+  save_screenshots: true
   verbose_output: true
 delay_between_prompts: 3
 max_retries: 3

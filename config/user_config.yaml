@@ -24,6 +24,18 @@ retry_backoff: 1.5
 retry_delay: 2
 retry_jitter: 0.5
 ui_elements:
+  extended_thought:
+    confidence: 0.7
+    reference_paths:
+    - assets/reference_images/extended_thought/extended_thought_1746422413.png
+    - assets/reference_images/extended_thought\extended_thought_1746422413_gray.png
+    - assets/reference_images/extended_thought\extended_thought_1746422413_contrast.png
+    - assets/reference_images/extended_thought\extended_thought_1746422413_thresh.png
+    region:
+    - 280
+    - 939
+    - 621
+    - 64
   prompt_box:
     confidence: 0.9
     reference_paths:

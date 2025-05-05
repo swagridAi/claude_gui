@@ -185,6 +185,20 @@ class SimpleAutomationMachine:
         log_with_screenshot(f"Before sending prompt {self.current_prompt_index + 1}", stage_name="BEFORE_PROMPT")
         
         try:
+            # If this is the first prompt, click the search_options_button first
+            if self.current_prompt_index == 0:
+                logging.info("First prompt - clicking search options button")
+                search_options_button = find_element(self.ui_elements.get("search_options_button"))
+                if search_options_button:
+                    log_with_screenshot("Search options button found", stage_name="SEARCH_OPTIONS_FOUND", region=search_options_button)
+                    click_element(search_options_button)
+                    log_with_screenshot("After clicking search options button", stage_name="AFTER_SEARCH_OPTIONS_CLICK")
+                    # Wait a moment for any UI changes after clicking search options
+                    time.sleep(1)
+                else:
+                    logging.warning("Search options button not found, continuing without search options")
+                    log_with_screenshot("Search options button not found", stage_name="SEARCH_OPTIONS_NOT_FOUND")
+            
             # Find and click the prompt box
             prompt_box = find_element(self.ui_elements["prompt_box"])
             if not prompt_box:

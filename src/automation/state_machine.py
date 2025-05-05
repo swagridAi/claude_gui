@@ -186,7 +186,6 @@ class SimpleAutomationMachine:
         
         try:
             # If this is the first prompt, click the search_options_button first
-            # If this is the first prompt, click the search_options_button first
             if self.current_prompt_index == 0:
                 logging.info("First prompt - clicking search options button")
                 search_options_button = find_element(self.ui_elements.get("search_options_button"))
@@ -196,23 +195,10 @@ class SimpleAutomationMachine:
                     log_with_screenshot("After clicking search options button", stage_name="AFTER_SEARCH_OPTIONS_CLICK")
                     # Wait a moment for any UI changes after clicking search options
                     time.sleep(1)
-                    
-                    # After clicking search options, click the extended_thought button
-                    logging.info("Clicking extended thought button")
-                    extended_thought = find_element(self.ui_elements.get("extended_thought"))
-                    if extended_thought:
-                        log_with_screenshot("Extended thought button found", stage_name="EXTENDED_THOUGHT_FOUND", region=extended_thought)
-                        click_element(extended_thought)
-                        log_with_screenshot("After clicking extended thought button", stage_name="AFTER_EXTENDED_THOUGHT_CLICK")
-                        # Wait a moment for any UI changes after clicking
-                        time.sleep(1)
-                    else:
-                        logging.warning("Extended thought button not found, continuing without it")
-                        log_with_screenshot("Extended thought button not found", stage_name="EXTENDED_THOUGHT_NOT_FOUND")
                 else:
                     logging.warning("Search options button not found, continuing without search options")
                     log_with_screenshot("Search options button not found", stage_name="SEARCH_OPTIONS_NOT_FOUND")
-                        
+            
             # Find and click the prompt box
             prompt_box = find_element(self.ui_elements["prompt_box"])
             if not prompt_box:
@@ -240,13 +226,61 @@ class SimpleAutomationMachine:
             
             log_with_screenshot("Prompt sent", stage_name="PROMPT_SENT")
             
+            # Wait for Claude to process the prompt and for the send button to become available again
+            logging.info("Waiting for Claude to process the prompt...")
+            response_timeout = self.config.get("response_timeout", 60)
+            fixed_wait_time = 180  # 3 minutes in seconds
+            start_time = time.time()
+            send_button_found = False
+            
+            # First, wait for the send button to become available again (with timeout)
+            while time.time() - start_time < response_timeout and not send_button_found:
+                # Check if send button is available
+                send_button = find_element(self.ui_elements["send_button"])
+                if send_button:
+                    logging.info("Send button is available again. Claude has finished processing.")
+                    log_with_screenshot("Claude finished processing prompt", stage_name="PROMPT_PROCESSED")
+                    send_button_found = True
+                
+                # Wait a short time before checking again
+                time.sleep(3)
+                
+                # Log a waiting message every 15 seconds for longer responses
+                elapsed = time.time() - start_time
+                if elapsed > 15 and int(elapsed) % 15 == 0:
+                    logging.info(f"Still waiting for Claude to finish processing ({int(elapsed)} seconds so far)...")
+            
+            if not send_button_found:
+                # If we exit the loop without finding the send button, we hit the timeout
+                logging.warning(f"Timeout reached while waiting for Claude to process prompt (timeout: {response_timeout}s)")
+                log_with_screenshot("Timeout waiting for response", stage_name="RESPONSE_TIMEOUT")
+            
+            # Now ensure we wait the minimum fixed time (3 minutes)
+            elapsed_time = time.time() - start_time
+            remaining_wait = fixed_wait_time - elapsed_time
+            
+            if remaining_wait > 0:
+                logging.info(f"Send button found, but enforcing minimum 3-minute wait. Waiting {int(remaining_wait)} more seconds...")
+                # Log progress during the fixed wait time
+                wait_start = time.time()
+                while time.time() - wait_start < remaining_wait:
+                    time.sleep(min(15, remaining_wait))  # Check every 15 seconds
+                    waited_so_far = time.time() - wait_start
+                    remaining = remaining_wait - waited_so_far
+                    if remaining > 0:
+                        logging.info(f"Still waiting: {int(remaining)} seconds remaining in mandatory wait period...")
+                
+                logging.info("Completed mandatory 3-minute wait period after sending prompt")
+                log_with_screenshot("Completed 3-minute wait period", stage_name="WAIT_COMPLETED")
+            
             # Move to next prompt
             self.current_prompt_index += 1
             
-            # Wait between prompts if there are more to send
+            # Wait a short additional delay between prompts if there are more to send
             if self.current_prompt_index < len(self.prompts):
-                logging.info(f"Waiting {self.delay_between_prompts} seconds before sending next prompt...")
-                time.sleep(self.delay_between_prompts)
+                delay = min(3, self.delay_between_prompts)  # Use a shorter delay since we already waited for processing
+                logging.info(f"Waiting {delay} seconds before sending next prompt...")
+                time.sleep(delay)
         
         except Exception as e:
             logging.error(f"Error sending prompt: {e}")
@@ -255,7 +289,7 @@ class SimpleAutomationMachine:
                 self.failure_type = FailureType.UNKNOWN
             self.last_error = str(e)
             raise
-    
+
     def _handle_error(self, error):
         """Handle errors and decide whether to retry."""
         logging.error(f"Error in state {self.state}: {error}")

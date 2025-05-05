@@ -16,6 +16,8 @@ ocr:
   engine: tesseract
   preprocess: true
 prompts:
+- How can I update this so instead of looking for the thinking icon, the program doesn't
+  send another prompt unless it sees the send button again
 - Identify functions or files that are overly complex or too long.
 response_timeout: 60
 retry_backoff: 1.5
@@ -34,6 +36,22 @@ ui_elements:
     - 939
     - 621
     - 64
+  limit_reached:
+    confidence: 0.7
+    reference_paths:
+    - assets/reference_images/limit_reached/limit_reached_1746424723.png
+    - assets/reference_images/limit_reached\limit_reached_1746424723_gray.png
+    - assets/reference_images/limit_reached\limit_reached_1746424723_contrast.png
+    - assets/reference_images/limit_reached\limit_reached_1746424723_thresh.png
+    - assets/reference_images/limit_reached/limit_reached_1746424729.png
+    - assets/reference_images/limit_reached\limit_reached_1746424729_gray.png
+    - assets/reference_images/limit_reached\limit_reached_1746424729_contrast.png
+    - assets/reference_images/limit_reached\limit_reached_1746424729_thresh.png
+    region:
+    - 141
+    - 1044
+    - 1124
+    - 89
   prompt_box:
     confidence: 0.9
     reference_paths:

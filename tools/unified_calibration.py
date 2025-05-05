@@ -126,7 +126,7 @@ class UnifiedCalibrationTool:
         
         # Bind events
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
-    
+
     def setup_setup_tab(self):
         """Set up the initial setup tab."""
         # Create a paned window for the setup tab
@@ -150,9 +150,11 @@ class UnifiedCalibrationTool:
         button_frame.pack(fill=tk.X, pady=(0, 10))
         
         ttk.Button(button_frame, text="Take Screenshot", 
-                   command=self.take_screenshot).pack(side=tk.LEFT, padx=(0, 5))
+                command=self.take_screenshot).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(button_frame, text="Load Image", 
-                   command=self.load_image).pack(side=tk.LEFT)
+                command=self.load_image).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_frame, text="Load from Logs", 
+                command=self.show_log_screenshots).pack(side=tk.LEFT)
         
         # Element management
         ttk.Separator(left_frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=10)
@@ -184,9 +186,9 @@ class UnifiedCalibrationTool:
         action_frame.pack(fill=tk.X, pady=(0, 10))
         
         ttk.Button(action_frame, text="Delete Element", 
-                  command=self.delete_element).pack(side=tk.LEFT, padx=(0, 5))
+                command=self.delete_element).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(action_frame, text="Go to Define Tab", 
-                  command=lambda: self.notebook.select(1)).pack(side=tk.RIGHT)
+                command=lambda: self.notebook.select(1)).pack(side=tk.RIGHT)
         
         # Configuration actions
         ttk.Separator(left_frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=10)
@@ -195,9 +197,9 @@ class UnifiedCalibrationTool:
         config_frame.pack(fill=tk.X, pady=(0, 10))
         
         ttk.Button(config_frame, text="Load Config", 
-                  command=self.load_configuration).pack(side=tk.LEFT, padx=(0, 5))
+                command=self.load_configuration).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(config_frame, text="Save Config", 
-                  command=self.save_configuration).pack(side=tk.LEFT)
+                command=self.save_configuration).pack(side=tk.LEFT)
         
         # Canvas for screenshot display
         self.setup_canvas = tk.Canvas(right_frame, bg="gray90")
@@ -207,7 +209,319 @@ class UnifiedCalibrationTool:
         self.setup_canvas.bind("<ButtonPress-1>", self.on_mouse_down)
         self.setup_canvas.bind("<B1-Motion>", self.on_mouse_drag)
         self.setup_canvas.bind("<ButtonRelease-1>", self.on_mouse_up)
+
+
+    def scan_log_screenshots(self):
+        """Scan for screenshots in the logs directory and organize them by run and element."""
+        log_screenshots = {}
+        
+        # Find all run directories
+        run_dirs = sorted(glob.glob("logs/run_*"), reverse=True)  # Sort newest first
+        
+        for run_dir in run_dirs:
+            run_name = os.path.basename(run_dir)
+            screenshot_dir = os.path.join(run_dir, "screenshots")
+            
+            if not os.path.exists(screenshot_dir):
+                continue
+                
+            log_screenshots[run_name] = {
+                "all": [],
+                "elements": {}
+            }
+            
+            # Scan all screenshots in this run directory
+            screenshots = glob.glob(os.path.join(screenshot_dir, "*.png"))
+            log_screenshots[run_name]["all"] = screenshots
+            
+            # Categorize by UI element
+            for screenshot in screenshots:
+                filename = os.path.basename(screenshot)
+                
+                # Look for element-specific screenshots based on filename patterns
+                for element_name in self.elements.keys():
+                    if element_name.lower() in filename.lower():
+                        if element_name not in log_screenshots[run_name]["elements"]:
+                            log_screenshots[run_name]["elements"][element_name] = []
+                        log_screenshots[run_name]["elements"][element_name].append(screenshot)
+                
+                # Also check for generic patterns like SEARCH_element_START
+                match = re.search(r"(?:SEARCH|FOUND|NOT_FOUND)_(\w+)", filename)
+                if match:
+                    element_name = match.group(1)
+                    if element_name not in log_screenshots[run_name]["elements"]:
+                        log_screenshots[run_name]["elements"][element_name] = []
+                    log_screenshots[run_name]["elements"][element_name].append(screenshot)
+        
+        return log_screenshots
     
+    def show_log_screenshots(self):
+        """Show a dialog with log screenshots organized by run and element."""
+        # Scan for log screenshots
+        log_screenshots = self.scan_log_screenshots()
+        
+        if not log_screenshots:
+            messagebox.showinfo("No Screenshots", "No log screenshots found.")
+            return
+        
+        # Create dialog
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Load Screenshot from Logs")
+        dialog.geometry("800x600")
+        dialog.transient(self.root)
+        dialog.grab_set()
+        
+        # Create a paned window
+        pane = ttk.PanedWindow(dialog, orient=tk.HORIZONTAL)
+        pane.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Left panel - Run and element selection
+        left_frame = ttk.Frame(pane)
+        pane.add(left_frame, weight=1)
+        
+        # Right panel - Screenshot preview
+        right_frame = ttk.LabelFrame(pane, text="Screenshot Preview")
+        pane.add(right_frame, weight=2)
+        
+        # Run selection
+        ttk.Label(left_frame, text="Select Run:").pack(anchor="w", pady=(0, 5))
+        
+        run_frame = ttk.Frame(left_frame)
+        run_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        run_listbox = tk.Listbox(run_frame, height=5)
+        run_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        run_scrollbar = ttk.Scrollbar(run_frame, orient=tk.VERTICAL, command=run_listbox.yview)
+        run_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        run_listbox.configure(yscrollcommand=run_scrollbar.set)
+        
+        # Element selection
+        ttk.Label(left_frame, text="Select Element:").pack(anchor="w", pady=(0, 5))
+        
+        element_frame = ttk.Frame(left_frame)
+        element_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        element_listbox = tk.Listbox(element_frame, height=5)
+        element_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        element_scrollbar = ttk.Scrollbar(element_frame, orient=tk.VERTICAL, command=element_listbox.yview)
+        element_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        element_listbox.configure(yscrollcommand=element_scrollbar.set)
+        
+        # Screenshot selection
+        ttk.Label(left_frame, text="Select Screenshot:").pack(anchor="w", pady=(0, 5))
+        
+        screenshot_frame = ttk.Frame(left_frame)
+        screenshot_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        screenshot_listbox = tk.Listbox(screenshot_frame)
+        screenshot_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        screenshot_scrollbar = ttk.Scrollbar(screenshot_frame, orient=tk.VERTICAL, command=screenshot_listbox.yview)
+        screenshot_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        screenshot_listbox.configure(yscrollcommand=screenshot_scrollbar.set)
+        
+        # Preview canvas
+        preview_canvas = tk.Canvas(right_frame, bg="gray90")
+        preview_canvas.pack(fill=tk.BOTH, expand=True)
+        
+        # Store preview image reference to prevent garbage collection
+        preview_image_ref = None
+        
+        # Action buttons
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(fill=tk.X, padx=10, pady=(0, 10))
+        
+        ttk.Button(button_frame, text="Cancel", 
+                command=dialog.destroy).pack(side=tk.RIGHT, padx=(5, 0))
+        
+        load_button = ttk.Button(button_frame, text="Load Selected", 
+                                command=lambda: None)  # Will set actual command later
+        load_button.pack(side=tk.RIGHT)
+        load_button.config(state=tk.DISABLED)  # Disabled until selection made
+        
+        # Fill run listbox
+        for run_name in log_screenshots.keys():
+            run_listbox.insert(tk.END, run_name)
+        
+        # Select the first run if available
+        if run_listbox.size() > 0:
+            run_listbox.selection_set(0)
+            current_run = run_listbox.get(0)
+        else:
+            current_run = None
+        
+        # Function to update element listbox based on selected run
+        def update_element_list(*args):
+            nonlocal current_run
+            selection = run_listbox.curselection()
+            if not selection:
+                return
+            
+            current_run = run_listbox.get(selection[0])
+            
+            # Clear element listbox
+            element_listbox.delete(0, tk.END)
+            
+            # Add "All Screenshots" option
+            element_listbox.insert(tk.END, "All Screenshots")
+            
+            # Add elements with screenshots
+            for element_name in sorted(log_screenshots[current_run]["elements"].keys()):
+                element_listbox.insert(tk.END, element_name)
+            
+            # Select first element
+            if element_listbox.size() > 0:
+                element_listbox.selection_set(0)
+                update_screenshot_list()
+        
+        # Dictionary to store path mapping
+        path_mapping = {}
+        
+        # Function to update screenshot listbox based on selected element
+        def update_screenshot_list(*args):
+            nonlocal current_run, path_mapping
+            if not current_run:
+                return
+                
+            element_selection = element_listbox.curselection()
+            if not element_selection:
+                return
+            
+            selected_element = element_listbox.get(element_selection[0])
+            
+            # Clear screenshot listbox and path mapping
+            screenshot_listbox.delete(0, tk.END)
+            path_mapping.clear()
+            
+            # Add screenshots
+            screenshots = []
+            if selected_element == "All Screenshots":
+                screenshots = log_screenshots[current_run]["all"]
+            else:
+                screenshots = log_screenshots[current_run]["elements"].get(selected_element, [])
+            
+            for screenshot in screenshots:
+                # Extract just the filename for display
+                filename = os.path.basename(screenshot)
+                screenshot_listbox.insert(tk.END, filename)
+                # Store path in our mapping dictionary
+                path_mapping[filename] = screenshot
+            
+            # Clear preview
+            preview_canvas.delete("all")
+        
+        # Function to show preview of selected screenshot
+        def show_preview(*args):
+            nonlocal preview_image_ref
+            
+            selection = screenshot_listbox.curselection()
+            if not selection:
+                load_button.config(state=tk.DISABLED)
+                return
+            
+            # Get full path of selected screenshot
+            index = selection[0]
+            filename = screenshot_listbox.get(index)
+            
+            # Get the path from our mapping dictionary
+            if filename in path_mapping:
+                screenshot_path = path_mapping[filename]
+            else:
+                self.show_status(f"Path for {filename} not found")
+                return
+            
+            # Load and display image
+            try:
+                img = Image.open(screenshot_path)
+                
+                # Get canvas dimensions
+                canvas_width = preview_canvas.winfo_width()
+                canvas_height = preview_canvas.winfo_height()
+                
+                # If canvas not yet sized, use defaults
+                if canvas_width <= 1:
+                    canvas_width = 400
+                    canvas_height = 300
+                
+                # Resize the image to fit the canvas while maintaining aspect ratio
+                img_width, img_height = img.size
+                scale = min(canvas_width / img_width, canvas_height / img_height)
+                
+                new_width = int(img_width * scale)
+                new_height = int(img_height * scale)
+                
+                # Resize the image
+                resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                
+                # Convert to Tkinter PhotoImage
+                preview_image_ref = ImageTk.PhotoImage(resized)
+                
+                # Clear canvas
+                preview_canvas.delete("all")
+                
+                # Draw the image
+                preview_canvas.create_image(0, 0, anchor=tk.NW, image=preview_image_ref)
+                preview_canvas.config(scrollregion=(0, 0, new_width, new_height))
+                
+                # Enable load button
+                load_button.config(state=tk.NORMAL)
+                
+                # Update status
+                self.show_status(f"Preview of {filename}")
+                
+            except Exception as e:
+                messagebox.showerror("Preview Error", f"Error loading preview: {e}")
+                self.show_status(f"Error loading preview: {e}")
+        
+        # Function to load the selected screenshot
+        def load_selected_screenshot():
+            selection = screenshot_listbox.curselection()
+            if not selection:
+                return
+            
+            # Get full path of selected screenshot
+            index = selection[0]
+            filename = screenshot_listbox.get(index)
+            
+            # Get the path from our mapping dictionary
+            if filename in path_mapping:
+                screenshot_path = path_mapping[filename]
+            else:
+                self.show_status(f"Path for {filename} not found")
+                return
+            
+            # Load the screenshot
+            try:
+                self.screenshot = Image.open(screenshot_path)
+                
+                # Update canvases
+                current_tab = self.notebook.index("current")
+                if current_tab == 0:
+                    self.update_canvas(self.setup_canvas)
+                elif current_tab == 1:
+                    self.update_canvas(self.define_canvas)
+                
+                dialog.destroy()
+                
+                self.show_status(f"Loaded screenshot from {os.path.basename(screenshot_path)}")
+                
+            except Exception as e:
+                messagebox.showerror("Load Error", f"Error loading screenshot: {e}")
+                self.show_status(f"Error loading screenshot: {e}")
+        
+        # Set the load button command
+        load_button.config(command=load_selected_screenshot)
+        
+        # Bind events
+        run_listbox.bind("<<ListboxSelect>>", update_element_list)
+        element_listbox.bind("<<ListboxSelect>>", update_screenshot_list)
+        screenshot_listbox.bind("<<ListboxSelect>>", show_preview)
+        
+        # Initialize lists
+        update_element_list()
+
     def setup_define_tab(self):
         """Set up the element definition tab."""
         # Create a paned window

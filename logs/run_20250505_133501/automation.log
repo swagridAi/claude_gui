@@ -1,0 +1,72 @@
+2025-05-05 13:35:01,637 - INFO - Logging initialized in logs\run_20250505_133501
+2025-05-05 13:35:01,637 - INFO - Starting Claude automation
+2025-05-05 13:35:01,641 - DEBUG - Loading default configuration from config/default_config.yaml
+2025-05-05 13:35:01,660 - DEBUG - Loading user configuration from config/user_config.yaml
+2025-05-05 13:35:01,677 - INFO - Reference image manager initialized with base directory: assets\reference_images
+2025-05-05 13:35:01,685 - INFO - Reference images already preprocessed, skipping preprocessing
+2025-05-05 13:35:01,696 - DEBUG - Configuration saved to config/user_config.yaml
+2025-05-05 13:35:01,707 - INFO - Reference image manager initialized with base directory: assets\reference_images
+2025-05-05 13:35:01,708 - INFO - Entering state: INITIALIZE
+2025-05-05 13:35:01,721 - DEBUG - Attempting to capture screenshot for stage: INITIALIZE
+2025-05-05 13:35:01,827 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:02,115 - DEBUG - Screenshot saved to logs\run_20250505_133501\screenshots\INITIALIZE_screenshot_20250505_133501_720483.png
+2025-05-05 13:35:02,208 - DEBUG - Annotated screenshot saved to logs\run_20250505_133501\screenshots\INITIALIZE_annotated_20250505_133501_720483.png
+2025-05-05 13:35:02,212 - INFO - Initializing automation
+2025-05-05 13:35:02,212 - INFO - Loaded 4 UI elements
+2025-05-05 13:35:02,218 - INFO - Prepared 3 prompts to send
+2025-05-05 13:35:02,218 - INFO - Successfully completed state: BROWSER_LAUNCH
+2025-05-05 13:35:02,224 - DEBUG - Attempting to capture screenshot for stage: BROWSER_LAUNCH_COMPLETE
+2025-05-05 13:35:02,328 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:02,646 - DEBUG - Screenshot saved to logs\run_20250505_133502\screenshots\BROWSER_LAUNCH_COMPLETE_screenshot_20250505_133502_224539.png
+2025-05-05 13:35:02,884 - DEBUG - Annotated screenshot saved to logs\run_20250505_133502\screenshots\BROWSER_LAUNCH_COMPLETE_annotated_20250505_133502_224539.png
+2025-05-05 13:35:02,895 - INFO - Entering state: BROWSER_LAUNCH
+2025-05-05 13:35:02,896 - DEBUG - Attempting to capture screenshot for stage: BROWSER_LAUNCH
+2025-05-05 13:35:03,041 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:03,429 - DEBUG - Screenshot saved to logs\run_20250505_133502\screenshots\BROWSER_LAUNCH_screenshot_20250505_133502_896943.png
+2025-05-05 13:35:03,528 - DEBUG - Annotated screenshot saved to logs\run_20250505_133502\screenshots\BROWSER_LAUNCH_annotated_20250505_133502_896943.png
+2025-05-05 13:35:03,532 - INFO - Launching browser
+2025-05-05 13:35:03,534 - INFO - Launching browser: C:\Program Files\Google\Chrome\Application\chrome.exe
+2025-05-05 13:35:03,539 - INFO - Using profile: C:\Users\User\ClaudeProfile
+2025-05-05 13:35:03,539 - INFO - Navigating to: https://claude.ai
+2025-05-05 13:35:03,555 - INFO - Waiting 10 seconds for browser to initialize
+2025-05-05 13:35:18,567 - INFO - Detected Claude window at (-13, -13, 2586, 1386)
+2025-05-05 13:35:18,567 - DEBUG - Set anchor point window_top_left at (-13, -13)
+2025-05-05 13:35:18,578 - INFO - Successfully completed state: WAIT_FOR_LOGIN
+2025-05-05 13:35:18,587 - DEBUG - Attempting to capture screenshot for stage: WAIT_FOR_LOGIN_COMPLETE
+2025-05-05 13:35:18,766 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:19,447 - DEBUG - Screenshot saved to logs\run_20250505_133518\screenshots\WAIT_FOR_LOGIN_COMPLETE_screenshot_20250505_133518_586839.png
+2025-05-05 13:35:19,663 - DEBUG - Annotated screenshot saved to logs\run_20250505_133518\screenshots\WAIT_FOR_LOGIN_COMPLETE_annotated_20250505_133518_586839.png
+2025-05-05 13:35:19,669 - INFO - Entering state: WAIT_FOR_LOGIN
+2025-05-05 13:35:19,675 - DEBUG - Attempting to capture screenshot for stage: WAIT_FOR_LOGIN
+2025-05-05 13:35:19,800 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:20,582 - DEBUG - Screenshot saved to logs\run_20250505_133519\screenshots\WAIT_FOR_LOGIN_screenshot_20250505_133519_675055.png
+2025-05-05 13:35:20,781 - DEBUG - Annotated screenshot saved to logs\run_20250505_133519\screenshots\WAIT_FOR_LOGIN_annotated_20250505_133519_675055.png
+2025-05-05 13:35:20,786 - INFO - Waiting for login completion
+2025-05-05 13:35:20,787 - INFO - Successfully completed state: SEND_PROMPTS
+2025-05-05 13:35:20,791 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS_COMPLETE
+2025-05-05 13:35:20,933 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:21,588 - DEBUG - Screenshot saved to logs\run_20250505_133520\screenshots\SEND_PROMPTS_COMPLETE_screenshot_20250505_133520_791522.png
+2025-05-05 13:35:21,758 - DEBUG - Annotated screenshot saved to logs\run_20250505_133520\screenshots\SEND_PROMPTS_COMPLETE_annotated_20250505_133520_791522.png
+2025-05-05 13:35:21,763 - INFO - Entering state: SEND_PROMPTS
+2025-05-05 13:35:21,768 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS
+2025-05-05 13:35:21,883 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:22,527 - DEBUG - Screenshot saved to logs\run_20250505_133521\screenshots\SEND_PROMPTS_screenshot_20250505_133521_768314.png
+2025-05-05 13:35:22,691 - DEBUG - Annotated screenshot saved to logs\run_20250505_133521\screenshots\SEND_PROMPTS_annotated_20250505_133521_768314.png
+2025-05-05 13:35:22,695 - INFO - Sending prompt 1/3: Summarize the latest AI trends....
+2025-05-05 13:35:22,696 - INFO - Before sending prompt 1
+2025-05-05 13:35:22,700 - DEBUG - Attempting to capture screenshot for stage: BEFORE_PROMPT
+2025-05-05 13:35:22,802 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:23,377 - DEBUG - Screenshot saved to logs\run_20250505_133522\screenshots\BEFORE_PROMPT_screenshot_20250505_133522_700675.png
+2025-05-05 13:35:23,616 - DEBUG - Annotated screenshot saved to logs\run_20250505_133522\screenshots\BEFORE_PROMPT_annotated_20250505_133522_700675.png
+2025-05-05 13:35:23,622 - INFO - Searching for element: prompt_box
+2025-05-05 13:35:23,626 - DEBUG - Attempting to capture screenshot for stage: SEARCH_prompt_box_START
+2025-05-05 13:35:23,732 - DEBUG - Screenshot captured successfully
+2025-05-05 13:35:24,366 - DEBUG - Screenshot saved to logs\run_20250505_133523\screenshots\SEARCH_prompt_box_START_screenshot_20250505_133523_625701.png
+2025-05-05 13:35:24,549 - DEBUG - Annotated screenshot saved to logs\run_20250505_133523\screenshots\SEARCH_prompt_box_START_annotated_20250505_133523_625701.png
+2025-05-05 13:43:10,806 - INFO - Automation stopped by user
+2025-05-05 13:44:05,313 - INFO - Cleaning up resources
+2025-05-05 13:47:06,544 - INFO - Closing browser...
+2025-05-05 13:47:06,544 - INFO - Attempting to close browser
+2025-05-05 13:47:08,917 - INFO - Browser closed successfully
+2025-05-05 13:47:08,917 - INFO - Browser closed successfully
+2025-05-05 13:47:08,917 - INFO - Automation complete

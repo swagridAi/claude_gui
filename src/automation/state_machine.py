@@ -136,7 +136,9 @@ class SimpleAutomationMachine:
     def _handle_browser_launch(self):
         """Launch the browser and navigate to Claude."""
         logging.info("Launching browser")
-        launch_browser(self.config.get("claude_url"))
+        
+        # Fix: Pass the entire config object as the second parameter
+        launch_browser(self.config.get("claude_url"), self.config)
         
         # Wait for browser to launch and detect window position
         time.sleep(5)
@@ -150,7 +152,7 @@ class SimpleAutomationMachine:
             self.detected_window = True
         else:
             logging.warning("Could not detect Claude window position, using full screen")
-            
+                
         self.state = AutomationState.WAIT_FOR_LOGIN
     
     def _handle_wait_for_login(self):

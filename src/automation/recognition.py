@@ -178,6 +178,8 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                 )
                 
                 if location:
+                    # Create a match_info without trying to access .confidence
+                    # This is the key fix for the 'Box' object has no attribute 'confidence' error
                     match_info = {
                         'location': (
                             location.left + x_offset,
@@ -185,7 +187,7 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                             location.width,
                             location.height
                         ),
-                        'score': location.confidence,
+                        'score': min_confidence,  # Use the minimum confidence as fallback
                         'method': 'pyautogui',
                         'template': reference_path
                     }

@@ -136,7 +136,9 @@ class SimpleAutomationMachine:
     def _handle_wait_for_login(self):
         """Wait for the user to complete login."""
         logging.info("Waiting for login completion")
-        
+        # Skip any login checks and proceed directly to sending prompts
+        self.state = AutomationState.SEND_PROMPTS
+        """
         # Check if already logged in
         logged_in_element = find_element(self.ui_elements["prompt_box"])
         
@@ -146,6 +148,7 @@ class SimpleAutomationMachine:
         else:
             input("Please complete login/CAPTCHA and press Enter to continue...")
             self.state = AutomationState.SEND_PROMPTS
+        """
     
     def _handle_send_prompts(self):
         """Send all prompts in sequence."""

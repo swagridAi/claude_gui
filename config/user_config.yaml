@@ -25,7 +25,7 @@ retry_delay: 2
 retry_jitter: 0.5
 ui_elements:
   prompt_box:
-    confidence: 0.9
+    confidence: 0.3
     reference_paths:
     - assets/reference_images/prompt_box\prompt_box_1_1746403024.png
     - assets/reference_images/prompt_box\prompt_box_1_1746404009.png
@@ -61,7 +61,7 @@ ui_elements:
     - 1800
     - 607
   response_area:
-    confidence: 0.9
+    confidence: 0.7
     reference_paths:
     - assets/reference_images/response_area\response_area_1.png
     - assets/reference_images/response_area\response_area_1_1746405848.png
@@ -77,7 +77,7 @@ ui_elements:
     - 1627
     - 853
   send_button:
-    confidence: 0.9
+    confidence: 0.7
     reference_paths:
     - assets/reference_images/send_button\send_button_1_1746404204.png
     - assets/reference_images/send_button\send_button_2_1746404231.png
@@ -93,7 +93,7 @@ ui_elements:
     - 513
     - 470
   thinking_indicator:
-    confidence: 0.9
+    confidence: 0.7
     reference_paths:
     - assets/reference_images/thinking_indicator\thinking_indicator_1.png
     - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241.png

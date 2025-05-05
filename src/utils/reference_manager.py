@@ -285,13 +285,14 @@ class ReferenceImageManager:
         result = find_element(ui_element)
         return result is not None
     
-    def update_stale_references(self, ui_element, config):
+    def update_stale_references(self, ui_element, config, preserve_sessions=False):
         """
         Update stale reference images that are no longer recognized.
         
         Args:
             ui_element: UIElement object to update
             config: Configuration manager object
+            preserve_sessions: Whether to preserve sessions when saving
             
         Returns:
             True if update successful, False otherwise
@@ -333,14 +334,20 @@ class ReferenceImageManager:
                         if variant not in element_config["reference_paths"]:
                             element_config["reference_paths"].append(variant)
                     
-                    # Save config
-                    config.save()
+                    # Save config with session preservation if requested
+                    if preserve_sessions and not config.is_in_session_mode():
+                        config.enter_session_mode()
+                        config.save()
+                        config.exit_session_mode()
+                    else:
+                        # Use standard save method (respects session mode if active)
+                        config.save()
                     
                 logging.info(f"Added new reference images for {ui_element.name}")
                 return True
                 
         return False
-    
+
     def images_need_preprocessing(self, paths, preprocessing_options=None):
         """
         Check if reference images need preprocessing.
@@ -395,7 +402,9 @@ class ReferenceImageManager:
         # If we get here, all preprocessing variants exist and are recent
         return False
 
-    def ensure_preprocessing(self, ui_elements_config, config=None):
+    # Update to ensure_preprocessing method in src/utils/reference_manager.py
+
+    def ensure_preprocessing(self, ui_elements_config, config=None, preserve_sessions=False):
         """
         Ensure all reference images have been preprocessed.
         Only processes images that need it.
@@ -403,6 +412,7 @@ class ReferenceImageManager:
         Args:
             ui_elements_config: Dictionary of UI element configurations
             config: ConfigManager instance for saving updates
+            preserve_sessions: Whether to preserve sessions when saving
             
         Returns:
             True if any preprocessing was done, False otherwise
@@ -420,18 +430,26 @@ class ReferenceImageManager:
         
         # Save configuration if changes were made and config is provided
         if any_preprocessing_done and config:
-            config.save()
+            # Check if config is already in session mode or we explicitly want to preserve sessions
+            if preserve_sessions and not config.is_in_session_mode():
+                config.enter_session_mode()
+                config.save()
+                config.exit_session_mode()
+            else:
+                # Use standard save method (which will respect session mode if active)
+                config.save()
             logging.info("Saved updated configuration with preprocessed image paths")
         
         return any_preprocessing_done
 
-    def refresh_all_references(self, ui_elements, config):
+    def refresh_all_references(self, ui_elements, config, preserve_sessions=False):
         """
         Refresh all reference images for all UI elements.
         
         Args:
             ui_elements: Dictionary of UIElement objects
             config: Configuration manager object
+            preserve_sessions: Whether to preserve sessions when saving
             
         Returns:
             Dictionary of update results by element name
@@ -449,8 +467,8 @@ class ReferenceImageManager:
                 results[name] = True
                 continue
                 
-            # Try to update the element
-            updated = self.update_stale_references(element, config)
+            # Try to update the element with session preservation
+            updated = self.update_stale_references(element, config, preserve_sessions)
             results[name] = updated
             
             if updated:
@@ -459,7 +477,7 @@ class ReferenceImageManager:
                 logging.warning(f"Failed to update references for {name}")
                 
         return results
-    
+
     def cleanup_old_variants(self, max_age_days=30):
         """
         Clean up old variant images that haven't been accessed recently.

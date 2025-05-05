@@ -43,6 +43,9 @@ class ConfigManager:
         self.config_path = config_path
         self.default_config_path = default_config_path
         self.config = {}
+        self._original_config = {}  # Store original config for preservation
+        self._in_session_mode = False  # Flag to track session mode
+        self._original_sessions = None  # Store original sessions
         
         # Important: Register YAML handlers here as well to ensure they're applied
         yaml.add_representer(tuple, represent_tuple)
@@ -69,6 +72,10 @@ class ConfigManager:
                 with open(config_path, 'r') as f:
                     user_config = yaml.safe_load(f) or {}
                     self._deep_update(self.config, user_config)
+                    # Store a deep copy of the original config
+                    self._original_config = copy.deepcopy(self.config)
+                    # Store original sessions separately
+                    self._original_sessions = copy.deepcopy(self.config.get('sessions', {}))
             except Exception as e:
                 logging.error(f"Error loading user configuration: {e}")
         else:
@@ -76,9 +83,9 @@ class ConfigManager:
             os.makedirs(os.path.dirname(config_path), exist_ok=True)
             logging.info(f"User configuration not found, creating empty file at {config_path}")
             self.save()
+            # Store a deep copy of the original config
+            self._original_config = copy.deepcopy(self.config)
     
-    # [Rest of the ConfigManager class remains the same]
-
     def save(self, path=None):
         """
         Save configuration to file.
@@ -94,7 +101,11 @@ class ConfigManager:
             # Create directory if it doesn't exist
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             
-            # Save configuration
+            # If in session mode, use session-preserving save instead
+            if self._in_session_mode:
+                return self.save_preserving_sessions(save_path)
+            
+            # Standard save - the whole config
             with open(save_path, 'w') as f:
                 yaml.dump(self.config, f, default_flow_style=False)
             
@@ -102,6 +113,38 @@ class ConfigManager:
             return True
         except Exception as e:
             logging.error(f"Error saving configuration: {e}")
+            return False
+    
+    def save_preserving_sessions(self, path=None):
+        """
+        Save configuration while preserving the original sessions structure.
+        
+        Args:
+            path: Optional path to save to (defaults to config_path)
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        save_path = path or self.config_path
+        try:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            
+            # Create a new config dict with current settings
+            preserved_config = copy.deepcopy(self.config)
+            
+            # Restore the original sessions if available
+            if self._original_sessions is not None:
+                preserved_config['sessions'] = self._original_sessions
+            
+            # Save the preserved configuration
+            with open(save_path, 'w') as f:
+                yaml.dump(preserved_config, f, default_flow_style=False)
+            
+            logging.debug(f"Configuration saved with preserved sessions to {save_path}")
+            return True
+        except Exception as e:
+            logging.error(f"Error saving configuration with preserved sessions: {e}")
             return False
     
     def get(self, key, default=None):
@@ -150,31 +193,6 @@ class ConfigManager:
             # Simple key update
             self.config[key] = value
     
-    def save(self, path=None):
-        """
-        Save configuration to file.
-        
-        Args:
-            path: Optional path to save to (defaults to config_path)
-        
-        Returns:
-            True if successful, False otherwise
-        """
-        save_path = path or self.config_path
-        try:
-            # Create directory if it doesn't exist
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            
-            # Save configuration
-            with open(save_path, 'w') as f:
-                yaml.dump(self.config, f, default_flow_style=False)
-            
-            logging.debug(f"Configuration saved to {save_path}")
-            return True
-        except Exception as e:
-            logging.error(f"Error saving configuration: {e}")
-            return False
-    
     def _deep_update(self, source, update):
         """
         Deep update a nested dictionary.
@@ -220,10 +238,116 @@ class ConfigManager:
         except Exception as e:
             logging.error(f"Error resetting configuration: {e}")
             return False
-    def represent_tuple(dumper, data):
-        """Custom representer for Python tuples in YAML."""
-        return dumper.represent_sequence('tag:yaml.org,2002:seq', list(data))
-
-    def construct_tuple(loader, node):
-        """Custom constructor for Python tuples from YAML."""
-        return tuple(loader.construct_sequence(node))
+            
+    def enter_session_mode(self, session_id=None):
+        """
+        Enter session mode - changes won't affect original sessions.
+        
+        Args:
+            session_id: Optional session identifier to track
+        """
+        if not self._in_session_mode:
+            # Store original sessions if not already stored
+            if self._original_sessions is None:
+                self._original_sessions = copy.deepcopy(self.config.get('sessions', {}))
+            
+            self._in_session_mode = True
+            logging.debug(f"Entered session mode with session_id: {session_id}")
+    
+    def exit_session_mode(self):
+        """
+        Exit session mode and restore original sessions.
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        if self._in_session_mode:
+            self._in_session_mode = False
+            
+            # Optionally restore original sessions here if needed
+            logging.debug("Exited session mode")
+            return True
+        return False
+    
+    def is_in_session_mode(self):
+        """
+        Check if the configuration manager is in session mode.
+        
+        Returns:
+            True if in session mode, False otherwise
+        """
+        return self._in_session_mode
+    
+    def restore_original_config(self):
+        """
+        Restore the original configuration.
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        if self._original_config:
+            self.config = copy.deepcopy(self._original_config)
+            logging.info("Restored original configuration")
+            return True
+        else:
+            logging.warning("No original configuration to restore")
+            return False
+    
+    def get_working_copy(self):
+        """
+        Get a working copy of the configuration manager.
+        
+        Returns:
+            A new ConfigManager instance with the same settings
+        """
+        # Create a new instance with the same settings
+        working_copy = ConfigManager(self.config_path, self.default_config_path)
+        
+        # Use our current config
+        working_copy.config = copy.deepcopy(self.config)
+        
+        # Mark it as in session mode
+        working_copy._in_session_mode = True
+        working_copy._original_sessions = copy.deepcopy(self._original_sessions or self.config.get('sessions', {}))
+        
+        return working_copy
+    
+    def merge_session_config(self, session_id):
+        """
+        Merge a specific session configuration with global settings.
+        
+        Args:
+            session_id: Session identifier
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        sessions = self.get('sessions', {})
+        
+        if session_id not in sessions:
+            logging.error(f"Session '{session_id}' not found")
+            return False
+        
+        # Enter session mode
+        self.enter_session_mode(session_id)
+        
+        # Get the session configuration
+        session_config = sessions[session_id]
+        
+        # Get global config (excluding sessions)
+        global_config = self.get_all()
+        if 'sessions' in global_config:
+            del global_config['sessions']
+        
+        # Merge session config with global settings
+        # Session settings override global settings
+        merged_config = {**global_config, **session_config}
+        
+        # Update configuration with merged settings
+        # but don't replace the 'sessions' key
+        for key, value in merged_config.items():
+            if key != 'sessions':
+                self.set(key, value)
+        
+        logging.info(f"Merged configuration for session '{session_id}'")
+        return True

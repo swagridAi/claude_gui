@@ -2005,16 +2005,30 @@ class UnifiedCalibrationTool:
         
         # Check for incomplete elements
         incomplete = [name for name, config in self.elements.items() 
-                     if not config.get("region") or not config.get("reference_paths")]
+                    if not config.get("region") or not config.get("reference_paths")]
         
         if incomplete:
             if not messagebox.askyesno("Incomplete Configuration", 
-                                     f"The following elements are incomplete:\n{', '.join(incomplete)}\n\nSave anyway?"):
+                                    f"The following elements are incomplete:\n{', '.join(incomplete)}\n\nSave anyway?"):
                 return
         
-        # Save configuration
-        self.save_configuration()
-    
+        # Add option to preserve sessions
+        preserve_sessions = messagebox.askyesno("Preserve Sessions", 
+                                            "Do you want to preserve any existing session configurations?")
+        
+        if preserve_sessions:
+            # Enter session mode if not already active
+            if not self.config_manager.is_in_session_mode():
+                self.config_manager.enter_session_mode()
+                self.save_configuration()
+                self.config_manager.exit_session_mode()
+            else:
+                # Already in session mode, use preserving save
+                self.save_configuration()
+        else:
+            # Standard save without session preservation
+            self.save_configuration()
+
     def load_configuration(self):
         """Load configuration from the config manager."""
         try:
@@ -2055,17 +2069,28 @@ class UnifiedCalibrationTool:
             # Update UI elements
             config["ui_elements"] = self.elements
             
+            # Check if we're in session mode
+            in_session_mode = self.config_manager.is_in_session_mode()
+            
             # Set values in config manager
             for key, value in config.items():
                 self.config_manager.set(key, value)
             
-            # Save configuration
-            if self.config_manager.save():
-                messagebox.showinfo("Success", "Configuration saved successfully.")
-                self.show_status("Configuration saved successfully.")
+            # Save configuration with appropriate method
+            if in_session_mode:
+                if self.config_manager.save_preserving_sessions():
+                    messagebox.showinfo("Success", "Configuration saved successfully (with preserved sessions).")
+                    self.show_status("Configuration saved successfully with preserved sessions.")
+                else:
+                    messagebox.showerror("Save Error", "Failed to save configuration.")
+                    self.show_status("Failed to save configuration.")
             else:
-                messagebox.showerror("Save Error", "Failed to save configuration.")
-                self.show_status("Failed to save configuration.")
+                if self.config_manager.save():
+                    messagebox.showinfo("Success", "Configuration saved successfully.")
+                    self.show_status("Configuration saved successfully.")
+                else:
+                    messagebox.showerror("Save Error", "Failed to save configuration.")
+                    self.show_status("Failed to save configuration.")
                 
         except Exception as e:
             messagebox.showerror("Save Error", f"Error saving configuration: {e}")

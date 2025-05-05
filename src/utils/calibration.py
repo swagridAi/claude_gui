@@ -10,12 +10,13 @@ from src.models.ui_element import UIElement
 from src.automation.recognition import find_element
 from src.utils.logging_util import log_with_screenshot
 
-def run_calibration(config):
+def run_calibration(config, preserve_sessions=False):
     """
     Auto-calibrate UI elements for Claude automation.
     
     Args:
         config: Configuration manager object
+        preserve_sessions: Whether to preserve sessions when saving
         
     Returns:
         bool: True if calibration successful, False otherwise
@@ -150,7 +151,7 @@ def run_calibration(config):
             
             calibrated_elements["thinking_indicator"] = {
                 "reference_paths": thinking_references,
-                "region": (tx - 50, ty - 50, tw + 100, th + 100),  # Fixed typo here
+                "region": (tx - 50, ty - 50, tw + 100, th + 100),
                 "confidence": 0.6
             }
         else:
@@ -168,6 +169,16 @@ def run_calibration(config):
         
         # Update config with calibrated elements
         config.set("ui_elements", calibrated_elements)
+        
+        # Save with session preservation if requested
+        if preserve_sessions and not config.is_in_session_mode():
+            config.enter_session_mode()
+            config.save()
+            config.exit_session_mode()
+        else:
+            # Use standard save method (respects session mode if active)
+            config.save()
+            
         logging.info("Calibration complete and configuration updated")
         show_calibration_results(calibrated_elements)
         
@@ -177,7 +188,8 @@ def run_calibration(config):
         if prompt_references:
             logging.info("Attempting to capture new reference images...")
             capture_reference_images(config)
-            return run_calibration(config)  # Try again with new references
+            # Use recursive call with preserve_sessions flag
+            return run_calibration(config, preserve_sessions)
         
         return False
 
@@ -344,36 +356,37 @@ def verify_calibration(config):
     
     return verification_passed
 
-def interactive_calibration(config):
-    """
-    Interactive calibration mode with user guidance.
-    
-    Args:
-        config: Configuration manager object
+    def interactive_calibration(config, preserve_sessions=False):
+        """
+        Interactive calibration mode with user guidance.
         
-    Returns:
-        bool: True if calibration successful, False otherwise
-    """
-    print("\n===== Claude GUI Automation - Interactive Calibration =====\n")
-    print("This wizard will help you calibrate the automation for Claude's interface.")
-    print("Please make sure Claude is open in your browser before continuing.\n")
-    
-    input("Press Enter to start calibration...")
-    
-    # First, capture reference images
-    capture_reference_images(config)
-    
-    # Run the main calibration
-    success = run_calibration(config)
-    
-    if success:
-        print("\nCalibration successful!")
-        print("The automation is now configured for your screen layout.")
-    else:
-        print("\nCalibration failed.")
-        print("Please check the logs for more information.")
-    
-    return success
+        Args:
+            config: Configuration manager object
+            preserve_sessions: Whether to preserve sessions when saving
+            
+        Returns:
+            bool: True if calibration successful, False otherwise
+        """
+        print("\n===== Claude GUI Automation - Interactive Calibration =====\n")
+        print("This wizard will help you calibrate the automation for Claude's interface.")
+        print("Please make sure Claude is open in your browser before continuing.\n")
+        
+        input("Press Enter to start calibration...")
+        
+        # First, capture reference images
+        capture_reference_images(config)
+        
+        # Run the main calibration with session preservation
+        success = run_calibration(config, preserve_sessions)
+        
+        if success:
+            print("\nCalibration successful!")
+            print("The automation is now configured for your screen layout.")
+        else:
+            print("\nCalibration failed.")
+            print("Please check the logs for more information.")
+        
+        return success
 
 # Additional helper functions
 def get_element_screenshot(element_name, config):

@@ -1023,34 +1023,81 @@ class UnifiedCalibrationTool:
         """Scan for debug images in the logs directory."""
         self.debug_images = {}
         
-        # Scan all run directories
+        # Find all run directories first
         run_dirs = glob.glob("logs/run_*")
+        
+        if not run_dirs:
+            self.show_status("No run directories found in logs folder")
+            return
+            
+        self.show_status(f"Found {len(run_dirs)} run directories")
+        
+        # Process each run directory
         for run_dir in run_dirs:
-            screenshots_dir = os.path.join(run_dir, "screenshots")
-            if not os.path.exists(screenshots_dir):
+            screenshot_dir = os.path.join(run_dir, "screenshots")
+            if not os.path.exists(screenshot_dir):
                 continue
                 
-            # Scan for recognition debug images
-            for image_path in glob.glob(os.path.join(screenshots_dir, "*matches*.png")):
+            # Scan all screenshots in this run directory
+            for image_path in glob.glob(os.path.join(screenshot_dir, "*.png")):
                 filename = os.path.basename(image_path)
-                # Extract element name from relevant part of filename
-                match = re.search(r"FOUND_(\w+)|(\w+)_matches", filename)
-                if match:
-                    element_name = match.group(1) or match.group(2)
-                    if element_name not in self.debug_images:
-                        self.debug_images[element_name] = {"recognition": [], "click": []}
-                    self.debug_images[element_name]["recognition"].append(image_path)
+                
+                # Try to categorize screenshot based on filename patterns
+                if "SEARCH_" in filename or "FOUND_" in filename:
+                    # Recognition-related screenshot
+                    # Extract element name from patterns like SEARCH_element_name_START or FOUND_element_name
+                    match = re.search(r"(?:SEARCH|FOUND)_(\w+)", filename)
+                    if match:
+                        element_name = match.group(1)
+                        if element_name not in self.debug_images:
+                            self.debug_images[element_name] = {"recognition": [], "click": []}
+                        self.debug_images[element_name]["recognition"].append(image_path)
+                
+                elif "AFTER_CLICKING" in filename or "click" in filename.lower():
+                    # Click-related screenshot
+                    match = re.search(r"(?:click|CLICK)_(\w+)", filename)
+                    if match:
+                        element_name = match.group(1)
+                        if element_name not in self.debug_images:
+                            self.debug_images[element_name] = {"recognition": [], "click": []}
+                        self.debug_images[element_name]["click"].append(image_path)
+                
+                # Also look for screenshots related to specific elements
+                for element_name in self.elements.keys():
+                    if element_name.lower() in filename.lower():
+                        if element_name not in self.debug_images:
+                            self.debug_images[element_name] = {"recognition": [], "click": []}
+                        # Categorize as recognition or click based on filename
+                        if "click" in filename.lower():
+                            self.debug_images[element_name]["click"].append(image_path)
+                        else:
+                            self.debug_images[element_name]["recognition"].append(image_path)
+        
+        # Update debug listbox
+        self.debug_listbox.delete(0, tk.END)
+        
+        # Add entries for each element
+        for element_name in sorted(self.debug_images.keys()):
+            rec_count = len(self.debug_images[element_name]["recognition"])
+            click_count = len(self.debug_images[element_name]["click"])
             
-            # Scan for click debug images
-            for image_path in glob.glob(os.path.join(screenshots_dir, "*click*.png")):
-                filename = os.path.basename(image_path)
-                # Extract element name
-                match = re.search(r"click_(\w+)", filename)
-                if match:
-                    element_name = match.group(1)
-                    if element_name not in self.debug_images:
-                        self.debug_images[element_name] = {"recognition": [], "click": []}
-                    self.debug_images[element_name]["click"].append(image_path)
+            self.debug_listbox.insert(tk.END, f"{element_name} (R:{rec_count}, C:{click_count})")
+            
+            # Add individual debug images with indent
+            for i, path in enumerate(self.debug_images[element_name]["recognition"]):
+                filename = os.path.basename(path)
+                self.debug_listbox.insert(tk.END, f"  - R{i+1}: {filename}")
+                
+            for i, path in enumerate(self.debug_images[element_name]["click"]):
+                filename = os.path.basename(path)
+                self.debug_listbox.insert(tk.END, f"  - C{i+1}: {filename}")
+        
+        # Show status
+        element_count = len(self.debug_images)
+        if element_count > 0:
+            self.show_status(f"Found debug images for {element_count} UI elements")
+        else:
+            self.show_status("No debug images found matching UI elements")
     
     def on_debug_image_select(self, event):
         """Handle selection of a debug image from the listbox."""
@@ -1064,13 +1111,26 @@ class UnifiedCalibrationTool:
         # Check if it's an element or an image entry
         if selected_entry.startswith("  - "):
             # It's an image entry
-            parts = selected_entry.strip().split(":", 1)
+            parts = selected_entry.strip()[4:].split(":", 1)  # Skip the "  - " prefix
             if len(parts) != 2:
                 return
                 
-            image_ref = parts[0].strip()[3:]  # Get R1, C1, etc.
+            image_ref = parts[0].strip()  # This should be something like "R1" or "C1"
+            if not image_ref or len(image_ref) < 2:
+                self.show_status(f"Invalid image reference: {image_ref}")
+                return
+                
             image_type = image_ref[0]  # R or C
-            image_index = int(image_ref[1:]) - 1  # 0-based index
+            try:
+                # Make sure there's actually a number after the R or C
+                if len(image_ref) < 2 or not image_ref[1:].isdigit():
+                    self.show_status(f"Invalid image index format: {image_ref}")
+                    return
+                    
+                image_index = int(image_ref[1:]) - 1  # Convert to 0-based index
+            except ValueError:
+                self.show_status(f"Invalid image index: {image_ref[1:]}")
+                return
             
             # Find the parent element entry
             parent_index = selection[0] - 1
@@ -1081,17 +1141,20 @@ class UnifiedCalibrationTool:
                 parent_index -= 1
             
             if parent_index < 0:
+                self.show_status("Could not find parent element for this image")
                 return
                 
             # Extract element name from parent entry
             parent_parts = parent_entry.split(" ", 1)
             if len(parent_parts) != 2:
+                self.show_status("Invalid parent element format")
                 return
                 
             element_name = parent_parts[0]
             
             # Get the image path
             if element_name not in self.debug_images:
+                self.show_status(f"No debug images found for {element_name}")
                 return
                 
             if image_type == "R" and image_index < len(self.debug_images[element_name]["recognition"]):
@@ -1100,6 +1163,11 @@ class UnifiedCalibrationTool:
             elif image_type == "C" and image_index < len(self.debug_images[element_name]["click"]):
                 image_path = self.debug_images[element_name]["click"][image_index]
                 self.display_debug_image(image_path, "click")
+            else:
+                self.show_status(f"Image index out of range: {image_ref}")
+        else:
+            # It's an element entry - just show status
+            self.show_status(f"Selected element: {selected_entry}")
     
     def display_debug_image(self, image_path, image_type):
         """Display a debug image on the analyze canvas."""

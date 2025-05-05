@@ -15,10 +15,27 @@ ocr:
   denoise: true
   engine: tesseract
   preprocess: true
-prompts:
-- How can I update this so instead of looking for the thinking icon, the program doesn't
-  send another prompt unless it sees the send button again
-- Identify functions or files that are overly complex or too long.
+# Define multiple sessions with their own prompts and URLs
+sessions:
+  session1:
+    name: "Research Questions"
+    url: "https://claude.ai/project/019699e5-0fdf-75f1-9190-3b4cc593bc9e"
+    prompts:
+      - "Analyze the following repository (or files) and identify: - Areas of code duplication (e.g., repeated blocks, similar functions, redundant modules) - Opportunities to refactor into shared functions, utilities, base classes, or config files - Ways to make the codebase more DRY (Don't Repeat Yourself) without overcomplicating maintainability."
+      - "Evaluate whether the entire code repository is functional, integrated properly, and free from major issues. Return a structured report."
+      - "Identify functions or files that are overly complex or too long.
+  
+  session2:
+    name: "Code Tasks"
+    url: "https://claude.ai/project/019699e5-0fdf-75f1-9190-3b4cc593bc9e"
+    prompts:
+      - "Create a README.md based on the structure and purpose of this repo."
+      - "could this readme.md be improved?"
+
+
+# Shared settings applied to all sessions
+delay_between_prompts: 3
+max_retries: 3
 response_timeout: 60
 retry_backoff: 1.5
 retry_delay: 2

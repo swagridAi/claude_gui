@@ -1,5 +1,5 @@
 browser_profile: C:\Temp\ClaudeProfile
-claude_url: https://claude.ai
+claude_url: https://claude.ai/project/019699e5-0fdf-75f1-9190-3b4cc593bc9e
 debug: true
 debug_settings:
   log_clicks: true
@@ -56,10 +56,10 @@ ui_elements:
     - assets/reference_images/prompt_box\prompt_box_7_1746404094_contrast.png
     - assets/reference_images/prompt_box\prompt_box_7_1746404094_thresh.png
     region:
-    - 546
-    - 689
-    - 1557
-    - 664
+    - 146
+    - 521
+    - 1958
+    - 827
   response_area:
     confidence: 0.8
     reference_paths:
@@ -76,6 +76,18 @@ ui_elements:
     - 269
     - 1627
     - 853
+  search_options_button:
+    confidence: 0.7
+    reference_paths:
+    - assets/reference_images/search_options_button/search_options_button_1746421759.png
+    - assets/reference_images/search_options_button\search_options_button_1746421759_gray.png
+    - assets/reference_images/search_options_button\search_options_button_1746421759_contrast.png
+    - assets/reference_images/search_options_button\search_options_button_1746421759_thresh.png
+    region:
+    - 258
+    - 711
+    - 92
+    - 86
   send_button:
     confidence: 0.8
     reference_paths:
@@ -88,10 +100,10 @@ ui_elements:
     - assets/reference_images/send_button\send_button_2_1746404231_contrast.png
     - assets/reference_images/send_button\send_button_2_1746404231_thresh.png
     region:
-    - 1857
-    - 829
-    - 246
-    - 522
+    - 1416
+    - 636
+    - 684
+    - 706
   thinking_indicator:
     confidence: 0.8
     reference_paths:

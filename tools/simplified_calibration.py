@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Simplified UI Calibration Tool for Claude Automation
+Enhanced UI Calibration Tool for Claude Automation
 
 This tool provides a visual interface to:
 1. Capture a screenshot of the Claude interface
 2. Highlight/select regions to identify UI elements
-3. Capture multiple reference images for each element
+3. Capture reference images directly from the main interface
 """
 
 import os
@@ -42,7 +42,7 @@ class SimplifiedCalibrationTool:
         self.elements = {}  # Dictionary to store element regions
         self.selection_start = None
         self.selection_box = None
-        self.capture_mode = False
+        self.capture_mode = False  # Track if we're in region define mode or reference capture mode
         self.reference_count = {}  # Count of reference images per element
         
         # Set up the UI
@@ -50,6 +50,9 @@ class SimplifiedCalibrationTool:
         
         # Ensure directories exist
         self.setup_directories()
+        
+        # Load existing configuration if available
+        self.load_configuration()
     
     def setup_directories(self):
         """Create necessary directories for assets."""
@@ -95,7 +98,25 @@ class SimplifiedCalibrationTool:
         action_frame.pack(fill=tk.X, pady=(0, 10))
         
         ttk.Button(action_frame, text="Delete Element", command=self.delete_element).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(action_frame, text="Capture References", command=self.start_reference_capture).pack(side=tk.RIGHT)
+        
+        # Mode toggle button - will switch between "Define Region" and "Capture References"
+        self.mode_button_var = tk.StringVar(value="Capture References")
+        self.mode_button = ttk.Button(
+            action_frame, 
+            textvariable=self.mode_button_var,
+            command=self.toggle_capture_mode
+        )
+        self.mode_button.pack(side=tk.RIGHT)
+        
+        # Capture button (only visible in reference capture mode)
+        self.capture_button = ttk.Button(
+            control_frame,
+            text="Capture Selected Area as Reference",
+            command=self.capture_current_selection,
+            state=tk.DISABLED  # Initially disabled
+        )
+        self.capture_button.pack(fill=tk.X, pady=5)
+        self.capture_button.pack_forget()  # Hide initially
         
         # Separator
         ttk.Separator(control_frame, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=10)
@@ -130,6 +151,15 @@ class SimplifiedCalibrationTool:
         self.canvas.bind("<ButtonPress-1>", self.on_mouse_down)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
         self.canvas.bind("<ButtonRelease-1>", self.on_mouse_up)
+        
+        # Mode indicator
+        self.mode_indicator = ttk.Label(
+            self.root, 
+            text="Mode: Define Regions", 
+            font=("Arial", 10, "bold"),
+            background="#f0f0f0"
+        )
+        self.mode_indicator.pack(fill=tk.X, before=main_pane, pady=5)
         
         # Status bar
         self.status_var = tk.StringVar(value="Ready")
@@ -216,6 +246,9 @@ class SimplifiedCalibrationTool:
         
         # Draw each element's region
         for name, region in self.elements.items():
+            if region is None:
+                continue
+                
             # Determine color (green for selected, blue for others)
             color = "green" if name == self.current_element else "blue"
             
@@ -328,11 +361,37 @@ class SimplifiedCalibrationTool:
         
         self.status_var.set("Element deleted.")
     
-    def on_mouse_down(self, event):
-        """Handle mouse button press."""
-        if not self.current_element or not self.screenshot or self.capture_mode:
+    def toggle_capture_mode(self):
+        """Toggle between region definition and reference capture modes."""
+        if not self.current_element:
+            messagebox.showwarning("No Selection", "Please select an element first.")
             return
         
+        # Toggle capture mode
+        self.capture_mode = not self.capture_mode
+        
+        if self.capture_mode:
+            # Entering reference capture mode
+            self.mode_button_var.set("Switch to Define Region Mode")
+            self.mode_indicator.config(text="Mode: Capture References", background="#ffedad")
+            self.capture_button.pack(fill=tk.X, pady=5)  # Show capture button
+            self.status_var.set(f"Reference capture mode active for '{self.current_element}'. Select area to capture.")
+        else:
+            # Exiting reference capture mode, back to region definition
+            self.mode_button_var.set("Switch to Capture References")
+            self.mode_indicator.config(text="Mode: Define Regions", background="#f0f0f0")
+            self.capture_button.pack_forget()  # Hide capture button
+            self.status_var.set("Region definition mode active. Select areas to define element regions.")
+    
+    def on_mouse_down(self, event):
+        """Handle mouse button press."""
+        if not self.screenshot:
+            return
+            
+        if not self.current_element:
+            messagebox.showwarning("No Selection", "Please select an element first.")
+            return
+            
         self.selection_start = (event.x, event.y)
         
         # Clear previous selection box
@@ -342,7 +401,7 @@ class SimplifiedCalibrationTool:
     
     def on_mouse_drag(self, event):
         """Handle mouse drag."""
-        if not self.current_element or not self.selection_start or self.capture_mode:
+        if not self.selection_start:
             return
         
         # Clear previous selection box
@@ -353,17 +412,22 @@ class SimplifiedCalibrationTool:
         self.selection_box = self.canvas.create_rectangle(
             self.selection_start[0], self.selection_start[1],
             event.x, event.y,
-            outline="red", width=2
+            outline="red" if self.capture_mode else "blue", 
+            width=2
         )
         
         # Update status with dimensions
         width = abs(event.x - self.selection_start[0])
         height = abs(event.y - self.selection_start[1])
-        self.status_var.set(f"Selection: {width}x{height} pixels")
+        
+        if self.capture_mode:
+            self.status_var.set(f"Selection for reference capture: {width}x{height} pixels")
+        else:
+            self.status_var.set(f"Element region selection: {width}x{height} pixels")
     
     def on_mouse_up(self, event):
         """Handle mouse button release."""
-        if not self.current_element or not self.selection_start or self.capture_mode:
+        if not self.current_element or not self.selection_start:
             return
         
         # Calculate selection rectangle
@@ -382,104 +446,122 @@ class SimplifiedCalibrationTool:
         orig_width = int((right - left) / self.scale)
         orig_height = int((bottom - top) / self.scale)
         
-        # Save region
-        self.elements[self.current_element] = (orig_left, orig_top, orig_width, orig_height)
+        # Selection region in original image coordinates
+        selection_region = (orig_left, orig_top, orig_width, orig_height)
         
-        # Update info text
-        self.info_var.set(f"Element: {self.current_element}\nRegion: x={orig_left}, y={orig_top}, w={orig_width}, h={orig_height}\nReferences: {self.reference_count.get(self.current_element, 0)}")
+        if self.capture_mode:
+            # In capture mode, capture the selected region as a reference image
+            self.capture_reference_image(selection_region)
+        else:
+            # In region definition mode, save the region for the element
+            self.elements[self.current_element] = selection_region
+            
+            # Update info text
+            self.info_var.set(f"Element: {self.current_element}\nRegion: x={orig_left}, y={orig_top}, w={orig_width}, h={orig_height}\nReferences: {self.reference_count.get(self.current_element, 0)}")
+            
+            self.status_var.set(f"Region defined for {self.current_element}.")
+            
+            # Redraw regions
+            self.draw_regions()
         
-        self.status_var.set(f"Region defined for {self.current_element}.")
-        
-        # Redraw regions
-        self.draw_regions()
+        # Reset selection
+        self.selection_start = None
     
-    def start_reference_capture(self):
-        """Start capturing reference images for the selected element."""
+    def capture_reference_image(self, region=None):
+        """Capture a reference image from the current screenshot."""
         if not self.current_element:
             messagebox.showwarning("No Selection", "Please select an element first.")
             return
-        
-        if self.elements[self.current_element] is None:
-            messagebox.showwarning("No Region", "Please define a region for this element first.")
-            return
-        
-        # Toggle capture mode
-        self.capture_mode = True
-        
-        # Hide the main window
-        self.root.iconify()
-        
-        # Show instructions
-        instructions = tk.Toplevel(self.root)
-        instructions.title("Capture Instructions")
-        instructions.geometry("400x200")
-        
-        ttk.Label(instructions, text=f"Capturing references for '{self.current_element}'", font=("Arial", 12, "bold")).pack(pady=10)
-        ttk.Label(instructions, text="1. Position the UI element in different states").pack(anchor="w", padx=20)
-        ttk.Label(instructions, text="2. Press 'c' to capture a reference image").pack(anchor="w", padx=20)
-        ttk.Label(instructions, text="3. Press 'Esc' when done capturing").pack(anchor="w", padx=20)
-        
-        ttk.Button(instructions, text="Start Capturing", command=lambda: self.capture_references(instructions)).pack(pady=20)
-    
-    def capture_references(self, instructions_window):
-        """Capture multiple reference images of an element."""
-        instructions_window.destroy()
-        time.sleep(0.5)  # Give time for window to close
-        
-        region = self.elements[self.current_element]
-        
-        # Create a small overlay window to show status
-        overlay = tk.Toplevel(self.root)
-        overlay.title("Capturing References")
-        overlay.attributes("-topmost", True)
-        overlay.geometry("300x100+50+50")
-        overlay.resizable(False, False)
-        
-        status_label = ttk.Label(overlay, text=f"Capturing for: {self.current_element}\nPress 'c' to capture, 'Esc' to finish")
-        status_label.pack(padx=10, pady=10)
-        
-        count_label = ttk.Label(overlay, text=f"Captured: {self.reference_count.get(self.current_element, 0)}")
-        count_label.pack(padx=10, pady=5)
-        
-        # Setup key listener
-        def on_key_press(event):
-            if event.keysym.lower() == 'c':
-                # Take screenshot of region
-                try:
-                    # Get current count
-                    count = self.reference_count.get(self.current_element, 0)
-                    
-                    # Capture screenshot of region
-                    x, y, w, h = region
-                    screenshot = pyautogui.screenshot(region=region)
-                    
-                    # Save as reference image
-                    timestamp = int(time.time())
-                    filename = f"assets/reference_images/{self.current_element}/{self.current_element}_{count+1}_{timestamp}.png"
-                    screenshot.save(filename)
-                    
-                    # Increment count
-                    self.reference_count[self.current_element] = count + 1
-                    count_label.config(text=f"Captured: {count+1}")
-                    
-                    # Flash overlay to indicate capture
-                    overlay.configure(background="green")
-                    overlay.after(200, lambda: overlay.configure(background=overlay.cget("background")))
-                    
-                except Exception as e:
-                    messagebox.showerror("Capture Error", f"Error capturing reference: {e}")
             
-            elif event.keysym.lower() == 'escape':
-                # End capture mode
-                overlay.destroy()
-                self.capture_mode = False
-                self.root.deiconify()
-                self.update_reference_preview(self.current_element)
-                self.info_var.set(f"Element: {self.current_element}\nRegion: x={region[0]}, y={region[1]}, w={region[2]}, h={region[3]}\nReferences: {self.reference_count.get(self.current_element, 0)}")
+        if not self.screenshot:
+            messagebox.showwarning("No Screenshot", "Please take a screenshot first.")
+            return
+            
+        if not region:
+            if self.selection_box:
+                # Use current selection if available
+                coords = self.canvas.coords(self.selection_box)
+                x1, y1, x2, y2 = coords
+                
+                # Convert to original image coordinates
+                left = min(x1, x2)
+                top = min(y1, y2)
+                width = abs(x2 - x1)
+                height = abs(y2 - y1)
+                
+                orig_left = int(left / self.scale)
+                orig_top = int(top / self.scale)
+                orig_width = int(width / self.scale)
+                orig_height = int(height / self.scale)
+                
+                region = (orig_left, orig_top, orig_width, orig_height)
+            else:
+                messagebox.showwarning("No Selection", "Please select a region to capture.")
+                return
         
-        # Bind key events
-        overlay.bind("<Key>", on_key_press)
-        overlay.focus_set()
+        try:
+            # Get current count
+            count = self.reference_count.get(self.current_element, 0)
+            
+            # Create directory if it doesn't exist
+            reference_dir = f"assets/reference_images/{self.current_element}"
+            os.makedirs(reference_dir, exist_ok=True)
+            
+            # Extract region from screenshot
+            x, y, w, h = region
+            cropped = self.screenshot.crop((x, y, x + w, y + h))
+            
+            # Save as reference image
+            timestamp = int(time.time())
+            filename = f"{reference_dir}/{self.current_element}_{count+1}_{timestamp}.png"
+            cropped.save(filename)
+            
+            # Increment count
+            self.reference_count[self.current_element] = count + 1
+            
+            # Update info text
+            element_region = self.elements[self.current_element]
+            if element_region:
+                rx, ry, rw, rh = element_region
+                self.info_var.set(f"Element: {self.current_element}\nRegion: x={rx}, y={ry}, w={rw}, h={rh}\nReferences: {self.reference_count.get(self.current_element, 0)}")
+            
+            # Update reference image preview
+            self.update_reference_preview(self.current_element)
+            
+            self.status_var.set(f"Captured reference image #{count+1} for {self.current_element}")
+            
+            # Flash the mode indicator to show success
+            orig_bg = self.mode_indicator.cget("background")
+            self.mode_indicator.config(background="green")
+            self.root.after(200, lambda: self.mode_indicator.config(background=orig_bg))
+            
+        except Exception as e:
+            messagebox.showerror("Capture Error", f"Error capturing reference: {e}")
+    
+    def capture_current_selection(self):
+        """Capture the current selection as a reference image."""
+        if self.selection_box:
+            # Get the coordinates of the current selection box
+            coords = self.canvas.coords(self.selection_box)
+            x1, y1, x2, y2 = coords
+            
+            # Convert to original image coordinates
+            left = min(x1, x2)
+            top = min(y1, y2)
+            width = abs(x2 - x1)
+            height = abs(y2 - y1)
+            
+            orig_left = int(left / self.scale)
+            orig_top = int(top / self.scale)
+            orig_width = int(width / self.scale)
+            orig_height = int(height / self.scale)
+            
+            region = (orig_left, orig_top, orig_width, orig_height)
+            
+            # Capture the reference image
+            self.capture_reference_image(region)
+        else:
+            messagebox.showwarning("No Selection", "Please select a region to capture.")
     
     def update_reference_preview(self, element_name):
         """Update the reference image preview panel."""
@@ -490,9 +572,12 @@ class SimplifiedCalibrationTool:
         # Get reference images for this element
         reference_dir = f"assets/reference_images/{element_name}"
         if not os.path.exists(reference_dir):
-            return
+            os.makedirs(reference_dir, exist_ok=True)
         
         reference_files = sorted([f for f in os.listdir(reference_dir) if f.endswith(('.png', '.jpg', '.jpeg'))])
+        
+        # Update reference count for this element
+        self.reference_count[element_name] = len(reference_files)
         
         if not reference_files:
             ttk.Label(self.reference_frame, text="No reference images").pack(pady=10)
@@ -616,6 +701,13 @@ class SimplifiedCalibrationTool:
             # Save to YAML file
             import yaml
             
+            # Define custom YAML handler for tuples
+            def represent_tuple(dumper, data):
+                return dumper.represent_sequence('tag:yaml.org,2002:seq', list(data))
+                
+            # Register the representer
+            yaml.add_representer(tuple, represent_tuple)
+            
             with open("config/user_config.yaml", "w") as f:
                 yaml.dump(config, f, default_flow_style=False)
             
@@ -624,6 +716,58 @@ class SimplifiedCalibrationTool:
             
         except Exception as e:
             messagebox.showerror("Save Error", f"Error saving configuration: {e}")
+            
+    def load_configuration(self):
+        """Load configuration from file."""
+        config_file = "config/user_config.yaml"
+        
+        if not os.path.exists(config_file):
+            self.status_var.set("No existing configuration found. Starting with empty configuration.")
+            return
+            
+        try:
+            import yaml
+            
+            # Add custom YAML constructor for Python tuples
+            def construct_tuple(loader, node):
+                return tuple(loader.construct_sequence(node))
+            
+            # Register the constructor
+            yaml.add_constructor('tag:yaml.org,2002:python/tuple', construct_tuple)
+            
+            with open(config_file, 'r') as f:
+                config = yaml.safe_load(f)
+                
+            if not config or 'ui_elements' not in config:
+                self.status_var.set("Invalid configuration file. Starting with empty configuration.")
+                return
+                
+            # Load UI elements
+            for name, element_config in config['ui_elements'].items():
+                # Add element to our dictionary
+                self.elements[name] = element_config.get('region')
+                
+                # Add to listbox
+                self.element_listbox.insert(tk.END, name)
+                
+                # Count reference images
+                reference_paths = element_config.get('reference_paths', [])
+                self.reference_count[name] = len(reference_paths)
+                
+                # Create directory for reference images if it doesn't exist
+                os.makedirs(f"assets/reference_images/{name}", exist_ok=True)
+            
+            # Select the first element if any exist
+            if self.elements:
+                self.element_listbox.selection_set(0)
+                self.current_element = self.element_listbox.get(0)
+                self.on_element_select(None)  # Update UI for selected element
+                
+            self.status_var.set(f"Loaded configuration with {len(self.elements)} elements")
+            
+        except Exception as e:
+            messagebox.showerror("Load Error", f"Error loading configuration: {e}")
+            self.status_var.set("Failed to load configuration. Starting with empty configuration.")
 
 
 def main():

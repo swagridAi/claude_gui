@@ -8,9 +8,11 @@ prompts:
 ui_elements:
   prompt_region:
     confidence: 0.7
-    reference_paths: []
+    reference_paths:
+    - assets/reference_images/prompt_region\prompt_region_1_1746403024.png
+    - assets/reference_images/prompt_region\prompt_region_2_1746403033.png
     region: !!python/tuple
-    - 536
-    - 722
-    - 1615
-    - 634
+    - 817
+    - 679
+    - 1597
+    - 680

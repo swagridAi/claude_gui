@@ -6,26 +6,26 @@ prompts:
 - Explain how reinforcement learning works.
 - Write a Python function that reverses a string.
 ui_elements:
-  prompt_region:
+  prompt_box:
     confidence: 0.7
     reference_paths:
-    - assets/reference_images/prompt_region\prompt_region_1_1746403024.png
-    - assets/reference_images/prompt_region\prompt_region_1_1746404009.png
-    - assets/reference_images/prompt_region\prompt_region_2_1746403033.png
-    - assets/reference_images/prompt_region\prompt_region_4_1746404014.png
-    - assets/reference_images/prompt_region\prompt_region_5_1746404084.png
-    - assets/reference_images/prompt_region\prompt_region_6_1746404088.png
-    - assets/reference_images/prompt_region\prompt_region_7_1746404094.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746403024.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746404009.png
+    - assets/reference_images/prompt_box\prompt_box_2_1746403033.png
+    - assets/reference_images/prompt_box\prompt_box_4_1746404014.png
+    - assets/reference_images/prompt_box\prompt_box_5_1746404084.png
+    - assets/reference_images/prompt_box\prompt_box_6_1746404088.png
+    - assets/reference_images/prompt_box\prompt_box_7_1746404094.png
     region:
     - 635
     - 745
     - 1800
     - 607
-  send_button_region:
+  send_button:
     confidence: 0.7
     reference_paths:
-    - assets/reference_images/send_button_region\send_button_region_1_1746404204.png
-    - assets/reference_images/send_button_region\send_button_region_2_1746404231.png
+    - assets/reference_images/send_button\send_button_1_1746404204.png
+    - assets/reference_images/send_button\send_button_2_1746404231.png
     region:
     - 1910
     - 867

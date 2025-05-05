@@ -8,6 +8,8 @@ This tool provides a visual interface to:
 3. Capture reference images directly from the main interface
 """
 
+#TODO: Have functionality which loads in defined names that the program is likely to read
+
 import os
 import sys
 import time

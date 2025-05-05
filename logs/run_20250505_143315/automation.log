@@ -1,0 +1,754 @@
+2025-05-05 14:33:15,632 - INFO - Logging initialized in logs\run_20250505_143315
+2025-05-05 14:33:15,632 - INFO - Starting Claude automation
+2025-05-05 14:33:15,648 - DEBUG - Loading default configuration from config/default_config.yaml
+2025-05-05 14:33:15,648 - DEBUG - Loading user configuration from config/user_config.yaml
+2025-05-05 14:33:15,663 - INFO - Reference image manager initialized with base directory: assets\reference_images
+2025-05-05 14:33:15,663 - INFO - Reference images already preprocessed, skipping preprocessing
+2025-05-05 14:33:15,679 - DEBUG - Configuration saved to config/user_config.yaml
+2025-05-05 14:33:15,695 - INFO - Reference image manager initialized with base directory: assets\reference_images
+2025-05-05 14:33:15,702 - INFO - Entering state: INITIALIZE
+2025-05-05 14:33:15,704 - DEBUG - Attempting to capture screenshot for stage: INITIALIZE
+2025-05-05 14:33:15,793 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:16,059 - DEBUG - Screenshot saved to logs\run_20250505_143315\screenshots\INITIALIZE_screenshot_20250505_143315_704846.png
+2025-05-05 14:33:16,184 - DEBUG - Annotated screenshot saved to logs\run_20250505_143315\screenshots\INITIALIZE_annotated_20250505_143315_704846.png
+2025-05-05 14:33:16,184 - INFO - Initializing automation
+2025-05-05 14:33:16,184 - INFO - Loaded 4 UI elements
+2025-05-05 14:33:16,184 - INFO - Prepared 3 prompts to send
+2025-05-05 14:33:16,184 - INFO - Successfully completed state: BROWSER_LAUNCH
+2025-05-05 14:33:16,199 - DEBUG - Attempting to capture screenshot for stage: BROWSER_LAUNCH_COMPLETE
+2025-05-05 14:33:16,289 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:16,514 - DEBUG - Screenshot saved to logs\run_20250505_143316\screenshots\BROWSER_LAUNCH_COMPLETE_screenshot_20250505_143316_184118.png
+2025-05-05 14:33:16,592 - DEBUG - Annotated screenshot saved to logs\run_20250505_143316\screenshots\BROWSER_LAUNCH_COMPLETE_annotated_20250505_143316_184118.png
+2025-05-05 14:33:16,592 - INFO - Entering state: BROWSER_LAUNCH
+2025-05-05 14:33:16,592 - DEBUG - Attempting to capture screenshot for stage: BROWSER_LAUNCH
+2025-05-05 14:33:16,670 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:16,917 - DEBUG - Screenshot saved to logs\run_20250505_143316\screenshots\BROWSER_LAUNCH_screenshot_20250505_143316_592305.png
+2025-05-05 14:33:16,997 - DEBUG - Annotated screenshot saved to logs\run_20250505_143316\screenshots\BROWSER_LAUNCH_annotated_20250505_143316_592305.png
+2025-05-05 14:33:17,013 - INFO - Launching browser
+2025-05-05 14:33:17,017 - INFO - Launching browser: C:\Program Files\Google\Chrome\Application\chrome.exe
+2025-05-05 14:33:17,017 - INFO - Using profile: C:\Users\User\ClaudeProfile
+2025-05-05 14:33:17,017 - INFO - Navigating to: https://claude.ai
+2025-05-05 14:33:17,017 - INFO - Waiting 10 seconds for browser to initialize
+2025-05-05 14:33:32,046 - INFO - Detected Claude window at (-13, -13, 2586, 1386)
+2025-05-05 14:33:32,046 - DEBUG - Set anchor point window_top_left at (-13, -13)
+2025-05-05 14:33:32,049 - INFO - Successfully completed state: WAIT_FOR_LOGIN
+2025-05-05 14:33:32,055 - DEBUG - Attempting to capture screenshot for stage: WAIT_FOR_LOGIN_COMPLETE
+2025-05-05 14:33:32,166 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:32,397 - DEBUG - Screenshot saved to logs\run_20250505_143332\screenshots\WAIT_FOR_LOGIN_COMPLETE_screenshot_20250505_143332_055258.png
+2025-05-05 14:33:32,507 - DEBUG - Annotated screenshot saved to logs\run_20250505_143332\screenshots\WAIT_FOR_LOGIN_COMPLETE_annotated_20250505_143332_055258.png
+2025-05-05 14:33:32,514 - INFO - Entering state: WAIT_FOR_LOGIN
+2025-05-05 14:33:32,515 - DEBUG - Attempting to capture screenshot for stage: WAIT_FOR_LOGIN
+2025-05-05 14:33:32,601 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:32,854 - DEBUG - Screenshot saved to logs\run_20250505_143332\screenshots\WAIT_FOR_LOGIN_screenshot_20250505_143332_515995.png
+2025-05-05 14:33:32,961 - DEBUG - Annotated screenshot saved to logs\run_20250505_143332\screenshots\WAIT_FOR_LOGIN_annotated_20250505_143332_515995.png
+2025-05-05 14:33:32,965 - INFO - Waiting for login completion
+2025-05-05 14:33:32,966 - INFO - Successfully completed state: SEND_PROMPTS
+2025-05-05 14:33:32,967 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS_COMPLETE
+2025-05-05 14:33:33,070 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:33,357 - DEBUG - Screenshot saved to logs\run_20250505_143332\screenshots\SEND_PROMPTS_COMPLETE_screenshot_20250505_143332_967956.png
+2025-05-05 14:33:33,470 - DEBUG - Annotated screenshot saved to logs\run_20250505_143332\screenshots\SEND_PROMPTS_COMPLETE_annotated_20250505_143332_967956.png
+2025-05-05 14:33:33,477 - INFO - Entering state: SEND_PROMPTS
+2025-05-05 14:33:33,483 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS
+2025-05-05 14:33:33,577 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:33,807 - DEBUG - Screenshot saved to logs\run_20250505_143333\screenshots\SEND_PROMPTS_screenshot_20250505_143333_483511.png
+2025-05-05 14:33:33,900 - DEBUG - Annotated screenshot saved to logs\run_20250505_143333\screenshots\SEND_PROMPTS_annotated_20250505_143333_483511.png
+2025-05-05 14:33:33,904 - INFO - Sending prompt 1/3: Summarize the latest AI trends....
+2025-05-05 14:33:33,905 - INFO - Before sending prompt 1
+2025-05-05 14:33:33,908 - DEBUG - Attempting to capture screenshot for stage: BEFORE_PROMPT
+2025-05-05 14:33:33,995 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:34,224 - DEBUG - Screenshot saved to logs\run_20250505_143333\screenshots\BEFORE_PROMPT_screenshot_20250505_143333_908675.png
+2025-05-05 14:33:34,307 - DEBUG - Annotated screenshot saved to logs\run_20250505_143333\screenshots\BEFORE_PROMPT_annotated_20250505_143333_908675.png
+2025-05-05 14:33:34,313 - INFO - Memory usage at start: 75.17 MB
+2025-05-05 14:33:34,314 - INFO - Searching for element: prompt_box
+2025-05-05 14:33:34,317 - DEBUG - Attempting to capture screenshot for stage: SEARCH_prompt_box_START
+2025-05-05 14:33:34,394 - DEBUG - Screenshot captured successfully
+2025-05-05 14:33:34,576 - DEBUG - Screenshot saved to logs\run_20250505_143334\screenshots\SEARCH_prompt_box_START_screenshot_20250505_143334_317576.png
+2025-05-05 14:33:34,709 - DEBUG - Annotated screenshot saved to logs\run_20250505_143334\screenshots\SEARCH_prompt_box_START_annotated_20250505_143334_317576.png
+2025-05-05 14:33:34,720 - INFO - Search parameters for prompt_box: confidence=0.9, min_confidence=0.7
+2025-05-05 14:33:34,720 - INFO - Search region: [621, 645, 1804, 702]
+2025-05-05 14:33:34,722 - INFO - Starting search for prompt_box with 28 reference images
+2025-05-05 14:33:34,723 - WARNING - Too many reference images for prompt_box, using only first 10 for performance
+2025-05-05 14:33:34,724 - INFO - Taking screenshot of region [621, 645, 1804, 702]
+2025-05-05 14:33:34,836 - INFO - Screenshot taken in 0.11 seconds
+2025-05-05 14:33:34,861 - INFO - Screenshot conversion completed in 0.02 seconds
+2025-05-05 14:33:34,865 - INFO - Screenshot dimensions: 1804x702 pixels
+2025-05-05 14:33:34,889 - INFO - Processing reference image 1/10: prompt_box_1_1746403024.png
+2025-05-05 14:33:34,897 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:33:34,908 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:33:35,038 - DEBUG - PyAutoGUI locate found no matches in 0.13 seconds
+2025-05-05 14:33:35,038 - DEBUG - Trying CV2 method 5
+2025-05-05 14:33:35,140 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:33:35,140 - DEBUG - Trying CV2 method 3
+2025-05-05 14:33:35,270 - DEBUG - Method 3 found 202048 potential matches in 0.13 seconds
+2025-05-05 14:33:36,744 - DEBUG - Trying CV2 method 1
+2025-05-05 14:33:36,829 - DEBUG - Method 1 found 202048 potential matches in 0.09 seconds
+2025-05-05 14:33:37,758 - INFO - Finished processing reference 1/10 in 2.87 seconds
+2025-05-05 14:33:37,759 - INFO - Processing reference image 2/10: prompt_box_1_1746404009.png
+2025-05-05 14:33:37,767 - INFO - Reference image dimensions: 671x138 pixels
+2025-05-05 14:33:37,773 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:33:37,888 - DEBUG - PyAutoGUI locate found no matches in 0.11 seconds
+2025-05-05 14:33:37,888 - DEBUG - Trying CV2 method 5
+2025-05-05 14:33:38,008 - DEBUG - Method 5 found 0 potential matches in 0.12 seconds
+2025-05-05 14:33:38,008 - DEBUG - Trying CV2 method 3
+2025-05-05 14:33:38,169 - DEBUG - Method 3 found 640710 potential matches in 0.16 seconds
+2025-05-05 14:33:40,821 - DEBUG - Trying CV2 method 1
+2025-05-05 14:33:40,925 - DEBUG - Method 1 found 640710 potential matches in 0.10 seconds
+2025-05-05 14:33:43,651 - INFO - Finished processing reference 2/10 in 5.89 seconds
+2025-05-05 14:33:43,651 - INFO - Processing reference image 3/10: prompt_box_2_1746403033.png
+2025-05-05 14:33:43,655 - INFO - Reference image dimensions: 350x77 pixels
+2025-05-05 14:33:43,659 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:33:43,745 - INFO - PyAutoGUI found match in 0.09 seconds
+2025-05-05 14:33:43,745 - DEBUG - Added match: {'location': (1131, 707, 350, 77), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_2_1746403033.png'}
+2025-05-05 14:33:43,748 - DEBUG - Trying CV2 method 5
+2025-05-05 14:33:43,834 - DEBUG - Method 5 found 644 potential matches in 0.09 seconds
+2025-05-05 14:33:43,840 - DEBUG - Trying CV2 method 3
+2025-05-05 14:33:43,917 - DEBUG - Method 3 found 910830 potential matches in 0.08 seconds
+2025-05-05 14:33:47,959 - DEBUG - Trying CV2 method 1
+2025-05-05 14:33:48,052 - DEBUG - Method 1 found 910830 potential matches in 0.09 seconds
+2025-05-05 14:33:52,486 - INFO - Finished processing reference 3/10 in 8.83 seconds
+2025-05-05 14:33:52,486 - INFO - Progress: 3/10 references processed in 18.17 seconds
+2025-05-05 14:33:52,489 - INFO - Current memory usage: 1639.93 MB
+2025-05-05 14:33:52,494 - INFO - Processing reference image 4/10: prompt_box_4_1746404014.png
+2025-05-05 14:33:52,495 - INFO - Reference image dimensions: 423x103 pixels
+2025-05-05 14:33:52,495 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:33:52,581 - INFO - PyAutoGUI found match in 0.09 seconds
+2025-05-05 14:33:52,581 - DEBUG - Added match: {'location': (621, 645, 423, 103), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_4_1746404014.png'}
+2025-05-05 14:33:52,584 - DEBUG - Trying CV2 method 5
+2025-05-05 14:33:52,667 - DEBUG - Method 5 found 829200 potential matches in 0.08 seconds
+2025-05-05 14:33:56,678 - DEBUG - Trying CV2 method 3
+2025-05-05 14:33:56,756 - DEBUG - Method 3 found 829200 potential matches in 0.08 seconds
+2025-05-05 14:34:01,041 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:01,139 - DEBUG - Method 1 found 829200 potential matches in 0.10 seconds
+2025-05-05 14:34:05,764 - INFO - Finished processing reference 4/10 in 13.27 seconds
+2025-05-05 14:34:05,764 - INFO - Processing reference image 5/10: prompt_box_5_1746404084.png
+2025-05-05 14:34:05,771 - INFO - Reference image dimensions: 479x118 pixels
+2025-05-05 14:34:05,774 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:34:05,920 - DEBUG - PyAutoGUI locate found no matches in 0.15 seconds
+2025-05-05 14:34:05,921 - DEBUG - Trying CV2 method 5
+2025-05-05 14:34:06,024 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:34:06,024 - DEBUG - Trying CV2 method 3
+2025-05-05 14:34:06,115 - DEBUG - Method 3 found 775710 potential matches in 0.09 seconds
+2025-05-05 14:34:10,304 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:10,401 - DEBUG - Method 1 found 775710 potential matches in 0.10 seconds
+2025-05-05 14:34:15,214 - INFO - Finished processing reference 5/10 in 9.45 seconds
+2025-05-05 14:34:15,215 - INFO - Processing reference image 6/10: prompt_box_6_1746404088.png
+2025-05-05 14:34:15,224 - INFO - Reference image dimensions: 645x101 pixels
+2025-05-05 14:34:15,230 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:34:15,355 - INFO - PyAutoGUI found match in 0.13 seconds
+2025-05-05 14:34:15,356 - DEBUG - Added match: {'location': (1132, 717, 645, 101), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_6_1746404088.png'}
+2025-05-05 14:34:15,364 - DEBUG - Trying CV2 method 5
+2025-05-05 14:34:15,487 - DEBUG - Method 5 found 644 potential matches in 0.12 seconds
+2025-05-05 14:34:15,496 - DEBUG - Trying CV2 method 3
+2025-05-05 14:34:15,615 - DEBUG - Method 3 found 698320 potential matches in 0.12 seconds
+2025-05-05 14:34:20,452 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:20,537 - DEBUG - Method 1 found 698320 potential matches in 0.08 seconds
+2025-05-05 14:34:24,825 - INFO - Finished processing reference 6/10 in 9.61 seconds
+2025-05-05 14:34:24,825 - INFO - Progress: 6/10 references processed in 50.51 seconds
+2025-05-05 14:34:24,825 - INFO - Current memory usage: 3551.24 MB
+2025-05-05 14:34:24,825 - INFO - Processing reference image 7/10: prompt_box_7_1746404094.png
+2025-05-05 14:34:24,848 - INFO - Reference image dimensions: 1680x134 pixels
+2025-05-05 14:34:24,852 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:34:24,953 - DEBUG - PyAutoGUI locate found no matches in 0.10 seconds
+2025-05-05 14:34:24,953 - DEBUG - Trying CV2 method 5
+2025-05-05 14:34:25,036 - DEBUG - Method 5 found 0 potential matches in 0.08 seconds
+2025-05-05 14:34:25,037 - DEBUG - Trying CV2 method 3
+2025-05-05 14:34:25,106 - DEBUG - Method 3 found 71125 potential matches in 0.07 seconds
+2025-05-05 14:34:25,473 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:25,564 - DEBUG - Method 1 found 71125 potential matches in 0.09 seconds
+2025-05-05 14:34:26,070 - INFO - Finished processing reference 7/10 in 1.24 seconds
+2025-05-05 14:34:26,070 - INFO - Processing reference image 8/10: prompt_box_1_1746403024_gray.png
+2025-05-05 14:34:26,080 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:34:26,084 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:34:26,202 - DEBUG - PyAutoGUI locate found no matches in 0.12 seconds
+2025-05-05 14:34:26,203 - DEBUG - Trying CV2 method 5
+2025-05-05 14:34:26,318 - DEBUG - Method 5 found 0 potential matches in 0.11 seconds
+2025-05-05 14:34:26,318 - DEBUG - Trying CV2 method 3
+2025-05-05 14:34:26,412 - DEBUG - Method 3 found 202048 potential matches in 0.09 seconds
+2025-05-05 14:34:27,664 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:27,749 - DEBUG - Method 1 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:34:29,174 - INFO - Finished processing reference 8/10 in 3.10 seconds
+2025-05-05 14:34:29,175 - INFO - Processing reference image 9/10: prompt_box_1_1746403024_contrast.png
+2025-05-05 14:34:29,184 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:34:29,188 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:34:29,297 - DEBUG - PyAutoGUI locate found no matches in 0.11 seconds
+2025-05-05 14:34:29,298 - DEBUG - Trying CV2 method 5
+2025-05-05 14:34:29,391 - DEBUG - Method 5 found 0 potential matches in 0.09 seconds
+2025-05-05 14:34:29,391 - DEBUG - Trying CV2 method 3
+2025-05-05 14:34:29,471 - DEBUG - Method 3 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:34:31,012 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:31,094 - DEBUG - Method 1 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:34:32,380 - INFO - Finished processing reference 9/10 in 3.21 seconds
+2025-05-05 14:34:32,381 - INFO - Progress: 9/10 references processed in 58.07 seconds
+2025-05-05 14:34:32,383 - INFO - Current memory usage: 3764.11 MB
+2025-05-05 14:34:32,387 - INFO - Processing reference image 10/10: prompt_box_1_1746403024_thresh.png
+2025-05-05 14:34:32,395 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:34:32,401 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:34:32,508 - DEBUG - PyAutoGUI locate found no matches in 0.11 seconds
+2025-05-05 14:34:32,508 - DEBUG - Trying CV2 method 5
+2025-05-05 14:34:32,602 - DEBUG - Method 5 found 0 potential matches in 0.09 seconds
+2025-05-05 14:34:32,602 - DEBUG - Trying CV2 method 3
+2025-05-05 14:34:32,682 - DEBUG - Method 3 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:34:34,040 - DEBUG - Trying CV2 method 1
+2025-05-05 14:34:34,123 - DEBUG - Method 1 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:34:35,782 - INFO - Finished processing reference 10/10 in 3.40 seconds
+2025-05-05 14:34:35,782 - INFO - Final memory usage: 3827.72 MB
+2025-05-05 14:34:35,785 - INFO - Total search time for prompt_box: 61.47 seconds
+2025-05-05 14:34:47,892 - DEBUG - Found 10298665 potential matches for prompt_box
+2025-05-05 14:34:47,898 - DEBUG - Match #1: score=1.00, method=cv2.3, location=(1540, 730, 423, 103)
+2025-05-05 14:34:47,899 - DEBUG - Match #2: score=1.00, method=cv2.3, location=(1284, 771, 423, 103)
+2025-05-05 14:34:47,901 - DEBUG - Match #3: score=1.00, method=cv2.3, location=(1506, 771, 423, 103)
+2025-05-05 14:34:47,902 - DEBUG - Match #4: score=1.00, method=cv2.3, location=(1388, 784, 423, 103)
+2025-05-05 14:34:47,902 - DEBUG - Match #5: score=1.00, method=cv2.3, location=(1446, 787, 423, 103)
+2025-05-05 14:34:48,128 - DEBUG - Saved matches debug image to logs/recognition_debug/prompt_box_matches_1746419688.png
+2025-05-05 14:34:48,129 - INFO - Best match for prompt_box: score=1.00, method=cv2.3, location=(1540, 730, 423, 103)
+2025-05-05 14:34:48,132 - INFO - Found prompt_box with score 1.00
+2025-05-05 14:34:48,141 - DEBUG - Attempting to capture screenshot for stage: FOUND_prompt_box
+2025-05-05 14:34:48,245 - DEBUG - Screenshot captured successfully
+2025-05-05 14:34:48,264 - DEBUG - Screenshot saved to logs\run_20250505_143448\screenshots\FOUND_prompt_box_screenshot_20250505_143448_141247.png
+2025-05-05 14:34:48,269 - DEBUG - Annotated screenshot saved to logs\run_20250505_143448\screenshots\FOUND_prompt_box_annotated_20250505_143448_141247.png
+2025-05-05 14:34:55,273 - INFO - Prompt box found
+2025-05-05 14:34:55,274 - DEBUG - Attempting to capture screenshot for stage: PROMPT_BOX_FOUND
+2025-05-05 14:34:55,370 - DEBUG - Screenshot captured successfully
+2025-05-05 14:34:55,378 - DEBUG - Screenshot saved to logs\run_20250505_143455\screenshots\PROMPT_BOX_FOUND_screenshot_20250505_143455_274778.png
+2025-05-05 14:34:55,382 - DEBUG - Annotated screenshot saved to logs\run_20250505_143455\screenshots\PROMPT_BOX_FOUND_annotated_20250505_143455_274778.png
+2025-05-05 14:34:55,577 - INFO - Click debug image saved to logs/click_debug\click_unknown_20250505_143455_522421.png
+2025-05-05 14:34:55,577 - INFO - Clicking unknown at position (1751, 781), original location: (1540, 730, 423, 103)
+2025-05-05 14:34:57,159 - DEBUG - Clicked at (1751, 781)
+2025-05-05 14:34:57,159 - INFO - After clicking prompt box
+2025-05-05 14:34:57,159 - DEBUG - Attempting to capture screenshot for stage: AFTER_PROMPT_BOX_CLICK
+2025-05-05 14:34:57,262 - DEBUG - Screenshot captured successfully
+2025-05-05 14:34:57,438 - DEBUG - Screenshot saved to logs\run_20250505_143457\screenshots\AFTER_PROMPT_BOX_CLICK_screenshot_20250505_143457_159174.png
+2025-05-05 14:34:57,523 - DEBUG - Annotated screenshot saved to logs\run_20250505_143457\screenshots\AFTER_PROMPT_BOX_CLICK_annotated_20250505_143457_159174.png
+2025-05-05 14:35:14,387 - DEBUG - Typed text: Summarize ...
+2025-05-05 14:35:14,387 - INFO - After typing prompt
+2025-05-05 14:35:14,396 - DEBUG - Attempting to capture screenshot for stage: AFTER_TYPE_PROMPT
+2025-05-05 14:35:14,473 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:14,629 - DEBUG - Screenshot saved to logs\run_20250505_143514\screenshots\AFTER_TYPE_PROMPT_screenshot_20250505_143514_396123.png
+2025-05-05 14:35:14,705 - DEBUG - Annotated screenshot saved to logs\run_20250505_143514\screenshots\AFTER_TYPE_PROMPT_annotated_20250505_143514_396123.png
+2025-05-05 14:35:14,709 - INFO - Memory usage at start: 79.27 MB
+2025-05-05 14:35:14,710 - INFO - Searching for element: send_button
+2025-05-05 14:35:14,716 - DEBUG - Attempting to capture screenshot for stage: SEARCH_send_button_START
+2025-05-05 14:35:14,799 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:14,951 - DEBUG - Screenshot saved to logs\run_20250505_143514\screenshots\SEARCH_send_button_START_screenshot_20250505_143514_716682.png
+2025-05-05 14:35:15,038 - DEBUG - Annotated screenshot saved to logs\run_20250505_143514\screenshots\SEARCH_send_button_START_annotated_20250505_143514_716682.png
+2025-05-05 14:35:15,043 - INFO - Search parameters for send_button: confidence=0.8, min_confidence=0.6000000000000001
+2025-05-05 14:35:15,044 - INFO - Search region: [1859, 833, 557, 510]
+2025-05-05 14:35:15,048 - INFO - Starting search for send_button with 8 reference images
+2025-05-05 14:35:15,048 - INFO - Taking screenshot of region [1859, 833, 557, 510]
+2025-05-05 14:35:15,133 - INFO - Screenshot taken in 0.08 seconds
+2025-05-05 14:35:15,146 - INFO - Screenshot conversion completed in 0.01 seconds
+2025-05-05 14:35:15,146 - INFO - Screenshot dimensions: 557x510 pixels
+2025-05-05 14:35:15,158 - INFO - Processing reference image 1/8: send_button_1_1746404204.png
+2025-05-05 14:35:15,159 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204.png
+2025-05-05 14:35:15,162 - INFO - Processing reference image 2/8: send_button_2_1746404231.png
+2025-05-05 14:35:15,164 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231.png
+2025-05-05 14:35:15,164 - INFO - Processing reference image 3/8: send_button_1_1746404204_gray.png
+2025-05-05 14:35:15,165 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_gray.png
+2025-05-05 14:35:15,166 - INFO - Progress: 3/8 references processed in 0.46 seconds
+2025-05-05 14:35:15,166 - INFO - Current memory usage: 81.38 MB
+2025-05-05 14:35:15,167 - INFO - Processing reference image 4/8: send_button_1_1746404204_contrast.png
+2025-05-05 14:35:15,168 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_contrast.png
+2025-05-05 14:35:15,168 - INFO - Processing reference image 5/8: send_button_1_1746404204_thresh.png
+2025-05-05 14:35:15,169 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_thresh.png
+2025-05-05 14:35:15,170 - INFO - Processing reference image 6/8: send_button_2_1746404231_gray.png
+2025-05-05 14:35:15,170 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_gray.png
+2025-05-05 14:35:15,178 - INFO - Progress: 6/8 references processed in 0.47 seconds
+2025-05-05 14:35:15,178 - INFO - Current memory usage: 81.38 MB
+2025-05-05 14:35:15,185 - INFO - Processing reference image 7/8: send_button_2_1746404231_contrast.png
+2025-05-05 14:35:15,185 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_contrast.png
+2025-05-05 14:35:15,186 - INFO - Processing reference image 8/8: send_button_2_1746404231_thresh.png
+2025-05-05 14:35:15,191 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_thresh.png
+2025-05-05 14:35:15,197 - INFO - Final memory usage: 81.38 MB
+2025-05-05 14:35:15,198 - INFO - Total search time for send_button: 0.49 seconds
+2025-05-05 14:35:15,199 - WARNING - Element send_button not found
+2025-05-05 14:35:15,202 - DEBUG - Attempting to capture screenshot for stage: NOT_FOUND_send_button
+2025-05-05 14:35:15,288 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:15,442 - DEBUG - Screenshot saved to logs\run_20250505_143515\screenshots\NOT_FOUND_send_button_screenshot_20250505_143515_202853.png
+2025-05-05 14:35:15,527 - DEBUG - Annotated screenshot saved to logs\run_20250505_143515\screenshots\NOT_FOUND_send_button_annotated_20250505_143515_202853.png
+2025-05-05 14:35:15,532 - WARNING - No matches found for send_button after 0.49 seconds
+2025-05-05 14:35:15,534 - INFO - Send button not found, using Enter key
+2025-05-05 14:35:15,540 - DEBUG - Attempting to capture screenshot for stage: SEND_BUTTON_NOT_FOUND
+2025-05-05 14:35:15,630 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:15,794 - DEBUG - Screenshot saved to logs\run_20250505_143515\screenshots\SEND_BUTTON_NOT_FOUND_screenshot_20250505_143515_540771.png
+2025-05-05 14:35:15,869 - DEBUG - Annotated screenshot saved to logs\run_20250505_143515\screenshots\SEND_BUTTON_NOT_FOUND_annotated_20250505_143515_540771.png
+2025-05-05 14:35:16,377 - INFO - Prompt sent
+2025-05-05 14:35:16,377 - DEBUG - Attempting to capture screenshot for stage: PROMPT_SENT
+2025-05-05 14:35:16,523 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:16,952 - DEBUG - Screenshot saved to logs\run_20250505_143516\screenshots\PROMPT_SENT_screenshot_20250505_143516_377202.png
+2025-05-05 14:35:17,116 - DEBUG - Annotated screenshot saved to logs\run_20250505_143516\screenshots\PROMPT_SENT_annotated_20250505_143516_377202.png
+2025-05-05 14:35:17,130 - INFO - Waiting 3 seconds before sending next prompt...
+2025-05-05 14:35:20,132 - INFO - Successfully completed state: SEND_PROMPTS
+2025-05-05 14:35:20,140 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS_COMPLETE
+2025-05-05 14:35:20,233 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:20,461 - DEBUG - Screenshot saved to logs\run_20250505_143520\screenshots\SEND_PROMPTS_COMPLETE_screenshot_20250505_143520_139834.png
+2025-05-05 14:35:20,567 - DEBUG - Annotated screenshot saved to logs\run_20250505_143520\screenshots\SEND_PROMPTS_COMPLETE_annotated_20250505_143520_139834.png
+2025-05-05 14:35:20,577 - INFO - Entering state: SEND_PROMPTS
+2025-05-05 14:35:20,578 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS
+2025-05-05 14:35:20,672 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:20,881 - DEBUG - Screenshot saved to logs\run_20250505_143520\screenshots\SEND_PROMPTS_screenshot_20250505_143520_578659.png
+2025-05-05 14:35:20,964 - DEBUG - Annotated screenshot saved to logs\run_20250505_143520\screenshots\SEND_PROMPTS_annotated_20250505_143520_578659.png
+2025-05-05 14:35:20,970 - INFO - Sending prompt 2/3: Explain how reinforcement learning works....
+2025-05-05 14:35:20,973 - INFO - Before sending prompt 2
+2025-05-05 14:35:20,974 - DEBUG - Attempting to capture screenshot for stage: BEFORE_PROMPT
+2025-05-05 14:35:21,056 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:21,348 - DEBUG - Screenshot saved to logs\run_20250505_143520\screenshots\BEFORE_PROMPT_screenshot_20250505_143520_974091.png
+2025-05-05 14:35:21,524 - DEBUG - Annotated screenshot saved to logs\run_20250505_143520\screenshots\BEFORE_PROMPT_annotated_20250505_143520_974091.png
+2025-05-05 14:35:21,543 - INFO - Memory usage at start: 78.70 MB
+2025-05-05 14:35:21,549 - INFO - Searching for element: prompt_box
+2025-05-05 14:35:21,562 - DEBUG - Attempting to capture screenshot for stage: SEARCH_prompt_box_START
+2025-05-05 14:35:21,669 - DEBUG - Screenshot captured successfully
+2025-05-05 14:35:22,041 - DEBUG - Screenshot saved to logs\run_20250505_143521\screenshots\SEARCH_prompt_box_START_screenshot_20250505_143521_561153.png
+2025-05-05 14:35:22,240 - DEBUG - Annotated screenshot saved to logs\run_20250505_143521\screenshots\SEARCH_prompt_box_START_annotated_20250505_143521_561153.png
+2025-05-05 14:35:22,250 - INFO - Search parameters for prompt_box: confidence=0.9, min_confidence=0.7
+2025-05-05 14:35:22,251 - INFO - Search region: [621, 645, 1804, 702]
+2025-05-05 14:35:22,251 - INFO - Starting search for prompt_box with 28 reference images
+2025-05-05 14:35:22,252 - WARNING - Too many reference images for prompt_box, using only first 10 for performance
+2025-05-05 14:35:22,253 - INFO - Taking screenshot of region [621, 645, 1804, 702]
+2025-05-05 14:35:22,369 - INFO - Screenshot taken in 0.12 seconds
+2025-05-05 14:35:22,397 - INFO - Screenshot conversion completed in 0.02 seconds
+2025-05-05 14:35:22,397 - INFO - Screenshot dimensions: 1804x702 pixels
+2025-05-05 14:35:22,428 - INFO - Processing reference image 1/10: prompt_box_1_1746403024.png
+2025-05-05 14:35:22,433 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:35:22,463 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:35:22,603 - DEBUG - PyAutoGUI locate found no matches in 0.14 seconds
+2025-05-05 14:35:22,608 - DEBUG - Trying CV2 method 5
+2025-05-05 14:35:22,744 - DEBUG - Method 5 found 0 potential matches in 0.14 seconds
+2025-05-05 14:35:22,744 - DEBUG - Trying CV2 method 3
+2025-05-05 14:35:22,844 - DEBUG - Method 3 found 202048 potential matches in 0.10 seconds
+2025-05-05 14:35:24,212 - DEBUG - Trying CV2 method 1
+2025-05-05 14:35:24,310 - DEBUG - Method 1 found 202048 potential matches in 0.10 seconds
+2025-05-05 14:35:25,511 - INFO - Finished processing reference 1/10 in 3.08 seconds
+2025-05-05 14:35:25,512 - INFO - Processing reference image 2/10: prompt_box_1_1746404009.png
+2025-05-05 14:35:25,521 - INFO - Reference image dimensions: 671x138 pixels
+2025-05-05 14:35:25,528 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:35:25,652 - DEBUG - PyAutoGUI locate found no matches in 0.12 seconds
+2025-05-05 14:35:25,653 - DEBUG - Trying CV2 method 5
+2025-05-05 14:35:25,776 - DEBUG - Method 5 found 0 potential matches in 0.12 seconds
+2025-05-05 14:35:25,777 - DEBUG - Trying CV2 method 3
+2025-05-05 14:35:25,891 - DEBUG - Method 3 found 640710 potential matches in 0.11 seconds
+2025-05-05 14:35:28,790 - DEBUG - Trying CV2 method 1
+2025-05-05 14:35:28,912 - DEBUG - Method 1 found 640710 potential matches in 0.12 seconds
+2025-05-05 14:35:32,131 - INFO - Finished processing reference 2/10 in 6.62 seconds
+2025-05-05 14:35:32,132 - INFO - Processing reference image 3/10: prompt_box_2_1746403033.png
+2025-05-05 14:35:32,139 - INFO - Reference image dimensions: 350x77 pixels
+2025-05-05 14:35:32,143 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:35:32,247 - INFO - PyAutoGUI found match in 0.10 seconds
+2025-05-05 14:35:32,247 - DEBUG - Added match: {'location': (817, 1131, 350, 77), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_2_1746403033.png'}
+2025-05-05 14:35:32,251 - DEBUG - Trying CV2 method 5
+2025-05-05 14:35:32,350 - DEBUG - Method 5 found 993 potential matches in 0.10 seconds
+2025-05-05 14:35:32,361 - DEBUG - Trying CV2 method 3
+2025-05-05 14:35:32,447 - DEBUG - Method 3 found 910830 potential matches in 0.09 seconds
+2025-05-05 14:35:37,006 - DEBUG - Trying CV2 method 1
+2025-05-05 14:35:37,104 - DEBUG - Method 1 found 910830 potential matches in 0.10 seconds
+2025-05-05 14:35:43,026 - INFO - Finished processing reference 3/10 in 10.89 seconds
+2025-05-05 14:35:43,027 - INFO - Progress: 3/10 references processed in 21.48 seconds
+2025-05-05 14:35:43,029 - INFO - Current memory usage: 1615.07 MB
+2025-05-05 14:35:43,034 - INFO - Processing reference image 4/10: prompt_box_4_1746404014.png
+2025-05-05 14:35:43,036 - INFO - Reference image dimensions: 423x103 pixels
+2025-05-05 14:35:43,039 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:35:43,116 - INFO - PyAutoGUI found match in 0.08 seconds
+2025-05-05 14:35:43,116 - DEBUG - Added match: {'location': (621, 645, 423, 103), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_4_1746404014.png'}
+2025-05-05 14:35:43,124 - DEBUG - Trying CV2 method 5
+2025-05-05 14:35:43,206 - DEBUG - Method 5 found 829200 potential matches in 0.08 seconds
+2025-05-05 14:35:47,238 - DEBUG - Trying CV2 method 3
+2025-05-05 14:35:47,320 - DEBUG - Method 3 found 829200 potential matches in 0.08 seconds
+2025-05-05 14:35:51,614 - DEBUG - Trying CV2 method 1
+2025-05-05 14:35:51,706 - DEBUG - Method 1 found 829200 potential matches in 0.09 seconds
+2025-05-05 14:35:56,102 - INFO - Finished processing reference 4/10 in 13.07 seconds
+2025-05-05 14:35:56,103 - INFO - Processing reference image 5/10: prompt_box_5_1746404084.png
+2025-05-05 14:35:56,111 - INFO - Reference image dimensions: 479x118 pixels
+2025-05-05 14:35:56,113 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:35:56,204 - DEBUG - PyAutoGUI locate found no matches in 0.09 seconds
+2025-05-05 14:35:56,205 - DEBUG - Trying CV2 method 5
+2025-05-05 14:35:56,306 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:35:56,307 - DEBUG - Trying CV2 method 3
+2025-05-05 14:35:56,390 - DEBUG - Method 3 found 775710 potential matches in 0.08 seconds
+2025-05-05 14:36:00,771 - DEBUG - Trying CV2 method 1
+2025-05-05 14:36:00,864 - DEBUG - Method 1 found 775710 potential matches in 0.09 seconds
+2025-05-05 14:36:05,288 - INFO - Finished processing reference 5/10 in 9.19 seconds
+2025-05-05 14:36:05,289 - INFO - Processing reference image 6/10: prompt_box_6_1746404088.png
+2025-05-05 14:36:05,297 - INFO - Reference image dimensions: 645x101 pixels
+2025-05-05 14:36:05,300 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:36:05,411 - INFO - PyAutoGUI found match in 0.11 seconds
+2025-05-05 14:36:05,412 - DEBUG - Added match: {'location': (820, 1141, 645, 101), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_6_1746404088.png'}
+2025-05-05 14:36:05,415 - DEBUG - Trying CV2 method 5
+2025-05-05 14:36:05,505 - DEBUG - Method 5 found 759 potential matches in 0.09 seconds
+2025-05-05 14:36:05,509 - DEBUG - Trying CV2 method 3
+2025-05-05 14:36:05,590 - DEBUG - Method 3 found 698320 potential matches in 0.08 seconds
+2025-05-05 14:36:09,709 - DEBUG - Trying CV2 method 1
+2025-05-05 14:36:09,784 - DEBUG - Method 1 found 698320 potential matches in 0.08 seconds
+2025-05-05 14:36:14,189 - INFO - Finished processing reference 6/10 in 8.90 seconds
+2025-05-05 14:36:14,189 - INFO - Progress: 6/10 references processed in 52.65 seconds
+2025-05-05 14:36:14,192 - INFO - Current memory usage: 3986.60 MB
+2025-05-05 14:36:14,196 - INFO - Processing reference image 7/10: prompt_box_7_1746404094.png
+2025-05-05 14:36:14,208 - INFO - Reference image dimensions: 1680x134 pixels
+2025-05-05 14:36:14,212 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:36:14,318 - DEBUG - PyAutoGUI locate found no matches in 0.11 seconds
+2025-05-05 14:36:14,318 - DEBUG - Trying CV2 method 5
+2025-05-05 14:36:14,416 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:36:14,416 - DEBUG - Trying CV2 method 3
+2025-05-05 14:36:14,508 - DEBUG - Method 3 found 71125 potential matches in 0.09 seconds
+2025-05-05 14:36:15,250 - DEBUG - Trying CV2 method 1
+2025-05-05 14:36:15,340 - DEBUG - Method 1 found 71125 potential matches in 0.09 seconds
+2025-05-05 14:36:15,718 - INFO - Finished processing reference 7/10 in 1.52 seconds
+2025-05-05 14:36:15,719 - INFO - Processing reference image 8/10: prompt_box_1_1746403024_gray.png
+2025-05-05 14:36:15,727 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:36:15,734 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:36:15,845 - DEBUG - PyAutoGUI locate found no matches in 0.11 seconds
+2025-05-05 14:36:15,846 - DEBUG - Trying CV2 method 5
+2025-05-05 14:36:15,945 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:36:15,945 - DEBUG - Trying CV2 method 3
+2025-05-05 14:36:16,047 - DEBUG - Method 3 found 202048 potential matches in 0.10 seconds
+2025-05-05 14:36:17,526 - DEBUG - Trying CV2 method 1
+2025-05-05 14:36:17,608 - DEBUG - Method 1 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:36:19,093 - INFO - Finished processing reference 8/10 in 3.37 seconds
+2025-05-05 14:36:19,094 - INFO - Processing reference image 9/10: prompt_box_1_1746403024_contrast.png
+2025-05-05 14:36:19,104 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:36:19,107 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:36:19,211 - DEBUG - PyAutoGUI locate found no matches in 0.10 seconds
+2025-05-05 14:36:19,212 - DEBUG - Trying CV2 method 5
+2025-05-05 14:36:19,314 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:36:19,314 - DEBUG - Trying CV2 method 3
+2025-05-05 14:36:19,420 - DEBUG - Method 3 found 202048 potential matches in 0.11 seconds
+2025-05-05 14:36:20,653 - DEBUG - Trying CV2 method 1
+2025-05-05 14:36:20,773 - DEBUG - Method 1 found 202048 potential matches in 0.12 seconds
+2025-05-05 14:36:22,558 - INFO - Finished processing reference 9/10 in 3.46 seconds
+2025-05-05 14:36:22,558 - WARNING - Search for prompt_box timed out after 60 seconds
+2025-05-05 14:36:22,561 - INFO - Returning best match found before timeout (9895033 matches)
+2025-05-05 14:36:34,311 - INFO - Prompt box found
+2025-05-05 14:36:34,323 - DEBUG - Attempting to capture screenshot for stage: PROMPT_BOX_FOUND
+2025-05-05 14:36:34,433 - DEBUG - Screenshot captured successfully
+2025-05-05 14:36:34,448 - DEBUG - Screenshot saved to logs\run_20250505_143634\screenshots\PROMPT_BOX_FOUND_screenshot_20250505_143634_322369.png
+2025-05-05 14:36:34,464 - DEBUG - Annotated screenshot saved to logs\run_20250505_143634\screenshots\PROMPT_BOX_FOUND_annotated_20250505_143634_322369.png
+2025-05-05 14:36:34,666 - INFO - Click debug image saved to logs/click_debug\click_unknown_20250505_143634_608685.png
+2025-05-05 14:36:34,667 - INFO - Clicking unknown at position (964, 696), original location: (753, 645, 423, 103)
+2025-05-05 14:36:36,255 - DEBUG - Clicked at (964, 696)
+2025-05-05 14:36:36,258 - INFO - After clicking prompt box
+2025-05-05 14:36:36,270 - DEBUG - Attempting to capture screenshot for stage: AFTER_PROMPT_BOX_CLICK
+2025-05-05 14:36:36,374 - DEBUG - Screenshot captured successfully
+2025-05-05 14:36:36,583 - DEBUG - Screenshot saved to logs\run_20250505_143636\screenshots\AFTER_PROMPT_BOX_CLICK_screenshot_20250505_143636_270535.png
+2025-05-05 14:36:36,667 - DEBUG - Annotated screenshot saved to logs\run_20250505_143636\screenshots\AFTER_PROMPT_BOX_CLICK_annotated_20250505_143636_270535.png
+2025-05-05 14:36:58,643 - DEBUG - Typed text: Explain ho...
+2025-05-05 14:36:58,643 - INFO - After typing prompt
+2025-05-05 14:36:58,651 - DEBUG - Attempting to capture screenshot for stage: AFTER_TYPE_PROMPT
+2025-05-05 14:36:58,736 - DEBUG - Screenshot captured successfully
+2025-05-05 14:36:58,916 - DEBUG - Screenshot saved to logs\run_20250505_143658\screenshots\AFTER_TYPE_PROMPT_screenshot_20250505_143658_651000.png
+2025-05-05 14:36:58,998 - DEBUG - Annotated screenshot saved to logs\run_20250505_143658\screenshots\AFTER_TYPE_PROMPT_annotated_20250505_143658_651000.png
+2025-05-05 14:36:59,007 - INFO - Memory usage at start: 107.40 MB
+2025-05-05 14:36:59,008 - INFO - Searching for element: send_button
+2025-05-05 14:36:59,010 - DEBUG - Attempting to capture screenshot for stage: SEARCH_send_button_START
+2025-05-05 14:36:59,094 - DEBUG - Screenshot captured successfully
+2025-05-05 14:36:59,279 - DEBUG - Screenshot saved to logs\run_20250505_143659\screenshots\SEARCH_send_button_START_screenshot_20250505_143659_010667.png
+2025-05-05 14:36:59,369 - DEBUG - Annotated screenshot saved to logs\run_20250505_143659\screenshots\SEARCH_send_button_START_annotated_20250505_143659_010667.png
+2025-05-05 14:36:59,373 - INFO - Search parameters for send_button: confidence=0.8, min_confidence=0.6000000000000001
+2025-05-05 14:36:59,375 - INFO - Search region: [1859, 833, 557, 510]
+2025-05-05 14:36:59,381 - INFO - Starting search for send_button with 8 reference images
+2025-05-05 14:36:59,382 - INFO - Taking screenshot of region [1859, 833, 557, 510]
+2025-05-05 14:36:59,470 - INFO - Screenshot taken in 0.09 seconds
+2025-05-05 14:36:59,474 - INFO - Screenshot conversion completed in 0.00 seconds
+2025-05-05 14:36:59,474 - INFO - Screenshot dimensions: 557x510 pixels
+2025-05-05 14:36:59,483 - INFO - Processing reference image 1/8: send_button_1_1746404204.png
+2025-05-05 14:36:59,483 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204.png
+2025-05-05 14:36:59,484 - INFO - Processing reference image 2/8: send_button_2_1746404231.png
+2025-05-05 14:36:59,485 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231.png
+2025-05-05 14:36:59,485 - INFO - Processing reference image 3/8: send_button_1_1746404204_gray.png
+2025-05-05 14:36:59,486 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_gray.png
+2025-05-05 14:36:59,486 - INFO - Progress: 3/8 references processed in 0.48 seconds
+2025-05-05 14:36:59,487 - INFO - Current memory usage: 109.17 MB
+2025-05-05 14:36:59,487 - INFO - Processing reference image 4/8: send_button_1_1746404204_contrast.png
+2025-05-05 14:36:59,488 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_contrast.png
+2025-05-05 14:36:59,488 - INFO - Processing reference image 5/8: send_button_1_1746404204_thresh.png
+2025-05-05 14:36:59,489 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_thresh.png
+2025-05-05 14:36:59,489 - INFO - Processing reference image 6/8: send_button_2_1746404231_gray.png
+2025-05-05 14:36:59,490 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_gray.png
+2025-05-05 14:36:59,491 - INFO - Progress: 6/8 references processed in 0.49 seconds
+2025-05-05 14:36:59,491 - INFO - Current memory usage: 109.17 MB
+2025-05-05 14:36:59,492 - INFO - Processing reference image 7/8: send_button_2_1746404231_contrast.png
+2025-05-05 14:36:59,492 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_contrast.png
+2025-05-05 14:36:59,493 - INFO - Processing reference image 8/8: send_button_2_1746404231_thresh.png
+2025-05-05 14:36:59,493 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_thresh.png
+2025-05-05 14:36:59,494 - INFO - Final memory usage: 109.17 MB
+2025-05-05 14:36:59,494 - INFO - Total search time for send_button: 0.49 seconds
+2025-05-05 14:36:59,495 - WARNING - Element send_button not found
+2025-05-05 14:36:59,496 - DEBUG - Attempting to capture screenshot for stage: NOT_FOUND_send_button
+2025-05-05 14:36:59,586 - DEBUG - Screenshot captured successfully
+2025-05-05 14:36:59,775 - DEBUG - Screenshot saved to logs\run_20250505_143659\screenshots\NOT_FOUND_send_button_screenshot_20250505_143659_496272.png
+2025-05-05 14:36:59,885 - DEBUG - Annotated screenshot saved to logs\run_20250505_143659\screenshots\NOT_FOUND_send_button_annotated_20250505_143659_496272.png
+2025-05-05 14:36:59,889 - WARNING - No matches found for send_button after 0.49 seconds
+2025-05-05 14:36:59,890 - INFO - Send button not found, using Enter key
+2025-05-05 14:36:59,900 - DEBUG - Attempting to capture screenshot for stage: SEND_BUTTON_NOT_FOUND
+2025-05-05 14:37:00,007 - DEBUG - Screenshot captured successfully
+2025-05-05 14:37:00,213 - DEBUG - Screenshot saved to logs\run_20250505_143659\screenshots\SEND_BUTTON_NOT_FOUND_screenshot_20250505_143659_899508.png
+2025-05-05 14:37:00,298 - DEBUG - Annotated screenshot saved to logs\run_20250505_143659\screenshots\SEND_BUTTON_NOT_FOUND_annotated_20250505_143659_899508.png
+2025-05-05 14:37:00,808 - INFO - Prompt sent
+2025-05-05 14:37:00,811 - DEBUG - Attempting to capture screenshot for stage: PROMPT_SENT
+2025-05-05 14:37:00,957 - DEBUG - Screenshot captured successfully
+2025-05-05 14:37:01,295 - DEBUG - Screenshot saved to logs\run_20250505_143700\screenshots\PROMPT_SENT_screenshot_20250505_143700_811468.png
+2025-05-05 14:37:01,386 - DEBUG - Annotated screenshot saved to logs\run_20250505_143700\screenshots\PROMPT_SENT_annotated_20250505_143700_811468.png
+2025-05-05 14:37:01,391 - INFO - Waiting 3 seconds before sending next prompt...
+2025-05-05 14:37:04,392 - INFO - Successfully completed state: SEND_PROMPTS
+2025-05-05 14:37:04,401 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS_COMPLETE
+2025-05-05 14:37:04,491 - DEBUG - Screenshot captured successfully
+2025-05-05 14:37:04,798 - DEBUG - Screenshot saved to logs\run_20250505_143704\screenshots\SEND_PROMPTS_COMPLETE_screenshot_20250505_143704_400158.png
+2025-05-05 14:37:04,917 - DEBUG - Annotated screenshot saved to logs\run_20250505_143704\screenshots\SEND_PROMPTS_COMPLETE_annotated_20250505_143704_400158.png
+2025-05-05 14:37:04,925 - INFO - Entering state: SEND_PROMPTS
+2025-05-05 14:37:04,926 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS
+2025-05-05 14:37:05,054 - DEBUG - Screenshot captured successfully
+2025-05-05 14:37:05,355 - DEBUG - Screenshot saved to logs\run_20250505_143704\screenshots\SEND_PROMPTS_screenshot_20250505_143704_926505.png
+2025-05-05 14:37:05,482 - DEBUG - Annotated screenshot saved to logs\run_20250505_143704\screenshots\SEND_PROMPTS_annotated_20250505_143704_926505.png
+2025-05-05 14:37:05,489 - INFO - Sending prompt 3/3: Write a Python function that reverses a string....
+2025-05-05 14:37:05,490 - INFO - Before sending prompt 3
+2025-05-05 14:37:05,498 - DEBUG - Attempting to capture screenshot for stage: BEFORE_PROMPT
+2025-05-05 14:37:05,610 - DEBUG - Screenshot captured successfully
+2025-05-05 14:37:05,916 - DEBUG - Screenshot saved to logs\run_20250505_143705\screenshots\BEFORE_PROMPT_screenshot_20250505_143705_497365.png
+2025-05-05 14:37:06,068 - DEBUG - Annotated screenshot saved to logs\run_20250505_143705\screenshots\BEFORE_PROMPT_annotated_20250505_143705_497365.png
+2025-05-05 14:37:06,074 - INFO - Memory usage at start: 107.43 MB
+2025-05-05 14:37:06,075 - INFO - Searching for element: prompt_box
+2025-05-05 14:37:06,081 - DEBUG - Attempting to capture screenshot for stage: SEARCH_prompt_box_START
+2025-05-05 14:37:06,216 - DEBUG - Screenshot captured successfully
+2025-05-05 14:37:06,538 - DEBUG - Screenshot saved to logs\run_20250505_143706\screenshots\SEARCH_prompt_box_START_screenshot_20250505_143706_081644.png
+2025-05-05 14:37:06,647 - DEBUG - Annotated screenshot saved to logs\run_20250505_143706\screenshots\SEARCH_prompt_box_START_annotated_20250505_143706_081644.png
+2025-05-05 14:37:06,652 - INFO - Search parameters for prompt_box: confidence=0.9, min_confidence=0.7
+2025-05-05 14:37:06,653 - INFO - Search region: [621, 645, 1804, 702]
+2025-05-05 14:37:06,653 - INFO - Starting search for prompt_box with 28 reference images
+2025-05-05 14:37:06,653 - WARNING - Too many reference images for prompt_box, using only first 10 for performance
+2025-05-05 14:37:06,653 - INFO - Taking screenshot of region [621, 645, 1804, 702]
+2025-05-05 14:37:06,785 - INFO - Screenshot taken in 0.13 seconds
+2025-05-05 14:37:06,828 - INFO - Screenshot conversion completed in 0.04 seconds
+2025-05-05 14:37:06,829 - INFO - Screenshot dimensions: 1804x702 pixels
+2025-05-05 14:37:06,874 - INFO - Processing reference image 1/10: prompt_box_1_1746403024.png
+2025-05-05 14:37:06,882 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:37:06,893 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:07,060 - DEBUG - PyAutoGUI locate found no matches in 0.17 seconds
+2025-05-05 14:37:07,061 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:07,211 - DEBUG - Method 5 found 0 potential matches in 0.15 seconds
+2025-05-05 14:37:07,211 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:07,323 - DEBUG - Method 3 found 202048 potential matches in 0.11 seconds
+2025-05-05 14:37:08,866 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:08,992 - DEBUG - Method 1 found 202048 potential matches in 0.13 seconds
+2025-05-05 14:37:10,244 - INFO - Finished processing reference 1/10 in 3.37 seconds
+2025-05-05 14:37:10,245 - INFO - Processing reference image 2/10: prompt_box_1_1746404009.png
+2025-05-05 14:37:10,256 - INFO - Reference image dimensions: 671x138 pixels
+2025-05-05 14:37:10,258 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:10,409 - DEBUG - PyAutoGUI locate found no matches in 0.15 seconds
+2025-05-05 14:37:10,410 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:10,566 - DEBUG - Method 5 found 0 potential matches in 0.16 seconds
+2025-05-05 14:37:10,566 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:10,691 - DEBUG - Method 3 found 640710 potential matches in 0.13 seconds
+2025-05-05 14:37:13,733 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:13,848 - DEBUG - Method 1 found 640710 potential matches in 0.11 seconds
+2025-05-05 14:37:16,500 - INFO - Finished processing reference 2/10 in 6.26 seconds
+2025-05-05 14:37:16,501 - INFO - Processing reference image 3/10: prompt_box_2_1746403033.png
+2025-05-05 14:37:16,505 - INFO - Reference image dimensions: 350x77 pixels
+2025-05-05 14:37:16,513 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:16,611 - INFO - PyAutoGUI found match in 0.10 seconds
+2025-05-05 14:37:16,611 - DEBUG - Added match: {'location': (817, 1131, 350, 77), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_2_1746403033.png'}
+2025-05-05 14:37:16,618 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:16,705 - DEBUG - Method 5 found 993 potential matches in 0.09 seconds
+2025-05-05 14:37:16,711 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:16,793 - DEBUG - Method 3 found 910830 potential matches in 0.08 seconds
+2025-05-05 14:37:20,743 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:20,842 - DEBUG - Method 1 found 910830 potential matches in 0.10 seconds
+2025-05-05 14:37:25,124 - INFO - Finished processing reference 3/10 in 8.62 seconds
+2025-05-05 14:37:25,125 - INFO - Progress: 3/10 references processed in 19.05 seconds
+2025-05-05 14:37:25,128 - INFO - Current memory usage: 1613.38 MB
+2025-05-05 14:37:25,132 - INFO - Processing reference image 4/10: prompt_box_4_1746404014.png
+2025-05-05 14:37:25,134 - INFO - Reference image dimensions: 423x103 pixels
+2025-05-05 14:37:25,136 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:25,221 - INFO - PyAutoGUI found match in 0.08 seconds
+2025-05-05 14:37:25,221 - DEBUG - Added match: {'location': (621, 645, 423, 103), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_4_1746404014.png'}
+2025-05-05 14:37:25,224 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:25,313 - DEBUG - Method 5 found 829200 potential matches in 0.09 seconds
+2025-05-05 14:37:29,245 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:29,325 - DEBUG - Method 3 found 829200 potential matches in 0.08 seconds
+2025-05-05 14:37:33,366 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:33,467 - DEBUG - Method 1 found 829200 potential matches in 0.10 seconds
+2025-05-05 14:37:37,876 - INFO - Finished processing reference 4/10 in 12.74 seconds
+2025-05-05 14:37:37,876 - INFO - Processing reference image 5/10: prompt_box_5_1746404084.png
+2025-05-05 14:37:37,886 - INFO - Reference image dimensions: 479x118 pixels
+2025-05-05 14:37:37,890 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:37,979 - DEBUG - PyAutoGUI locate found no matches in 0.09 seconds
+2025-05-05 14:37:37,980 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:38,102 - DEBUG - Method 5 found 0 potential matches in 0.12 seconds
+2025-05-05 14:37:38,103 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:38,193 - DEBUG - Method 3 found 775710 potential matches in 0.09 seconds
+2025-05-05 14:37:42,412 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:42,505 - DEBUG - Method 1 found 775710 potential matches in 0.09 seconds
+2025-05-05 14:37:46,939 - INFO - Finished processing reference 5/10 in 9.06 seconds
+2025-05-05 14:37:46,940 - INFO - Processing reference image 6/10: prompt_box_6_1746404088.png
+2025-05-05 14:37:46,950 - INFO - Reference image dimensions: 645x101 pixels
+2025-05-05 14:37:46,953 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:47,052 - INFO - PyAutoGUI found match in 0.10 seconds
+2025-05-05 14:37:47,052 - DEBUG - Added match: {'location': (820, 1141, 645, 101), 'score': 0.7, 'method': 'pyautogui', 'template': 'assets/reference_images/prompt_box\\prompt_box_6_1746404088.png'}
+2025-05-05 14:37:47,055 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:47,154 - DEBUG - Method 5 found 759 potential matches in 0.10 seconds
+2025-05-05 14:37:47,162 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:47,239 - DEBUG - Method 3 found 698320 potential matches in 0.08 seconds
+2025-05-05 14:37:51,346 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:51,444 - DEBUG - Method 1 found 698320 potential matches in 0.10 seconds
+2025-05-05 14:37:55,826 - INFO - Finished processing reference 6/10 in 8.89 seconds
+2025-05-05 14:37:55,827 - INFO - Progress: 6/10 references processed in 49.75 seconds
+2025-05-05 14:37:55,829 - INFO - Current memory usage: 3985.79 MB
+2025-05-05 14:37:55,833 - INFO - Processing reference image 7/10: prompt_box_7_1746404094.png
+2025-05-05 14:37:55,837 - INFO - Reference image dimensions: 1680x134 pixels
+2025-05-05 14:37:55,852 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:55,951 - DEBUG - PyAutoGUI locate found no matches in 0.10 seconds
+2025-05-05 14:37:55,951 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:56,045 - DEBUG - Method 5 found 0 potential matches in 0.09 seconds
+2025-05-05 14:37:56,045 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:56,126 - DEBUG - Method 3 found 71125 potential matches in 0.08 seconds
+2025-05-05 14:37:56,786 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:56,869 - DEBUG - Method 1 found 71125 potential matches in 0.08 seconds
+2025-05-05 14:37:57,305 - INFO - Finished processing reference 7/10 in 1.47 seconds
+2025-05-05 14:37:57,306 - INFO - Processing reference image 8/10: prompt_box_1_1746403024_gray.png
+2025-05-05 14:37:57,313 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:37:57,320 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:37:57,466 - DEBUG - PyAutoGUI locate found no matches in 0.15 seconds
+2025-05-05 14:37:57,468 - DEBUG - Trying CV2 method 5
+2025-05-05 14:37:57,606 - DEBUG - Method 5 found 0 potential matches in 0.14 seconds
+2025-05-05 14:37:57,606 - DEBUG - Trying CV2 method 3
+2025-05-05 14:37:57,713 - DEBUG - Method 3 found 202048 potential matches in 0.11 seconds
+2025-05-05 14:37:59,188 - DEBUG - Trying CV2 method 1
+2025-05-05 14:37:59,314 - DEBUG - Method 1 found 202048 potential matches in 0.13 seconds
+2025-05-05 14:38:00,589 - INFO - Finished processing reference 8/10 in 3.28 seconds
+2025-05-05 14:38:00,589 - INFO - Processing reference image 9/10: prompt_box_1_1746403024_contrast.png
+2025-05-05 14:38:00,598 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:38:00,601 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:38:00,705 - DEBUG - PyAutoGUI locate found no matches in 0.10 seconds
+2025-05-05 14:38:00,705 - DEBUG - Trying CV2 method 5
+2025-05-05 14:38:00,804 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:38:00,805 - DEBUG - Trying CV2 method 3
+2025-05-05 14:38:00,896 - DEBUG - Method 3 found 202048 potential matches in 0.09 seconds
+2025-05-05 14:38:02,176 - DEBUG - Trying CV2 method 1
+2025-05-05 14:38:02,263 - DEBUG - Method 1 found 202048 potential matches in 0.09 seconds
+2025-05-05 14:38:03,896 - INFO - Finished processing reference 9/10 in 3.31 seconds
+2025-05-05 14:38:03,896 - INFO - Progress: 9/10 references processed in 57.82 seconds
+2025-05-05 14:38:03,901 - INFO - Current memory usage: 3878.71 MB
+2025-05-05 14:38:03,905 - INFO - Processing reference image 10/10: prompt_box_1_1746403024_thresh.png
+2025-05-05 14:38:03,909 - INFO - Reference image dimensions: 1453x129 pixels
+2025-05-05 14:38:03,918 - DEBUG - Trying PyAutoGUI locate with min_confidence=0.7
+2025-05-05 14:38:04,023 - DEBUG - PyAutoGUI locate found no matches in 0.10 seconds
+2025-05-05 14:38:04,023 - DEBUG - Trying CV2 method 5
+2025-05-05 14:38:04,121 - DEBUG - Method 5 found 0 potential matches in 0.10 seconds
+2025-05-05 14:38:04,121 - DEBUG - Trying CV2 method 3
+2025-05-05 14:38:04,204 - DEBUG - Method 3 found 202048 potential matches in 0.08 seconds
+2025-05-05 14:38:05,866 - DEBUG - Trying CV2 method 1
+2025-05-05 14:38:05,978 - DEBUG - Method 1 found 202048 potential matches in 0.11 seconds
+2025-05-05 14:38:07,576 - INFO - Finished processing reference 10/10 in 3.67 seconds
+2025-05-05 14:38:07,576 - INFO - Final memory usage: 3874.25 MB
+2025-05-05 14:38:07,578 - INFO - Total search time for prompt_box: 61.50 seconds
+2025-05-05 14:38:21,125 - DEBUG - Found 10299129 potential matches for prompt_box
+2025-05-05 14:38:21,139 - DEBUG - Match #1: score=1.00, method=cv2.3, location=(1633, 713, 423, 103)
+2025-05-05 14:38:21,139 - DEBUG - Match #2: score=1.00, method=cv2.3, location=(1761, 713, 423, 103)
+2025-05-05 14:38:21,140 - DEBUG - Match #3: score=1.00, method=cv2.3, location=(1806, 729, 423, 103)
+2025-05-05 14:38:21,148 - DEBUG - Match #4: score=1.00, method=cv2.3, location=(983, 747, 423, 103)
+2025-05-05 14:38:21,149 - DEBUG - Match #5: score=1.00, method=cv2.3, location=(973, 769, 423, 103)
+2025-05-05 14:38:21,386 - DEBUG - Saved matches debug image to logs/recognition_debug/prompt_box_matches_1746419901.png
+2025-05-05 14:38:21,387 - INFO - Best match for prompt_box: score=1.00, method=cv2.3, location=(1633, 713, 423, 103)
+2025-05-05 14:38:21,393 - INFO - Found prompt_box with score 1.00
+2025-05-05 14:38:21,405 - DEBUG - Attempting to capture screenshot for stage: FOUND_prompt_box
+2025-05-05 14:38:21,500 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:21,516 - DEBUG - Screenshot saved to logs\run_20250505_143821\screenshots\FOUND_prompt_box_screenshot_20250505_143821_404384.png
+2025-05-05 14:38:21,520 - DEBUG - Annotated screenshot saved to logs\run_20250505_143821\screenshots\FOUND_prompt_box_annotated_20250505_143821_404384.png
+2025-05-05 14:38:30,726 - INFO - Prompt box found
+2025-05-05 14:38:30,732 - DEBUG - Attempting to capture screenshot for stage: PROMPT_BOX_FOUND
+2025-05-05 14:38:30,821 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:30,831 - DEBUG - Screenshot saved to logs\run_20250505_143830\screenshots\PROMPT_BOX_FOUND_screenshot_20250505_143830_731731.png
+2025-05-05 14:38:30,837 - DEBUG - Annotated screenshot saved to logs\run_20250505_143830\screenshots\PROMPT_BOX_FOUND_annotated_20250505_143830_731731.png
+2025-05-05 14:38:31,034 - INFO - Click debug image saved to logs/click_debug\click_unknown_20250505_143830_966927.png
+2025-05-05 14:38:31,035 - INFO - Clicking unknown at position (1844, 764), original location: (1633, 713, 423, 103)
+2025-05-05 14:38:32,642 - DEBUG - Clicked at (1844, 764)
+2025-05-05 14:38:32,642 - INFO - After clicking prompt box
+2025-05-05 14:38:32,649 - DEBUG - Attempting to capture screenshot for stage: AFTER_PROMPT_BOX_CLICK
+2025-05-05 14:38:32,758 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:32,947 - DEBUG - Screenshot saved to logs\run_20250505_143832\screenshots\AFTER_PROMPT_BOX_CLICK_screenshot_20250505_143832_649982.png
+2025-05-05 14:38:33,032 - DEBUG - Annotated screenshot saved to logs\run_20250505_143832\screenshots\AFTER_PROMPT_BOX_CLICK_annotated_20250505_143832_649982.png
+2025-05-05 14:38:58,080 - DEBUG - Typed text: Write a Py...
+2025-05-05 14:38:58,080 - INFO - After typing prompt
+2025-05-05 14:38:58,084 - DEBUG - Attempting to capture screenshot for stage: AFTER_TYPE_PROMPT
+2025-05-05 14:38:58,176 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:58,350 - DEBUG - Screenshot saved to logs\run_20250505_143858\screenshots\AFTER_TYPE_PROMPT_screenshot_20250505_143858_084747.png
+2025-05-05 14:38:58,431 - DEBUG - Annotated screenshot saved to logs\run_20250505_143858\screenshots\AFTER_TYPE_PROMPT_annotated_20250505_143858_084747.png
+2025-05-05 14:38:58,435 - INFO - Memory usage at start: 124.38 MB
+2025-05-05 14:38:58,436 - INFO - Searching for element: send_button
+2025-05-05 14:38:58,441 - DEBUG - Attempting to capture screenshot for stage: SEARCH_send_button_START
+2025-05-05 14:38:58,524 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:58,706 - DEBUG - Screenshot saved to logs\run_20250505_143858\screenshots\SEARCH_send_button_START_screenshot_20250505_143858_441549.png
+2025-05-05 14:38:58,799 - DEBUG - Annotated screenshot saved to logs\run_20250505_143858\screenshots\SEARCH_send_button_START_annotated_20250505_143858_441549.png
+2025-05-05 14:38:58,804 - INFO - Search parameters for send_button: confidence=0.8, min_confidence=0.6000000000000001
+2025-05-05 14:38:58,804 - INFO - Search region: [1859, 833, 557, 510]
+2025-05-05 14:38:58,810 - INFO - Starting search for send_button with 8 reference images
+2025-05-05 14:38:58,810 - INFO - Taking screenshot of region [1859, 833, 557, 510]
+2025-05-05 14:38:58,894 - INFO - Screenshot taken in 0.08 seconds
+2025-05-05 14:38:58,898 - INFO - Screenshot conversion completed in 0.00 seconds
+2025-05-05 14:38:58,899 - INFO - Screenshot dimensions: 557x510 pixels
+2025-05-05 14:38:58,906 - INFO - Processing reference image 1/8: send_button_1_1746404204.png
+2025-05-05 14:38:58,906 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204.png
+2025-05-05 14:38:58,909 - INFO - Processing reference image 2/8: send_button_2_1746404231.png
+2025-05-05 14:38:58,909 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231.png
+2025-05-05 14:38:58,910 - INFO - Processing reference image 3/8: send_button_1_1746404204_gray.png
+2025-05-05 14:38:58,911 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_gray.png
+2025-05-05 14:38:58,912 - INFO - Progress: 3/8 references processed in 0.48 seconds
+2025-05-05 14:38:58,913 - INFO - Current memory usage: 126.33 MB
+2025-05-05 14:38:58,914 - INFO - Processing reference image 4/8: send_button_1_1746404204_contrast.png
+2025-05-05 14:38:58,914 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_contrast.png
+2025-05-05 14:38:58,915 - INFO - Processing reference image 5/8: send_button_1_1746404204_thresh.png
+2025-05-05 14:38:58,916 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_1_1746404204_thresh.png
+2025-05-05 14:38:58,916 - INFO - Processing reference image 6/8: send_button_2_1746404231_gray.png
+2025-05-05 14:38:58,917 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_gray.png
+2025-05-05 14:38:58,917 - INFO - Progress: 6/8 references processed in 0.48 seconds
+2025-05-05 14:38:58,918 - INFO - Current memory usage: 126.34 MB
+2025-05-05 14:38:58,918 - INFO - Processing reference image 7/8: send_button_2_1746404231_contrast.png
+2025-05-05 14:38:58,919 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_contrast.png
+2025-05-05 14:38:58,919 - INFO - Processing reference image 8/8: send_button_2_1746404231_thresh.png
+2025-05-05 14:38:58,920 - WARNING - Reference image not found: assets/reference_images/send_button\send_button_2_1746404231_thresh.png
+2025-05-05 14:38:58,921 - INFO - Final memory usage: 126.34 MB
+2025-05-05 14:38:58,921 - INFO - Total search time for send_button: 0.49 seconds
+2025-05-05 14:38:58,924 - WARNING - Element send_button not found
+2025-05-05 14:38:58,929 - DEBUG - Attempting to capture screenshot for stage: NOT_FOUND_send_button
+2025-05-05 14:38:59,020 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:59,213 - DEBUG - Screenshot saved to logs\run_20250505_143858\screenshots\NOT_FOUND_send_button_screenshot_20250505_143858_929579.png
+2025-05-05 14:38:59,304 - DEBUG - Annotated screenshot saved to logs\run_20250505_143858\screenshots\NOT_FOUND_send_button_annotated_20250505_143858_929579.png
+2025-05-05 14:38:59,310 - WARNING - No matches found for send_button after 0.49 seconds
+2025-05-05 14:38:59,311 - INFO - Send button not found, using Enter key
+2025-05-05 14:38:59,318 - DEBUG - Attempting to capture screenshot for stage: SEND_BUTTON_NOT_FOUND
+2025-05-05 14:38:59,408 - DEBUG - Screenshot captured successfully
+2025-05-05 14:38:59,693 - DEBUG - Screenshot saved to logs\run_20250505_143859\screenshots\SEND_BUTTON_NOT_FOUND_screenshot_20250505_143859_317232.png
+2025-05-05 14:38:59,781 - DEBUG - Annotated screenshot saved to logs\run_20250505_143859\screenshots\SEND_BUTTON_NOT_FOUND_annotated_20250505_143859_317232.png
+2025-05-05 14:39:00,286 - INFO - Prompt sent
+2025-05-05 14:39:00,298 - DEBUG - Attempting to capture screenshot for stage: PROMPT_SENT
+2025-05-05 14:39:00,447 - DEBUG - Screenshot captured successfully
+2025-05-05 14:39:00,800 - DEBUG - Screenshot saved to logs\run_20250505_143900\screenshots\PROMPT_SENT_screenshot_20250505_143900_298089.png
+2025-05-05 14:39:00,903 - DEBUG - Annotated screenshot saved to logs\run_20250505_143900\screenshots\PROMPT_SENT_annotated_20250505_143900_298089.png
+2025-05-05 14:39:00,910 - INFO - Successfully completed state: SEND_PROMPTS
+2025-05-05 14:39:00,915 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS_COMPLETE
+2025-05-05 14:39:01,009 - DEBUG - Screenshot captured successfully
+2025-05-05 14:39:01,191 - DEBUG - Screenshot saved to logs\run_20250505_143900\screenshots\SEND_PROMPTS_COMPLETE_screenshot_20250505_143900_915226.png
+2025-05-05 14:39:01,269 - DEBUG - Annotated screenshot saved to logs\run_20250505_143900\screenshots\SEND_PROMPTS_COMPLETE_annotated_20250505_143900_915226.png
+2025-05-05 14:39:01,273 - INFO - Entering state: SEND_PROMPTS
+2025-05-05 14:39:01,283 - DEBUG - Attempting to capture screenshot for stage: SEND_PROMPTS
+2025-05-05 14:39:01,377 - DEBUG - Screenshot captured successfully
+2025-05-05 14:39:01,543 - DEBUG - Screenshot saved to logs\run_20250505_143901\screenshots\SEND_PROMPTS_screenshot_20250505_143901_283134.png
+2025-05-05 14:39:01,629 - DEBUG - Annotated screenshot saved to logs\run_20250505_143901\screenshots\SEND_PROMPTS_annotated_20250505_143901_283134.png
+2025-05-05 14:39:01,634 - INFO - All prompts have been sent
+2025-05-05 14:39:01,635 - INFO - All prompts completed
+2025-05-05 14:39:01,641 - DEBUG - Attempting to capture screenshot for stage: PROMPTS_COMPLETED
+2025-05-05 14:39:01,733 - DEBUG - Screenshot captured successfully
+2025-05-05 14:39:01,898 - DEBUG - Screenshot saved to logs\run_20250505_143901\screenshots\PROMPTS_COMPLETED_screenshot_20250505_143901_641327.png
+2025-05-05 14:39:01,972 - DEBUG - Annotated screenshot saved to logs\run_20250505_143901\screenshots\PROMPTS_COMPLETED_annotated_20250505_143901_641327.png
+2025-05-05 14:39:02,000 - INFO - Closing browser...
+2025-05-05 14:39:02,000 - INFO - Attempting to close browser
+2025-05-05 14:39:04,412 - INFO - Browser closed successfully
+2025-05-05 14:39:04,412 - INFO - Browser closed successfully
+2025-05-05 14:39:04,412 - INFO - Successfully completed state: COMPLETE
+2025-05-05 14:39:04,412 - DEBUG - Attempting to capture screenshot for stage: COMPLETE_COMPLETE
+2025-05-05 14:39:04,490 - DEBUG - Screenshot captured successfully
+2025-05-05 14:39:04,662 - DEBUG - Screenshot saved to logs\run_20250505_143904\screenshots\COMPLETE_COMPLETE_screenshot_20250505_143904_412106.png
+2025-05-05 14:39:04,740 - DEBUG - Annotated screenshot saved to logs\run_20250505_143904\screenshots\COMPLETE_COMPLETE_annotated_20250505_143904_412106.png
+2025-05-05 14:39:04,740 - INFO - Automation completed successfully. Sent 3 prompts.
+2025-05-05 14:39:04,740 - INFO - Cleaning up resources
+2025-05-05 14:39:04,755 - INFO - Closing browser...
+2025-05-05 14:39:04,755 - INFO - Attempting to close browser
+2025-05-05 14:39:06,903 - INFO - Browser closed successfully
+2025-05-05 14:39:06,903 - INFO - Browser closed successfully
+2025-05-05 14:39:06,918 - INFO - Automation complete

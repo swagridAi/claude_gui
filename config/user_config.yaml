@@ -56,10 +56,10 @@ ui_elements:
     - assets/reference_images/prompt_box\prompt_box_7_1746404094_contrast.png
     - assets/reference_images/prompt_box\prompt_box_7_1746404094_thresh.png
     region:
-    - 621
-    - 645
-    - 1804
-    - 702
+    - 546
+    - 689
+    - 1557
+    - 664
   response_area:
     confidence: 0.8
     reference_paths:
@@ -88,10 +88,10 @@ ui_elements:
     - assets/reference_images/send_button\send_button_2_1746404231_contrast.png
     - assets/reference_images/send_button\send_button_2_1746404231_thresh.png
     region:
-    - 1908
-    - 837
-    - 505
-    - 497
+    - 1857
+    - 829
+    - 246
+    - 522
   thinking_indicator:
     confidence: 0.8
     reference_paths:
@@ -104,7 +104,7 @@ ui_elements:
     - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241_contrast.png
     - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241_thresh.png
     region:
-    - 1970
-    - 1128
-    - 182
-    - 210
+    - 1960
+    - 1239
+    - 94
+    - 87

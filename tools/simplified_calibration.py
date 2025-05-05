@@ -701,7 +701,7 @@ class SimplifiedCalibrationTool:
             # Save to YAML file
             import yaml
             
-            # Define custom YAML handler for tuples
+            # Define custom YAML handler for tuples - match the same format as config_manager.py
             def represent_tuple(dumper, data):
                 return dumper.represent_sequence('tag:yaml.org,2002:seq', list(data))
                 
@@ -728,7 +728,7 @@ class SimplifiedCalibrationTool:
         try:
             import yaml
             
-            # Add custom YAML constructor for Python tuples
+            # Add custom YAML constructor for Python tuples - use the same tag as config_manager.py
             def construct_tuple(loader, node):
                 return tuple(loader.construct_sequence(node))
             

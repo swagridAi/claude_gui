@@ -1,3 +1,4 @@
+# In src/utils/config_manager.py
 import yaml
 import os
 import logging
@@ -24,6 +25,10 @@ def construct_numpy_scalar(loader, node):
     value = loader.construct_scalar(node)
     return int(value)
 
+# Register the handlers
+yaml.add_representer(tuple, represent_tuple)
+yaml.add_constructor('tag:yaml.org,2002:python/tuple', construct_tuple)
+
 class ConfigManager:
     """Configuration manager that handles loading and saving YAML config files."""
     
@@ -39,7 +44,7 @@ class ConfigManager:
         self.default_config_path = default_config_path
         self.config = {}
         
-        # Register YAML handlers for tuples and numpy objects
+        # Important: Register YAML handlers here as well to ensure they're applied
         yaml.add_representer(tuple, represent_tuple)
         yaml.add_constructor('tag:yaml.org,2002:python/tuple', construct_tuple)
         

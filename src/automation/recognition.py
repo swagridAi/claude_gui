@@ -108,7 +108,8 @@ def find_element_cv(ui_element, confidence=0.7):
 
 def find_element(ui_element, confidence_override=None, use_advanced=True):
     """
-    Enhanced version of find_element with more robust recognition techniques.
+    Enhanced version of find_element that finds all possible matches and
+    selects the one with the highest confidence score.
     
     Args:
         ui_element: UIElement object
@@ -127,6 +128,7 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
     import os
     
     confidence = confidence_override or ui_element.confidence
+    min_confidence = max(0.4, confidence - 0.2)  # Set a minimum confidence threshold
     region = ui_element.region
     
     # Get a screenshot for analysis
@@ -141,10 +143,8 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
     screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     screenshot_gray = cv2.cvtColor(screenshot_cv, cv2.COLOR_BGR2GRAY)
     
-    best_match = None
-    best_score = 0
-    best_method = None
-    best_template = None
+    # Store all potential matches
+    all_matches = []
     
     # Helper function to check if template is larger than screenshot
     def template_fits(template, img):
@@ -174,21 +174,26 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                 location = pyautogui.locate(
                     reference_path,
                     screenshot,
-                    confidence=confidence
+                    confidence=min_confidence
                 )
                 
                 if location:
-                    logging.debug(f"Found {ui_element.name} using PyAutoGUI with {reference_path}")
-                    return (
-                        location.left + x_offset,
-                        location.top + y_offset,
-                        location.width,
-                        location.height
-                    )
+                    match_info = {
+                        'location': (
+                            location.left + x_offset,
+                            location.top + y_offset,
+                            location.width,
+                            location.height
+                        ),
+                        'score': location.confidence,
+                        'method': 'pyautogui',
+                        'template': reference_path
+                    }
+                    all_matches.append(match_info)
             except Exception as e:
                 logging.debug(f"PyAutoGUI locate failed: {e}")
             
-            # If standard method fails and advanced is enabled, try advanced methods
+            # If advanced methods enabled, try them too
             if use_advanced:
                 # Convert template to grayscale
                 template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
@@ -207,88 +212,171 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
                         
                         # Different handling based on method
                         if method == cv2.TM_SQDIFF_NORMED:
-                            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-                            score = 1.0 - min_val  # Convert to similarity score
-                            loc = min_loc
-                        else:
-                            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-                            score = max_val
-                            loc = max_loc
-                        
-                        if score > best_score and score >= confidence:
-                            best_score = score
-                            h, w = template_gray.shape
-                            best_match = (
-                                loc[0] + x_offset,
-                                loc[1] + y_offset,
-                                w,
-                                h
-                            )
-                            best_method = method
-                            best_template = reference_path
+                            # For SQDIFF, smaller values are better matches
+                            # Find all matches above threshold (below 1-threshold for SQDIFF)
+                            threshold = 1.0 - min_confidence
+                            loc = np.where(result <= threshold)
                             
-                            # Early return if we have a very good match
-                            if score > 0.95:
-                                logging.debug(f"Excellent match found for {ui_element.name} using {reference_path}")
-                                return best_match
+                            # Convert similarity score (smaller is better for SQDIFF)
+                            for pt in zip(*loc[::-1]):
+                                score = 1.0 - result[pt[1], pt[0]]
+                                if score >= min_confidence:
+                                    h, w = template_gray.shape
+                                    match_info = {
+                                        'location': (
+                                            pt[0] + x_offset,
+                                            pt[1] + y_offset,
+                                            w,
+                                            h
+                                        ),
+                                        'score': score,
+                                        'method': 'cv2.TM_SQDIFF_NORMED',
+                                        'template': reference_path
+                                    }
+                                    all_matches.append(match_info)
+                        else:
+                            # For other methods, larger values are better matches
+                            threshold = min_confidence
+                            loc = np.where(result >= threshold)
+                            
+                            for pt in zip(*loc[::-1]):
+                                score = result[pt[1], pt[0]]
+                                if score >= min_confidence:
+                                    h, w = template_gray.shape
+                                    match_info = {
+                                        'location': (
+                                            pt[0] + x_offset,
+                                            pt[1] + y_offset,
+                                            w,
+                                            h
+                                        ),
+                                        'score': score,
+                                        'method': 'cv2.' + method.__str__().split('.')[-1],
+                                        'template': reference_path
+                                    }
+                                    all_matches.append(match_info)
+                        
+                        # Try with multi-scale template matching
+                        scales = [0.8, 0.9, 1.1, 1.2]
+                        for scale in scales:
+                            # Resize template
+                            h, w = template_gray.shape
+                            new_h, new_w = int(h * scale), int(w * scale)
+                            
+                            # Skip if resized template is too large
+                            if new_h > screenshot_gray.shape[0] or new_w > screenshot_gray.shape[1]:
+                                continue
+                            
+                            resized_template = cv2.resize(template_gray, (new_w, new_h))
+                            
+                            # Match with resized template
+                            result = cv2.matchTemplate(screenshot_gray, resized_template, method)
+                            
+                            # Get results for this scale
+                            if method == cv2.TM_SQDIFF_NORMED:
+                                threshold = 1.0 - min_confidence
+                                loc = np.where(result <= threshold)
                                 
-                        # Try with multi-scale template matching if no good match found
-                        if score < confidence:
-                            # Try some basic scaling
-                            scales = [0.8, 0.9, 1.1, 1.2]
-                            for scale in scales:
-                                # Resize template
-                                h, w = template_gray.shape
-                                new_h, new_w = int(h * scale), int(w * scale)
+                                for pt in zip(*loc[::-1]):
+                                    score = 1.0 - result[pt[1], pt[0]]
+                                    if score >= min_confidence:
+                                        match_info = {
+                                            'location': (
+                                                pt[0] + x_offset,
+                                                pt[1] + y_offset,
+                                                new_w,
+                                                new_h
+                                            ),
+                                            'score': score,
+                                            'method': f'cv2.TM_SQDIFF_NORMED (scale: {scale})',
+                                            'template': reference_path
+                                        }
+                                        all_matches.append(match_info)
+                            else:
+                                threshold = min_confidence
+                                loc = np.where(result >= threshold)
                                 
-                                # Skip if resized template is too large
-                                if new_h > screenshot_gray.shape[0] or new_w > screenshot_gray.shape[1]:
-                                    continue
-                                
-                                resized_template = cv2.resize(template_gray, (new_w, new_h))
-                                
-                                # Match with resized template
-                                result = cv2.matchTemplate(screenshot_gray, resized_template, method)
-                                
-                                # Get result based on method
-                                if method == cv2.TM_SQDIFF_NORMED:
-                                    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-                                    score = 1.0 - min_val
-                                    loc = min_loc
-                                else:
-                                    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-                                    score = max_val
-                                    loc = max_loc
-                                
-                                if score > best_score and score >= confidence:
-                                    best_score = score
-                                    best_match = (
-                                        loc[0] + x_offset,
-                                        loc[1] + y_offset,
-                                        new_w,
-                                        new_h
-                                    )
-                                    best_method = f"{method} (scale: {scale})"
-                                    best_template = reference_path
-                                    
-                                    # Early return for great matches
-                                    if score > 0.9:
-                                        logging.debug(f"Good scaled match for {ui_element.name} at scale {scale}")
-                                        return best_match
+                                for pt in zip(*loc[::-1]):
+                                    score = result[pt[1], pt[0]]
+                                    if score >= min_confidence:
+                                        match_info = {
+                                            'location': (
+                                                pt[0] + x_offset,
+                                                pt[1] + y_offset,
+                                                new_w,
+                                                new_h
+                                            ),
+                                            'score': score,
+                                            'method': f'cv2.{method.__str__().split(".")[-1]} (scale: {scale})',
+                                            'template': reference_path
+                                        }
+                                        all_matches.append(match_info)
                                         
                     except Exception as e:
                         logging.debug(f"Method {method} failed for {reference_path}: {e}")
                         
         except Exception as e:
             logging.warning(f"Error processing reference {reference_path}: {e}")
-            
-    if best_match and best_score >= confidence:
-        logging.debug(f"Found {ui_element.name} using {best_method} with {best_template} (score: {best_score:.2f})")
-        return best_match
+    
+    # If we found any matches, return the best one
+    if all_matches:
+        # Sort by score, highest first
+        all_matches.sort(key=lambda x: x['score'], reverse=True)
+        best_match = all_matches[0]
         
+        # Log all potential matches for debugging
+        if len(all_matches) > 1:
+            logging.debug(f"Found {len(all_matches)} potential matches for {ui_element.name}")
+            for i, match in enumerate(all_matches[:min(5, len(all_matches))]):
+                logging.debug(f"Match #{i+1}: score={match['score']:.2f}, method={match['method']}, location={match['location']}")
+        
+        # Debug visualization - save image showing what was found
+        debug_dir = "logs/recognition_debug"
+        os.makedirs(debug_dir, exist_ok=True)
+        
+        try:
+            # Take a screenshot and mark all potential matches
+            full_screenshot = pyautogui.screenshot()
+            debug_img = cv2.cvtColor(np.array(full_screenshot), cv2.COLOR_RGB2BGR)
+            
+            # Draw rectangle for each potential match (up to 5)
+            for i, match in enumerate(all_matches[:min(5, len(all_matches))]):
+                x, y, w, h = match['location']
+                
+                # Use different colors based on rank
+                colors = [(0, 255, 0), (0, 255, 255), (0, 165, 255), (0, 0, 255), (128, 0, 255)]
+                color = colors[i] if i < len(colors) else (200, 200, 200)
+                
+                # Draw rectangle
+                cv2.rectangle(debug_img, (x, y), (x + w, y + h), color, 2)
+                
+                # Add text with score
+                cv2.putText(
+                    debug_img,
+                    f"#{i+1}: {match['score']:.2f}",
+                    (x, y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    color,
+                    1
+                )
+            
+            # Save the debug image
+            import time
+            timestamp = int(time.time())
+            debug_path = f"{debug_dir}/{ui_element.name}_matches_{timestamp}.png"
+            cv2.imwrite(debug_path, debug_img)
+            logging.debug(f"Saved matches debug image to {debug_path}")
+        except Exception as e:
+            logging.error(f"Error saving debug image: {e}")
+        
+        logging.debug(f"Best match for {ui_element.name}: score={best_match['score']:.2f}, "
+                     f"method={best_match['method']}, location={best_match['location']}")
+        
+        return best_match['location']
+    
     # If no match was found, return None
     return None
-
 
 def wait_for_visual_change(region, timeout=60, check_interval=0.5, threshold=0.1):
     """

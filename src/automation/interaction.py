@@ -23,8 +23,11 @@ def click_element(location, right_click=False, double_click=False, offset=(0, 0)
         True if successful, False otherwise
     """
     try:
+        element_name = "unknown"
+        
         # Handle UIElement objects
         if isinstance(location, UIElement):
+            element_name = location.name
             element_location = find_element(location)
             if not element_location:
                 logging.error(f"Could not find element {location.name} to click")
@@ -38,6 +41,10 @@ def click_element(location, right_click=False, double_click=False, offset=(0, 0)
             center_y = y + height // 2 + offset[1]
         else:
             center_x, center_y = location[0] + offset[0], location[1] + offset[1]
+        
+        # Debug click location (add this line)
+        from src.utils.click_debugger import debug_click_location
+        debug_click_location(location, offset, element_name)
         
         # Add slight humanized movement
         humanize_mouse_movement(center_x, center_y)

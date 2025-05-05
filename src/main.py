@@ -5,7 +5,7 @@ from src.utils.logging_util import setup_visual_logging
 import argparse
 import logging
 from src.utils.region_manager import RegionManager
-
+from src.models.ui_element import UIElement
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Claude GUI Automation")
@@ -25,6 +25,7 @@ def main():
     args = parse_arguments()
     
     # Set up logging
+    args.debug = True
     log_dir = setup_visual_logging(debug=args.debug)
     logging.info("Starting Claude automation")
     

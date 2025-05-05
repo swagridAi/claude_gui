@@ -16,6 +16,7 @@ def setup_visual_logging(debug=False):
     Returns:
         Path to log directory
     """
+    debug = True
     # Create timestamped log directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_dir = os.path.join("logs", f"run_{timestamp}")

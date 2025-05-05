@@ -1,13 +1,31 @@
 browser_profile: C:\Temp\ClaudeProfile
 claude_url: https://claude.ai
-debug: false
+debug: true
+debug_settings:
+  save_screenshots: true
+  log_clicks: true
+  log_recognition: true
+  verbose_output: true
+delay_between_prompts: 3
+max_retries: 3
+max_retry_delay: 30
+ocr:
+  config: --psm 6
+  contrast_enhance: true
+  denoise: true
+  engine: tesseract
+  preprocess: true
 prompts:
 - Summarize the latest AI trends.
 - Explain how reinforcement learning works.
 - Write a Python function that reverses a string.
+response_timeout: 60
+retry_backoff: 1.5
+retry_delay: 2
+retry_jitter: 0.5
 ui_elements:
   prompt_box:
-    confidence: 0.7
+    confidence: 0.9
     reference_paths:
     - assets/reference_images/prompt_box\prompt_box_1_1746403024.png
     - assets/reference_images/prompt_box\prompt_box_1_1746404009.png
@@ -16,18 +34,77 @@ ui_elements:
     - assets/reference_images/prompt_box\prompt_box_5_1746404084.png
     - assets/reference_images/prompt_box\prompt_box_6_1746404088.png
     - assets/reference_images/prompt_box\prompt_box_7_1746404094.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746403024_gray.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746403024_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746403024_thresh.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746404009_gray.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746404009_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_1_1746404009_thresh.png
+    - assets/reference_images/prompt_box\prompt_box_2_1746403033_gray.png
+    - assets/reference_images/prompt_box\prompt_box_2_1746403033_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_2_1746403033_thresh.png
+    - assets/reference_images/prompt_box\prompt_box_4_1746404014_gray.png
+    - assets/reference_images/prompt_box\prompt_box_4_1746404014_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_4_1746404014_thresh.png
+    - assets/reference_images/prompt_box\prompt_box_5_1746404084_gray.png
+    - assets/reference_images/prompt_box\prompt_box_5_1746404084_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_5_1746404084_thresh.png
+    - assets/reference_images/prompt_box\prompt_box_6_1746404088_gray.png
+    - assets/reference_images/prompt_box\prompt_box_6_1746404088_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_6_1746404088_thresh.png
+    - assets/reference_images/prompt_box\prompt_box_7_1746404094_gray.png
+    - assets/reference_images/prompt_box\prompt_box_7_1746404094_contrast.png
+    - assets/reference_images/prompt_box\prompt_box_7_1746404094_thresh.png
     region:
     - 635
     - 745
     - 1800
     - 607
+  response_area:
+    confidence: 0.9
+    reference_paths:
+    - assets/reference_images/response_area\response_area_1.png
+    - assets/reference_images/response_area\response_area_1_1746405848.png
+    - assets/reference_images/response_area\response_area_1_gray.png
+    - assets/reference_images/response_area\response_area_1_contrast.png
+    - assets/reference_images/response_area\response_area_1_thresh.png
+    - assets/reference_images/response_area\response_area_1_1746405848_gray.png
+    - assets/reference_images/response_area\response_area_1_1746405848_contrast.png
+    - assets/reference_images/response_area\response_area_1_1746405848_thresh.png
+    region:
+    - 526
+    - 269
+    - 1627
+    - 853
   send_button:
-    confidence: 0.7
+    confidence: 0.9
     reference_paths:
     - assets/reference_images/send_button\send_button_1_1746404204.png
     - assets/reference_images/send_button\send_button_2_1746404231.png
+    - assets/reference_images/send_button\send_button_1_1746404204_gray.png
+    - assets/reference_images/send_button\send_button_1_1746404204_contrast.png
+    - assets/reference_images/send_button\send_button_1_1746404204_thresh.png
+    - assets/reference_images/send_button\send_button_2_1746404231_gray.png
+    - assets/reference_images/send_button\send_button_2_1746404231_contrast.png
+    - assets/reference_images/send_button\send_button_2_1746404231_thresh.png
     region:
     - 1910
     - 867
     - 513
     - 470
+  thinking_indicator:
+    confidence: 0.9
+    reference_paths:
+    - assets/reference_images/thinking_indicator\thinking_indicator_1.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_gray.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_contrast.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_thresh.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241_gray.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241_contrast.png
+    - assets/reference_images/thinking_indicator\thinking_indicator_1_1746405241_thresh.png
+    region:
+    - 1970
+    - 1128
+    - 182
+    - 210

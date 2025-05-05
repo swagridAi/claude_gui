@@ -39,60 +39,95 @@ def setup_visual_logging(debug=False):
     logging.info(f"Logging initialized in {log_dir}")
     return log_dir
 
-def log_with_screenshot(message, level=logging.INFO, region=None):
+def log_with_screenshot(message, level=logging.INFO, region=None, stage_name=None):
     """
-    Log a message and capture a screenshot.
+    Log a message and capture a screenshot at each program stage.
     
     Args:
         message: Log message
         level: Logging level (default: INFO)
         region: Optional region to capture (x, y, width, height)
+        stage_name: Name of the current execution stage (used in filename)
     """
     # Log the message
     logging.log(level, message)
     
     try:
-        # Create screenshots directory if it doesn't exist
-        screenshot_dir = os.path.join("logs", "screenshots")
+        # Create screenshots directory for this run
+        timestamp_run = datetime.now().strftime("%Y%m%d_%H%M%S")
+        screenshot_dir = os.path.join("logs", f"run_{timestamp_run}", "screenshots")
         os.makedirs(screenshot_dir, exist_ok=True)
         
-        # Generate filename with timestamp
+        # Generate timestamp for this specific screenshot
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-        filename = os.path.join(screenshot_dir, f"screenshot_{timestamp}.png")
+        
+        # Include stage name in filename if provided
+        stage_prefix = f"{stage_name}_" if stage_name else ""
+        filename = os.path.join(screenshot_dir, f"{stage_prefix}screenshot_{timestamp}.png")
+        
+        # Log before attempting to capture
+        logging.debug(f"Attempting to capture screenshot for stage: {stage_name or 'unnamed'}")
         
         # Capture screenshot (full screen or region)
-        screenshot = pyautogui.screenshot(region=region)
+        try:
+            screenshot = pyautogui.screenshot(region=region)
+            logging.debug(f"Screenshot captured successfully")
+        except Exception as screenshot_error:
+            logging.error(f"Failed to capture screenshot: {screenshot_error}", exc_info=True)
+            return
         
         # Save the screenshot
-        screenshot.save(filename)
+        try:
+            screenshot.save(filename)
+            logging.debug(f"Screenshot saved to {filename}")
+        except Exception as save_error:
+            logging.error(f"Failed to save screenshot: {save_error}", exc_info=True)
+            return
         
-        # If region is specified, add visual indicator
-        if region:
-            # Capture full screen for reference
-            full_screenshot = pyautogui.screenshot()
-            full_img = np.array(full_screenshot)
-            full_img = cv2.cvtColor(full_img, cv2.COLOR_RGB2BGR)
+        # Create an annotated version with timestamp and stage info
+        try:
+            # Convert to OpenCV format
+            img = np.array(screenshot)
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             
-            # Draw rectangle around the region
-            x, y, w, h = region
-            cv2.rectangle(full_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # Add timestamp and stage information
+            stage_info = f"Stage: {stage_name}" if stage_name else "Unnamed stage"
+            time_info = f"Time: {datetime.now().strftime('%H:%M:%S.%f')[:-3]}"
             
-            # Add text label with message
+            # Add text to top of image
             cv2.putText(
-                full_img, 
-                message[:50] + "..." if len(message) > 50 else message,
-                (x, y - 10),
+                img, 
+                f"{stage_info} | {time_info}",
+                (10, 30),  # Position at top-left with padding
                 cv2.FONT_HERSHEY_SIMPLEX,
-                0.5,
-                (0, 255, 0),
-                1
+                0.7,  # Font size
+                (0, 0, 255),  # Red color
+                2  # Thickness
             )
             
+            # Add message text
+            cv2.putText(
+                img, 
+                message[:100] + "..." if len(message) > 100 else message,
+                (10, 70),  # Position below stage info
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,  # Font size
+                (0, 255, 0),  # Green color
+                1  # Thickness
+            )
+            
+            # If region is specified, draw rectangle
+            if region:
+                x, y, w, h = region
+                cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 3)
+            
             # Save the annotated screenshot
-            annotated_filename = os.path.join(screenshot_dir, f"annotated_{timestamp}.png")
-            cv2.imwrite(annotated_filename, full_img)
-        
-        logging.debug(f"Screenshot saved to {filename}")
+            annotated_filename = os.path.join(screenshot_dir, f"{stage_prefix}annotated_{timestamp}.png")
+            cv2.imwrite(annotated_filename, img)
+            logging.debug(f"Annotated screenshot saved to {annotated_filename}")
+            
+        except Exception as annotation_error:
+            logging.error(f"Failed to create annotated screenshot: {annotation_error}", exc_info=True)
         
     except Exception as e:
-        logging.error(f"Failed to capture screenshot: {e}")
+        logging.error(f"Failed in log_with_screenshot: {e}", exc_info=True)

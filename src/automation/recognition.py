@@ -126,6 +126,13 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
     import logging
     import glob
     import os
+    from src.utils.logging_util import log_with_screenshot
+    
+    # Log beginning of search
+    log_with_screenshot(
+        f"Searching for element: {ui_element.name}", 
+        stage_name=f"SEARCH_{ui_element.name}_START"
+    )
     
     confidence = confidence_override or ui_element.confidence
     min_confidence = max(0.4, confidence - 0.2)  # Set a minimum confidence threshold
@@ -320,6 +327,22 @@ def find_element(ui_element, confidence_override=None, use_advanced=True):
         except Exception as e:
             logging.warning(f"Error processing reference {reference_path}: {e}")
     
+    if all_matches:
+        all_matches.sort(key=lambda x: x['score'], reverse=True)
+        best_match = all_matches[0]
+        log_with_screenshot(
+            f"Found {ui_element.name} with score {best_match['score']:.2f}", 
+            stage_name=f"FOUND_{ui_element.name}",
+            region=best_match['location']
+        )
+        return best_match['location']
+    else:
+        log_with_screenshot(
+            f"Element {ui_element.name} not found", 
+            level=logging.WARNING,
+            stage_name=f"NOT_FOUND_{ui_element.name}"
+        )
+
     # If we found any matches, return the best one
     if all_matches:
         # Sort by score, highest first

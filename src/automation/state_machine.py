@@ -63,26 +63,46 @@ class SimpleAutomationMachine:
     def _execute_current_state(self):
         """Execute the current state and transition to the next state."""
         try:
+            # Log the state transition with screenshot
+            log_with_screenshot(
+                f"Entering state: {self.state.name}", 
+                level=logging.INFO,
+                stage_name=self.state.name
+            )
+            
             if self.state == AutomationState.INITIALIZE:
                 self._handle_initialize()
-            
+                
             elif self.state == AutomationState.BROWSER_LAUNCH:
                 self._handle_browser_launch()
-            
+                
             elif self.state == AutomationState.WAIT_FOR_LOGIN:
                 self._handle_wait_for_login()
-            
+                
             elif self.state == AutomationState.SEND_PROMPTS:
                 self._handle_send_prompts()
-                
+                    
             elif self.state == AutomationState.RETRY:
                 self._handle_retry()
+            
+            # Log successful state completion with screenshot
+            log_with_screenshot(
+                f"Successfully completed state: {self.state.name}", 
+                level=logging.INFO,
+                stage_name=f"{self.state.name}_COMPLETE"
+            )
             
             # Reset retry count on successful state execution (only for non-retry states)
             if self.state != AutomationState.RETRY:
                 self.retry_count = 0
-            
+                
         except Exception as e:
+            # Log error with screenshot
+            log_with_screenshot(
+                f"Error in state {self.state.name}: {str(e)}", 
+                level=logging.ERROR,
+                stage_name=f"{self.state.name}_ERROR"
+            )
             self._handle_error(e)
     
     def _handle_initialize(self):
@@ -154,6 +174,7 @@ class SimpleAutomationMachine:
         """Send all prompts in sequence."""
         if self.current_prompt_index >= len(self.prompts):
             logging.info("All prompts have been sent")
+            log_with_screenshot("All prompts completed", stage_name="PROMPTS_COMPLETED")
             self.state = AutomationState.COMPLETE
             # Close browser when all prompts are sent
             self.close_browser()
@@ -161,28 +182,35 @@ class SimpleAutomationMachine:
         
         current_prompt = self.prompts[self.current_prompt_index]
         logging.info(f"Sending prompt {self.current_prompt_index + 1}/{len(self.prompts)}: {current_prompt[:50]}...")
+        log_with_screenshot(f"Before sending prompt {self.current_prompt_index + 1}", stage_name="BEFORE_PROMPT")
         
         try:
             # Find and click the prompt box
             prompt_box = find_element(self.ui_elements["prompt_box"])
             if not prompt_box:
+                log_with_screenshot("Prompt box not found", level=logging.ERROR, stage_name="PROMPT_BOX_NOT_FOUND")
                 self.failure_type = FailureType.UI_NOT_FOUND
                 raise Exception("Prompt box not found")
             
+            log_with_screenshot("Prompt box found", stage_name="PROMPT_BOX_FOUND", region=prompt_box)
             click_element(prompt_box)
+            log_with_screenshot("After clicking prompt box", stage_name="AFTER_PROMPT_BOX_CLICK")
             
             # Send the prompt text
             send_text(current_prompt)
+            log_with_screenshot("After typing prompt", stage_name="AFTER_TYPE_PROMPT")
             
             # Find and click the send button or press Enter
             send_button = find_element(self.ui_elements["send_button"])
             if send_button:
+                log_with_screenshot("Send button found", stage_name="SEND_BUTTON_FOUND", region=send_button)
                 click_element(send_button)
             else:
+                log_with_screenshot("Send button not found, using Enter key", stage_name="SEND_BUTTON_NOT_FOUND")
                 from pyautogui import press
                 press("enter")
             
-            log_with_screenshot("Prompt sent")
+            log_with_screenshot("Prompt sent", stage_name="PROMPT_SENT")
             
             # Move to next prompt
             self.current_prompt_index += 1

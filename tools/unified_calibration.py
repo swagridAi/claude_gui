@@ -1023,54 +1023,34 @@ class UnifiedCalibrationTool:
         """Scan for debug images in the logs directory."""
         self.debug_images = {}
         
-        # Scan recognition debug images
-        recognition_dir = "logs/recognition_debug"
-        if os.path.exists(recognition_dir):
-            for image_path in glob.glob(os.path.join(recognition_dir, "*.png")):
-                # Extract element name from filename (pattern: element_name_matches_timestamp.png)
+        # Scan all run directories
+        run_dirs = glob.glob("logs/run_*")
+        for run_dir in run_dirs:
+            screenshots_dir = os.path.join(run_dir, "screenshots")
+            if not os.path.exists(screenshots_dir):
+                continue
+                
+            # Scan for recognition debug images
+            for image_path in glob.glob(os.path.join(screenshots_dir, "*matches*.png")):
                 filename = os.path.basename(image_path)
-                match = re.match(r"(\w+)_matches_\d+\.png", filename)
+                # Extract element name from relevant part of filename
+                match = re.search(r"FOUND_(\w+)|(\w+)_matches", filename)
                 if match:
-                    element_name = match.group(1)
+                    element_name = match.group(1) or match.group(2)
                     if element_name not in self.debug_images:
                         self.debug_images[element_name] = {"recognition": [], "click": []}
                     self.debug_images[element_name]["recognition"].append(image_path)
-        
-        # Scan click debug images
-        click_dir = "logs/click_debug"
-        if os.path.exists(click_dir):
-            for image_path in glob.glob(os.path.join(click_dir, "*.png")):
-                # Extract element name from filename (pattern: click_element_name_timestamp.png)
+            
+            # Scan for click debug images
+            for image_path in glob.glob(os.path.join(screenshots_dir, "*click*.png")):
                 filename = os.path.basename(image_path)
-                match = re.match(r"click_(\w+)_\d+.*\.png", filename)
+                # Extract element name
+                match = re.search(r"click_(\w+)", filename)
                 if match:
                     element_name = match.group(1)
                     if element_name not in self.debug_images:
                         self.debug_images[element_name] = {"recognition": [], "click": []}
                     self.debug_images[element_name]["click"].append(image_path)
-        
-        # Update debug listbox
-        self.debug_listbox.delete(0, tk.END)
-        
-        # Add entries for each element
-        for element_name in sorted(self.debug_images.keys()):
-            rec_count = len(self.debug_images[element_name]["recognition"])
-            click_count = len(self.debug_images[element_name]["click"])
-            
-            self.debug_listbox.insert(tk.END, f"{element_name} (R:{rec_count}, C:{click_count})")
-            
-            # Add individual debug images with indent
-            for i, path in enumerate(self.debug_images[element_name]["recognition"]):
-                filename = os.path.basename(path)
-                self.debug_listbox.insert(tk.END, f"  - R{i+1}: {filename}")
-                
-            for i, path in enumerate(self.debug_images[element_name]["click"]):
-                filename = os.path.basename(path)
-                self.debug_listbox.insert(tk.END, f"  - C{i+1}: {filename}")
-        
-        # Show status
-        element_count = len(self.debug_images)
-        self.show_status(f"Found debug images for {element_count} UI elements")
     
     def on_debug_image_select(self, event):
         """Handle selection of a debug image from the listbox."""

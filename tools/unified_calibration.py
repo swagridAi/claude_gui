@@ -564,6 +564,21 @@ class UnifiedCalibrationTool:
         ttk.Button(ref_button_frame, text="Capture Reference", 
                   command=self.capture_reference_from_selection).pack(side=tk.RIGHT)
         
+        coord_button_frame = ttk.Frame(left_frame)
+        coord_button_frame.pack(fill=tk.X, pady=(0, 10))
+
+        ttk.Button(
+            coord_button_frame, 
+            text="Capture Coordinates", 
+            command=self.capture_click_coordinates
+        ).pack(side=tk.LEFT, padx=(0, 5))
+
+        ttk.Button(
+            coord_button_frame, 
+            text="Toggle Coordinates First", 
+            command=self.toggle_coordinate_preference
+        ).pack(side=tk.LEFT, padx=(0, 5))
+
         # Reference image preview
         self.reference_frame = ttk.LabelFrame(left_frame, text="Reference Images")
         self.reference_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
@@ -814,6 +829,12 @@ class UnifiedCalibrationTool:
         
         # Draw existing regions
         self.draw_regions(canvas)
+
+        # Draw existing regions
+        self.draw_regions(canvas)
+        
+        # Draw coordinate markers
+        self.draw_coordinate_markers(canvas)
     
     def draw_regions(self, canvas):
         """Draw all defined regions on the given canvas."""
@@ -1085,11 +1106,19 @@ class UnifiedCalibrationTool:
             # Format reference image counts
             ref_count = len(element_config.get("reference_paths", []))
             
+            # Format coordinates
+            coordinates_str = "Not defined"
+            if "click_coordinates" in element_config and element_config["click_coordinates"]:
+                x, y = element_config["click_coordinates"]
+                coordinates_str = f"({x}, {y})"
+            
             # Build the info text
             info = f"Element: {self.current_element}\n"
             info += f"Region: {region_str}\n"
             info += f"References: {ref_count}\n"
-            info += f"Confidence: {element_config.get('confidence', 0.7):.2f}"
+            info += f"Confidence: {element_config.get('confidence', 0.7):.2f}\n"
+            info += f"Click coords: {coordinates_str}\n"
+            info += f"Use coords first: {element_config.get('use_coordinates_first', False)}"
             
             self.element_info.insert(tk.END, info)
         else:
@@ -2030,35 +2059,103 @@ class UnifiedCalibrationTool:
             self.save_configuration()
 
     def load_configuration(self):
-        """Load configuration from the config manager."""
+        """
+        Load configuration from the default and user configuration files.
+        
+        Returns:
+            bool: True if successful, False otherwise
+        """
         try:
-            # Get UI elements from configuration
-            ui_elements = self.config_manager.get("ui_elements", {})
+            # Start with an empty configuration
+            self.config = {}
             
-            # Update elements dictionary
-            self.elements = ui_elements
+            # Load default configuration if it exists
+            if os.path.exists(self.default_config_path):
+                logging.debug(f"Loading default configuration from {self.default_config_path}")
+                try:
+                    with open(self.default_config_path, 'r') as f:
+                        default_config = yaml.safe_load(f) or {}
+                    self.config = default_config
+                    logging.debug(f"Default configuration loaded successfully with {len(default_config)} items")
+                except Exception as e:
+                    logging.error(f"Error loading default configuration: {e}")
+                    return False
             
-            # Update element listbox
-            self.element_listbox.delete(0, tk.END)
-            for name in sorted(self.elements.keys()):
-                self.element_listbox.insert(tk.END, name)
+            # Load user configuration and merge with defaults if it exists
+            if os.path.exists(self.config_path):
+                logging.debug(f"Loading user configuration from {self.config_path}")
+                try:
+                    with open(self.config_path, 'r') as f:
+                        user_config = yaml.safe_load(f) or {}
+                    
+                    # Merge with defaults using deep update
+                    self._deep_update(self.config, user_config)
+                    
+                    # Store a deep copy of the original config
+                    self._original_config = copy.deepcopy(self.config)
+                    
+                    # Store original sessions separately
+                    self._original_sessions = copy.deepcopy(self.config.get('sessions', {}))
+                    
+                    logging.debug(f"User configuration loaded and merged successfully")
+                except Exception as e:
+                    logging.error(f"Error loading user configuration: {e}")
+                    return False
+            else:
+                # If user config doesn't exist, create an empty one
+                logging.info(f"User configuration not found at {self.config_path}")
+                os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
                 
-                # Count reference images
-                ref_paths = self.elements[name].get("reference_paths", [])
-                self.reference_count[name] = len(ref_paths)
+                # Store a deep copy of the original config
+                self._original_config = copy.deepcopy(self.config)
+                
+                # Return success without saving - we'll save only when explicitly requested
+                return True
             
-            # Select the first element if any
-            if self.elements:
-                self.element_listbox.selection_set(0)
-                self.current_element = self.element_listbox.get(0)
-                self.update_element_info()
-                self.update_reference_preview()
+            # Process coordinate-based properties for backward compatibility
+            self._process_coordinate_properties()
             
-            self.show_status(f"Loaded configuration with {len(self.elements)} elements")
-            
+            return True
         except Exception as e:
-            messagebox.showerror("Load Error", f"Error loading configuration: {e}")
-            self.show_status(f"Error loading configuration: {e}")
+            logging.error(f"Unexpected error loading configuration: {e}")
+            return False
+
+    def _process_coordinate_properties(self):
+        """
+        Process coordinate-based properties for backward compatibility.
+        Convert any list coordinates to tuples and ensure use_coordinates_first is set.
+        """
+        try:
+            # Get UI elements from config
+            ui_elements = self.config.get("ui_elements", {})
+            
+            for element_name, element_config in ui_elements.items():
+                # Handle click_coordinates if present
+                if "click_coordinates" in element_config:
+                    coords = element_config["click_coordinates"]
+                    
+                    # Convert from list to tuple if needed
+                    if isinstance(coords, list) and len(coords) == 2:
+                        element_config["click_coordinates"] = tuple(coords)
+                    
+                    # Ensure use_coordinates_first is set if not present
+                    if "use_coordinates_first" not in element_config:
+                        # Use global default if present, otherwise true
+                        global_preference = self.config.get("automation_settings", {}).get("prefer_coordinates", True)
+                        element_config["use_coordinates_first"] = global_preference
+                        
+                        logging.debug(f"Set use_coordinates_first={global_preference} for {element_name}")
+                
+            # Ensure global automation_settings with coordinate preferences exist
+            if "automation_settings" not in self.config:
+                self.config["automation_settings"] = {}
+                
+            if "prefer_coordinates" not in self.config.get("automation_settings", {}):
+                self.config["automation_settings"]["prefer_coordinates"] = True
+                
+            logging.debug("Processed coordinate properties for backward compatibility")
+        except Exception as e:
+            logging.error(f"Error processing coordinate properties: {e}")
     
     def save_configuration(self):
         """Save the current configuration."""
@@ -2095,6 +2192,110 @@ class UnifiedCalibrationTool:
         except Exception as e:
             messagebox.showerror("Save Error", f"Error saving configuration: {e}")
             self.show_status(f"Error saving configuration: {e}")
+
+def capture_click_coordinates(self):
+    """Capture mouse coordinates for direct clicking."""
+    if not self.current_element:
+        messagebox.showwarning("No Selection", "Please select an element first.")
+        return
+        
+    # Display instructions
+    msg = f"Position your mouse where you want to click for '{self.current_element}'.\n\n"
+    msg += "The window will minimize in 2 seconds. Position your mouse and remain still."
+    messagebox.showinfo("Capture Coordinates", msg)
+    
+    self.root.iconify()  # Minimize window
+    self.show_status(f"Position mouse for {self.current_element} click and wait 3 seconds...")
+    time.sleep(3)  # Give user time to position mouse
+    
+    # Get mouse position
+    x, y = pyautogui.position()
+    
+    # Update element configuration
+    if self.current_element not in self.elements:
+        self.elements[self.current_element] = {
+            "region": None, 
+            "reference_paths": [], 
+            "confidence": 0.7
+        }
+    
+    self.elements[self.current_element]["click_coordinates"] = [x, y]
+    
+    # Set use_coordinates_first to true if not already set
+    if "use_coordinates_first" not in self.elements[self.current_element]:
+        self.elements[self.current_element]["use_coordinates_first"] = True
+    
+    self.root.deiconify()  # Restore window
+    self.update_element_info()  # Update UI to show new coordinates
+    
+    # Also update the canvas to show the coordinates
+    current_tab = self.notebook.index("current")
+    if current_tab == 1:  # Define tab
+        self.draw_coordinate_markers(self.define_canvas)
+    
+    self.show_status(f"Captured click coordinates for {self.current_element}: ({x}, {y})")
+
+def toggle_coordinate_preference(self):
+    """Toggle whether to use coordinates first or visual recognition first."""
+    if not self.current_element or self.current_element not in self.elements:
+        messagebox.showwarning("No Element", "Please select a valid element first.")
+        return
+    
+    # Toggle the preference
+    current = self.elements[self.current_element].get("use_coordinates_first", False)
+    self.elements[self.current_element]["use_coordinates_first"] = not current
+    
+    # Update the UI
+    self.update_element_info()
+    self.show_status(f"Set {self.current_element} to {'use coordinates first' if not current else 'use visual recognition first'}")
+
+def draw_coordinate_markers(self, canvas):
+    """Draw markers for click coordinates on the canvas."""
+    if not self.screenshot:
+        return
+    
+    # Clear previous markers
+    canvas.delete("coordinate_marker")
+    
+    # Draw each element's coordinates
+    for name, config in self.elements.items():
+        if "click_coordinates" in config and config["click_coordinates"]:
+            try:
+                x, y = config["click_coordinates"]
+                
+                # Scale to canvas size
+                canvas_x = x * self.scale
+                canvas_y = y * self.scale
+                
+                # Draw a crosshair
+                size = 10
+                canvas.create_line(
+                    canvas_x - size, canvas_y, 
+                    canvas_x + size, canvas_y, 
+                    fill="red", width=2, tags="coordinate_marker"
+                )
+                canvas.create_line(
+                    canvas_x, canvas_y - size, 
+                    canvas_x, canvas_y + size, 
+                    fill="red", width=2, tags="coordinate_marker"
+                )
+                
+                # Draw a circle
+                canvas.create_oval(
+                    canvas_x - size, canvas_y - size,
+                    canvas_x + size, canvas_y + size,
+                    outline="red", width=2, tags="coordinate_marker"
+                )
+                
+                # Add label
+                canvas.create_text(
+                    canvas_x + size + 5, canvas_y,
+                    text=f"{name} ({x}, {y})",
+                    fill="red", anchor=tk.W, tags="coordinate_marker"
+                )
+            except Exception as e:
+                logging.error(f"Error drawing coordinate marker for {name}: {e}")
+
 
 def main():
     """Main function to run the calibration tool."""

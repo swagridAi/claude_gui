@@ -9,10 +9,12 @@ class UIElement:
         relative_region: Region defined relative to parent or screen
         parent: Parent element to calculate relative position from
         confidence: Confidence threshold for recognition
+        click_coordinates: (x, y) tuple for direct clicking
+        use_coordinates_first: Whether to prioritize coordinates over visual recognition
     """
     
     def __init__(self, name, reference_paths=None, region=None, relative_region=None, 
-                 parent=None, confidence=0.7):
+                 parent=None, confidence=0.7, click_coordinates=None, use_coordinates_first=True):
         """
         Initialize a UI element.
         
@@ -24,6 +26,8 @@ class UIElement:
                 Format: (x_pct, y_pct, width_pct, height_pct) or (x_offset, y_offset, width, height)
             parent: Parent element name or None for screen-relative
             confidence: Confidence threshold for recognition
+            click_coordinates: (x, y) tuple for direct clicking
+            use_coordinates_first: Whether to prioritize coordinates over visual recognition
         """
         self.name = name
         self.reference_paths = reference_paths or []
@@ -34,17 +38,23 @@ class UIElement:
         # Add fields to track successful matches
         self.last_match_location = None
         self.last_match_time = 0
+        
+        # New coordinate-based properties
+        self.click_coordinates = click_coordinates
+        self.use_coordinates_first = use_coordinates_first
     
     def __str__(self):
         """String representation of the UI element."""
-        if self.relative_region:
+        if self.click_coordinates:
+            return f"UIElement(name={self.name}, click_coordinates={self.click_coordinates}, use_coordinates_first={self.use_coordinates_first})"
+        elif self.relative_region:
             return f"UIElement(name={self.name}, relative_region={self.relative_region}, parent={self.parent}, confidence={self.confidence})"
         else:
             return f"UIElement(name={self.name}, region={self.region}, confidence={self.confidence})"
     
     def __repr__(self):
         """Detailed representation of the UI element."""
-        return f"UIElement(name='{self.name}', reference_paths={self.reference_paths}, region={self.region}, relative_region={self.relative_region}, parent={self.parent}, confidence={self.confidence})"
+        return f"UIElement(name='{self.name}', reference_paths={self.reference_paths}, region={self.region}, relative_region={self.relative_region}, parent={self.parent}, confidence={self.confidence}, click_coordinates={self.click_coordinates}, use_coordinates_first={self.use_coordinates_first})"
     
     def get_effective_region(self, ui_elements=None, screen_size=None):
         """

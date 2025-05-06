@@ -9,6 +9,44 @@ from src.automation.recognition import find_element
 pyautogui.PAUSE = 0.5  # Default delay between actions
 pyautogui.FAILSAFE = True  # Move mouse to upper-left to abort
 
+def click_at_coordinates(x, y, right_click=False, double_click=False, element_name="coordinates"):
+    """
+    Click directly at the specified coordinates.
+    
+    Args:
+        x, y: Screen coordinates to click
+        right_click: Whether to perform a right click
+        double_click: Whether to perform a double click
+        element_name: Name for logging and debugging
+    
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Debug click location
+        from src.utils.click_debugger import debug_click_location
+        debug_click_location((x, y, 1, 1), name=element_name)
+        
+        # Add slight humanized movement
+        humanize_mouse_movement(x, y)
+        
+        # Perform the click
+        if right_click:
+            pyautogui.rightClick(x, y)
+            logging.debug(f"Right-clicked at coordinates ({x}, {y})")
+        elif double_click:
+            pyautogui.doubleClick(x, y)
+            logging.debug(f"Double-clicked at coordinates ({x}, {y})")
+        else:
+            pyautogui.click(x, y)
+            logging.debug(f"Clicked at coordinates ({x}, {y})")
+        
+        return True
+    
+    except Exception as e:
+        logging.error(f"Click at coordinates failed: {e}")
+        return False
+
 def click_element(location, right_click=False, double_click=False, offset=(0, 0)):
     """
     Click on a UI element at the specified location.
@@ -28,10 +66,29 @@ def click_element(location, right_click=False, double_click=False, offset=(0, 0)
         # Handle UIElement objects
         if isinstance(location, UIElement):
             element_name = location.name
+            
+            # Try direct coordinates first if available and configured
+            if location.click_coordinates and location.use_coordinates_first:
+                coords = location.click_coordinates
+                # Handle both tuple and list formats
+                x, y = coords if isinstance(coords, tuple) else tuple(coords)
+                logging.info(f"Using direct coordinates for {element_name}: ({x}, {y})")
+                return click_at_coordinates(x, y, right_click, double_click, element_name)
+            
+            # Fall back to visual recognition
             element_location = find_element(location)
             if not element_location:
+                # Try coordinates as fallback if available
+                if location.click_coordinates:
+                    coords = location.click_coordinates
+                    # Handle both tuple and list formats
+                    x, y = coords if isinstance(coords, tuple) else tuple(coords)
+                    logging.info(f"Visual recognition failed. Using fallback coordinates for {element_name}: ({x}, {y})")
+                    return click_at_coordinates(x, y, right_click, double_click, element_name)
+                    
                 logging.error(f"Could not find element {location.name} to click")
                 return False
+                
             location = element_location
         
         # Extract coordinates
@@ -42,7 +99,7 @@ def click_element(location, right_click=False, double_click=False, offset=(0, 0)
         else:
             center_x, center_y = location[0] + offset[0], location[1] + offset[1]
         
-        # Debug click location (add this line)
+        # Debug click location
         from src.utils.click_debugger import debug_click_location
         debug_click_location(location, offset, element_name)
         
@@ -187,26 +244,45 @@ def drag_drop(start_location, end_location, duration=0.5):
     try:
         # Handle start location
         if isinstance(start_location, UIElement):
-            element_location = find_element(start_location)
-            if not element_location:
-                logging.error(f"Could not find element {start_location.name} for drag")
-                return False
-            start_location = element_location
+            # Try coordinates first if available and configured
+            if start_location.click_coordinates and start_location.use_coordinates_first:
+                coords = start_location.click_coordinates
+                # Handle both tuple and list formats
+                start_x, start_y = coords if isinstance(coords, tuple) else tuple(coords)
+            else:
+                element_location = find_element(start_location)
+                if not element_location:
+                    logging.error(f"Could not find element {start_location.name} for drag")
+                    return False
+                start_location = element_location
+                # Calculate center
+                start_x = start_location[0] + start_location[2] // 2
+                start_y = start_location[1] + start_location[3] // 2
+        else:
+            # Calculate center from region
+            start_x = start_location[0] + start_location[2] // 2
+            start_y = start_location[1] + start_location[3] // 2
         
         # Handle end location
         if isinstance(end_location, UIElement):
-            element_location = find_element(end_location)
-            if not element_location:
-                logging.error(f"Could not find element {end_location.name} for drop")
-                return False
-            end_location = element_location
-        
-        # Calculate centers
-        start_x = start_location[0] + start_location[2] // 2
-        start_y = start_location[1] + start_location[3] // 2
-        
-        end_x = end_location[0] + end_location[2] // 2
-        end_y = end_location[1] + end_location[3] // 2
+            # Try coordinates first if available and configured
+            if end_location.click_coordinates and end_location.use_coordinates_first:
+                coords = end_location.click_coordinates
+                # Handle both tuple and list formats
+                end_x, end_y = coords if isinstance(coords, tuple) else tuple(coords)
+            else:
+                element_location = find_element(end_location)
+                if not element_location:
+                    logging.error(f"Could not find element {end_location.name} for drop")
+                    return False
+                end_location = element_location
+                # Calculate center
+                end_x = end_location[0] + end_location[2] // 2
+                end_y = end_location[1] + end_location[3] // 2
+        else:
+            # Calculate center from region
+            end_x = end_location[0] + end_location[2] // 2
+            end_y = end_location[1] + end_location[3] // 2
         
         # Perform drag and drop
         pyautogui.moveTo(start_x, start_y)
@@ -252,11 +328,28 @@ def wait_and_click(ui_element, timeout=10, interval=0.5):
     """
     start_time = time.time()
     while time.time() - start_time < timeout:
+        # Check if we should use coordinates first
+        if ui_element.click_coordinates and ui_element.use_coordinates_first:
+            coords = ui_element.click_coordinates
+            # Handle both tuple and list formats
+            x, y = coords if isinstance(coords, tuple) else tuple(coords)
+            logging.info(f"Using direct coordinates for {ui_element.name}: ({x}, {y})")
+            return click_at_coordinates(x, y, element_name=ui_element.name)
+        
+        # Use visual recognition
         location = find_element(ui_element)
         if location:
             return click_element(location)
         
         time.sleep(interval)
+    
+    # If element not found by visual recognition, try coordinates as fallback
+    if ui_element.click_coordinates:
+        coords = ui_element.click_coordinates
+        # Handle both tuple and list formats
+        x, y = coords if isinstance(coords, tuple) else tuple(coords)
+        logging.info(f"Element not found visually. Using fallback coordinates for {ui_element.name}: ({x}, {y})")
+        return click_at_coordinates(x, y, element_name=ui_element.name)
     
     logging.error(f"Timed out waiting for {ui_element.name}")
     return False

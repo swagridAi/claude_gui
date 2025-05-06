@@ -36,6 +36,13 @@ def parse_arguments():
     # Add option to cleanup temporary configs
     parser.add_argument("--cleanup-temp-configs", type=int, metavar="DAYS",
                       help="Remove temporary config files older than specified days")
+    # Add new arguments for coordinate-based clicking
+    parser.add_argument("--use-coordinates", action="store_true",
+                      help="Prioritize coordinate-based clicking over visual recognition")
+    parser.add_argument("--use-visual", action="store_true",
+                      help="Prioritize visual recognition over coordinate-based clicking")
+    parser.add_argument("--capture-coordinates", action="store_true",
+                      help="Run coordinate capture tool before starting")
     return parser.parse_args()
 
 def cleanup_temp_configs(days_old=7):
@@ -186,6 +193,42 @@ def main():
         working_config.set("retry_delay", args.retry_delay)
         logging.info(f"Setting retry delay to {args.retry_delay} from command line")
     
+    # Handle coordinate-based clicking command line options
+    if args.use_coordinates:
+        # Set global preference for coordinates
+        working_config.set("automation_settings.prefer_coordinates", True)
+        logging.info("Setting global preference to use coordinates first (from command line)")
+        
+        # Set all elements to use coordinates first
+        ui_elements_config = working_config.get("ui_elements", {})
+        for element_name, element_config in ui_elements_config.items():
+            if "click_coordinates" in element_config:
+                element_config["use_coordinates_first"] = True
+                logging.info(f"Setting {element_name} to use coordinates first")
+    
+    if args.use_visual:
+        # Set global preference for visual recognition
+        working_config.set("automation_settings.prefer_coordinates", False)
+        logging.info("Setting global preference to use visual recognition first (from command line)")
+        
+        # Set all elements to use visual recognition first
+        ui_elements_config = working_config.get("ui_elements", {})
+        for element_name, element_config in ui_elements_config.items():
+            if "click_coordinates" in element_config:
+                element_config["use_coordinates_first"] = False
+                logging.info(f"Setting {element_name} to use visual recognition first")
+    
+    # Run coordinate capture if requested
+    if args.capture_coordinates:
+        from tools.unified_calibration import run_coordinate_capture
+        logging.info("Running coordinate capture tool")
+        try:
+            run_coordinate_capture(working_config, preserve_config)
+            logging.info("Coordinate capture completed")
+        except Exception as e:
+            logging.error(f"Error during coordinate capture: {e}")
+            logging.warning("Continuing with existing coordinates")
+    
     # Run calibration if requested
     if args.calibrate:
         from src.utils.calibration import run_calibration
@@ -205,13 +248,19 @@ def main():
     # Parse config for UI elements with both absolute and relative regions
     ui_elements = {}
     for element_name, element_config in working_config.get("ui_elements", {}).items():
+        # Get coordinate-based properties
+        click_coordinates = element_config.get("click_coordinates")
+        use_coordinates_first = element_config.get("use_coordinates_first", True)
+        
         ui_elements[element_name] = UIElement(
             name=element_name,
             reference_paths=element_config.get("reference_paths", []),
             region=element_config.get("region"),
             relative_region=element_config.get("relative_region"),
             parent=element_config.get("parent"),
-            confidence=element_config.get("confidence", 0.7)
+            confidence=element_config.get("confidence", 0.7),
+            click_coordinates=click_coordinates,
+            use_coordinates_first=use_coordinates_first
         )
     
     # Register UI elements with region manager

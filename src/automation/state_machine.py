@@ -321,6 +321,16 @@ class SimpleAutomationMachine:
             logging.error(f"Max retries reached, stopping automation")
             self.state = AutomationState.ERROR
     
+    def set_preserve_config(self, preserve):
+        """
+        Set whether to preserve configuration when saving.
+        
+        Args:
+            preserve: Boolean flag indicating whether to preserve config
+        """
+        self.preserve_config = preserve
+        logging.debug(f"Set preserve_config to {preserve}")
+
     def _handle_retry(self):
         """Handle the retry logic based on the failure type."""
         logging.info(f"Handling retry attempt {self.retry_count} for {self.failure_type}")

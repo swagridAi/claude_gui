@@ -24,9 +24,9 @@ ocr:
   engine: tesseract
   preprocess: true
 prompts:
-- 'Please Analyze the following repository (or files) and identify: - Areas of code duplication
-  (e.g., repeated blocks, similar functions, redundant modules) - Opportunities to
-  refactor into shared functions, utilities, base classes, or config files - Ways
+- 'Please Analyze the following repository (or files) and identify: - Areas of code
+  duplication (e.g., repeated blocks, similar functions, redundant modules) - Opportunities
+  to refactor into shared functions, utilities, base classes, or config files - Ways
   to make the codebase more DRY (Don''t Repeat Yourself) without overcomplicating
   maintainability.'
 - Evaluate whether the entire code repository is functional, integrated properly,
@@ -164,12 +164,12 @@ ui_elements:
     - assets/reference_images/final_prompt_box\final_prompt_box_1746565980_contrast.png
     - assets/reference_images/final_prompt_box\final_prompt_box_1746565980_thresh.png
     region:
-    - 914
-    - 1133
-    - 1185
-    - 213
+    - 155
+    - 1138
+    - 760
+    - 199
   limit_reached:
-    confidence: 0.7
+    confidence: 0.9
     reference_paths:
     - assets/reference_images/limit_reached/limit_reached_1746424723.png
     - assets/reference_images/limit_reached\limit_reached_1746424723_gray.png

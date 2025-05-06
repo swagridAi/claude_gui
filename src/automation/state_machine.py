@@ -187,103 +187,68 @@ class SimpleAutomationMachine:
         log_with_screenshot(f"Before sending prompt {self.current_prompt_index + 1}", stage_name="BEFORE_PROMPT")
         
         try:
-            # If this is the first prompt, click the search_options_button first
+            # If this is the first prompt, click the initial_prompt_box
             if self.current_prompt_index == 0:
-                logging.info("First prompt - clicking search options button")
-                search_options_button = find_element(self.ui_elements.get("search_options_button"))
-                if search_options_button:
-                    log_with_screenshot("Search options button found", stage_name="SEARCH_OPTIONS_FOUND", region=search_options_button)
-                    click_element(search_options_button)
-                    log_with_screenshot("After clicking search options button", stage_name="AFTER_SEARCH_OPTIONS_CLICK")
-                    # Wait a moment for any UI changes after clicking search options
-                    time.sleep(1)
-                else:
-                    logging.warning("Search options button not found, continuing without search options")
-                    log_with_screenshot("Search options button not found", stage_name="SEARCH_OPTIONS_NOT_FOUND")
-            
-            # Find and click the prompt box
-            prompt_box = find_element(self.ui_elements["prompt_box"])
-            if not prompt_box:
-                log_with_screenshot("Prompt box not found", level=logging.ERROR, stage_name="PROMPT_BOX_NOT_FOUND")
-                self.failure_type = FailureType.UI_NOT_FOUND
-                raise Exception("Prompt box not found")
-            
-            log_with_screenshot("Prompt box found", stage_name="PROMPT_BOX_FOUND", region=prompt_box)
-            click_element(prompt_box)
-            log_with_screenshot("After clicking prompt box", stage_name="AFTER_PROMPT_BOX_CLICK")
+                logging.info("First prompt - using initial_prompt_box")
+                prompt_box = find_element(self.ui_elements.get("Initial_prompt_box"))
+                if not prompt_box:
+                    log_with_screenshot("Initial prompt box not found", level=logging.ERROR, stage_name="INITIAL_PROMPT_BOX_NOT_FOUND")
+                    self.failure_type = FailureType.UI_NOT_FOUND
+                    raise Exception("Initial prompt box not found")
+                
+                log_with_screenshot("Initial prompt box found", stage_name="INITIAL_PROMPT_BOX_FOUND", region=prompt_box)
+                click_element(prompt_box)
+                log_with_screenshot("After clicking initial prompt box", stage_name="AFTER_INITIAL_PROMPT_BOX_CLICK")
+            else:
+                # For subsequent prompts, use the final_prompt_box
+                logging.info(f"Subsequent prompt - using final_prompt_box")
+                prompt_box = find_element(self.ui_elements.get("final_prompt_box"))
+                if not prompt_box:
+                    log_with_screenshot("Final prompt box not found", level=logging.ERROR, stage_name="FINAL_PROMPT_BOX_NOT_FOUND")
+                    self.failure_type = FailureType.UI_NOT_FOUND
+                    raise Exception("Final prompt box not found")
+                
+                log_with_screenshot("Final prompt box found", stage_name="FINAL_PROMPT_BOX_FOUND", region=prompt_box)
+                click_element(prompt_box)
+                log_with_screenshot("After clicking final prompt box", stage_name="AFTER_FINAL_PROMPT_BOX_CLICK")
             
             # Send the prompt text
             send_text(current_prompt)
             log_with_screenshot("After typing prompt", stage_name="AFTER_TYPE_PROMPT")
             
-            # Find and click the send button or press Enter
-            send_button = find_element(self.ui_elements["send_button"])
-            if send_button:
-                log_with_screenshot("Send button found", stage_name="SEND_BUTTON_FOUND", region=send_button)
-                click_element(send_button)
-            else:
-                log_with_screenshot("Send button not found, using Enter key", stage_name="SEND_BUTTON_NOT_FOUND")
-                from pyautogui import press
-                press("enter")
+            # Press Enter instead of clicking send button
+            from pyautogui import press
+            press("enter")
+            logging.info("Pressed Enter to send prompt")
+            log_with_screenshot("Prompt sent using Enter key", stage_name="PROMPT_SENT_ENTER")
             
-            log_with_screenshot("Prompt sent", stage_name="PROMPT_SENT")
+            # Wait fixed 5 minutes (300 seconds) after sending prompt
+            fixed_wait_time = 300  # 5 minutes in seconds
+            logging.info(f"Waiting {fixed_wait_time} seconds (5 minutes) after sending prompt...")
             
-            # Wait for Claude to process the prompt and for the send button to become available again
-            logging.info("Waiting for Claude to process the prompt...")
-            response_timeout = self.config.get("response_timeout", 60)
-            fixed_wait_time = 180  # 3 minutes in seconds
+            # Log progress during the fixed wait time at 30-second intervals
             start_time = time.time()
-            send_button_found = False
+            while time.time() - start_time < fixed_wait_time:
+                time.sleep(30)  # Check every 30 seconds
+                waited_so_far = time.time() - start_time
+                remaining = fixed_wait_time - waited_so_far
+                if remaining > 0:
+                    logging.info(f"Still waiting: {int(remaining)} seconds remaining in 5-minute wait period...")
             
-            # First, wait for the send button to become available again (with timeout)
-            while time.time() - start_time < response_timeout and not send_button_found:
-                # Check if send button is available
-                send_button = find_element(self.ui_elements["send_button"])
-                if send_button:
-                    logging.info("Send button is available again. Claude has finished processing.")
-                    log_with_screenshot("Claude finished processing prompt", stage_name="PROMPT_PROCESSED")
-                    send_button_found = True
-                
-                # Wait a short time before checking again
-                time.sleep(3)
-                
-                # Log a waiting message every 15 seconds for longer responses
-                elapsed = time.time() - start_time
-                if elapsed > 15 and int(elapsed) % 15 == 0:
-                    logging.info(f"Still waiting for Claude to finish processing ({int(elapsed)} seconds so far)...")
+            logging.info("Completed mandatory 5-minute wait period after sending prompt")
+            log_with_screenshot("Completed 5-minute wait period", stage_name="WAIT_COMPLETED")
             
-            if not send_button_found:
-                # If we exit the loop without finding the send button, we hit the timeout
-                logging.warning(f"Timeout reached while waiting for Claude to process prompt (timeout: {response_timeout}s)")
-                log_with_screenshot("Timeout waiting for response", stage_name="RESPONSE_TIMEOUT")
-            
-            # Now ensure we wait the minimum fixed time (3 minutes)
-            elapsed_time = time.time() - start_time
-            remaining_wait = fixed_wait_time - elapsed_time
-            
-            if remaining_wait > 0:
-                logging.info(f"Send button found, but enforcing minimum 3-minute wait. Waiting {int(remaining_wait)} more seconds...")
-                # Log progress during the fixed wait time
-                wait_start = time.time()
-                while time.time() - wait_start < remaining_wait:
-                    time.sleep(min(15, remaining_wait))  # Check every 15 seconds
-                    waited_so_far = time.time() - wait_start
-                    remaining = remaining_wait - waited_so_far
-                    if remaining > 0:
-                        logging.info(f"Still waiting: {int(remaining)} seconds remaining in mandatory wait period...")
-                
-                logging.info("Completed mandatory 3-minute wait period after sending prompt")
-                log_with_screenshot("Completed 3-minute wait period", stage_name="WAIT_COMPLETED")
+            # Check for message limit reached notification
+            limit_reached = find_element(self.ui_elements.get("limit_reached"))
+            if limit_reached:
+                logging.warning("Message limit reached, cannot send more prompts")
+                log_with_screenshot("Message limit reached", stage_name="LIMIT_REACHED", region=limit_reached)
+                self.state = AutomationState.COMPLETE
+                return
             
             # Move to next prompt
             self.current_prompt_index += 1
             
-            # Wait a short additional delay between prompts if there are more to send
-            if self.current_prompt_index < len(self.prompts):
-                delay = min(3, self.delay_between_prompts)  # Use a shorter delay since we already waited for processing
-                logging.info(f"Waiting {delay} seconds before sending next prompt...")
-                time.sleep(delay)
-        
         except Exception as e:
             logging.error(f"Error sending prompt: {e}")
             # Set failure type if not already set

@@ -24,7 +24,7 @@ ocr:
   engine: tesseract
   preprocess: true
 prompts:
-- 'Analyze the following repository (or files) and identify: - Areas of code duplication
+- 'Please Analyze the following repository (or files) and identify: - Areas of code duplication
   (e.g., repeated blocks, similar functions, redundant modules) - Opportunities to
   refactor into shared functions, utilities, base classes, or config files - Ways
   to make the codebase more DRY (Don''t Repeat Yourself) without overcomplicating

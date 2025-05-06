@@ -44,6 +44,10 @@ logging.basicConfig(
 )
 
 class UnifiedCalibrationTool:
+
+    # Add this in the __init__ method of the UnifiedCalibrationTool class
+    # Right after initializing the managers:
+
     def __init__(self, root):
         self.root = root
         self.root.title("Claude UI Unified Calibration Tool")
@@ -53,6 +57,9 @@ class UnifiedCalibrationTool:
         self.config_manager = ConfigManager()
         self.reference_manager = ReferenceImageManager()
         self.region_manager = RegionManager()
+        
+        # Add this line to define the default_config_path
+        self.default_config_path = "config/default_config.yaml"
         
         # UI-related variables
         self.screenshot = None
@@ -77,7 +84,7 @@ class UnifiedCalibrationTool:
         
         # Show welcome message
         self.show_status("Welcome to the Unified Calibration Tool. Start by loading or capturing a screenshot.")
-    
+
     def setup_directories(self):
         """Create necessary directories."""
         directories = [
@@ -2060,64 +2067,56 @@ class UnifiedCalibrationTool:
 
     def load_configuration(self):
         """
-        Load configuration from the default and user configuration files.
+        Load configuration from ConfigManager.
         
         Returns:
             bool: True if successful, False otherwise
         """
         try:
-            # Start with an empty configuration
-            self.config = {}
+            # Load configuration from config manager
+            config = self.config_manager.get_all()
             
-            # Load default configuration if it exists
-            if os.path.exists(self.default_config_path):
-                logging.debug(f"Loading default configuration from {self.default_config_path}")
-                try:
-                    with open(self.default_config_path, 'r') as f:
-                        default_config = yaml.safe_load(f) or {}
-                    self.config = default_config
-                    logging.debug(f"Default configuration loaded successfully with {len(default_config)} items")
-                except Exception as e:
-                    logging.error(f"Error loading default configuration: {e}")
-                    return False
+            # Extract UI elements configuration
+            ui_elements = config.get("ui_elements", {})
             
-            # Load user configuration and merge with defaults if it exists
-            if os.path.exists(self.config_path):
-                logging.debug(f"Loading user configuration from {self.config_path}")
-                try:
-                    with open(self.config_path, 'r') as f:
-                        user_config = yaml.safe_load(f) or {}
-                    
-                    # Merge with defaults using deep update
-                    self._deep_update(self.config, user_config)
-                    
-                    # Store a deep copy of the original config
-                    self._original_config = copy.deepcopy(self.config)
-                    
-                    # Store original sessions separately
-                    self._original_sessions = copy.deepcopy(self.config.get('sessions', {}))
-                    
-                    logging.debug(f"User configuration loaded and merged successfully")
-                except Exception as e:
-                    logging.error(f"Error loading user configuration: {e}")
-                    return False
-            else:
-                # If user config doesn't exist, create an empty one
-                logging.info(f"User configuration not found at {self.config_path}")
-                os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
+            # Clear current elements
+            self.elements = {}
+            self.element_listbox.delete(0, tk.END)
+            
+            # Process each UI element
+            for name, element_config in ui_elements.items():
+                # Add to our elements dictionary
+                self.elements[name] = element_config
                 
-                # Store a deep copy of the original config
-                self._original_config = copy.deepcopy(self.config)
+                # Add to listbox
+                self.element_listbox.insert(tk.END, name)
                 
-                # Return success without saving - we'll save only when explicitly requested
-                return True
+                # Count reference images
+                ref_count = len(element_config.get("reference_paths", []))
+                self.reference_count[name] = ref_count
             
-            # Process coordinate-based properties for backward compatibility
-            self._process_coordinate_properties()
+            # Update UI if we have elements
+            if self.elements:
+                # Select the first element
+                self.element_listbox.selection_set(0)
+                self.current_element = self.element_listbox.get(0)
+                self.update_element_info()
+                self.update_reference_preview()
+                
+                # Update canvas if we have a screenshot
+                if self.screenshot:
+                    current_tab = self.notebook.index("current")
+                    if current_tab == 0:
+                        self.update_canvas(self.setup_canvas)
+                    elif current_tab == 1:
+                        self.update_canvas(self.define_canvas)
             
+            self.show_status("Configuration loaded successfully")
             return True
+            
         except Exception as e:
-            logging.error(f"Unexpected error loading configuration: {e}")
+            messagebox.showerror("Load Error", f"Error loading configuration: {e}")
+            self.show_status(f"Error loading configuration: {e}")
             return False
 
     def _process_coordinate_properties(self):
@@ -2193,108 +2192,108 @@ class UnifiedCalibrationTool:
             messagebox.showerror("Save Error", f"Error saving configuration: {e}")
             self.show_status(f"Error saving configuration: {e}")
 
-def capture_click_coordinates(self):
-    """Capture mouse coordinates for direct clicking."""
-    if not self.current_element:
-        messagebox.showwarning("No Selection", "Please select an element first.")
-        return
+    def capture_click_coordinates(self):
+        """Capture mouse coordinates for direct clicking."""
+        if not self.current_element:
+            messagebox.showwarning("No Selection", "Please select an element first.")
+            return
+            
+        # Display instructions
+        msg = f"Position your mouse where you want to click for '{self.current_element}'.\n\n"
+        msg += "The window will minimize in 2 seconds. Position your mouse and remain still."
+        messagebox.showinfo("Capture Coordinates", msg)
         
-    # Display instructions
-    msg = f"Position your mouse where you want to click for '{self.current_element}'.\n\n"
-    msg += "The window will minimize in 2 seconds. Position your mouse and remain still."
-    messagebox.showinfo("Capture Coordinates", msg)
-    
-    self.root.iconify()  # Minimize window
-    self.show_status(f"Position mouse for {self.current_element} click and wait 3 seconds...")
-    time.sleep(3)  # Give user time to position mouse
-    
-    # Get mouse position
-    x, y = pyautogui.position()
-    
-    # Update element configuration
-    if self.current_element not in self.elements:
-        self.elements[self.current_element] = {
-            "region": None, 
-            "reference_paths": [], 
-            "confidence": 0.7
-        }
-    
-    self.elements[self.current_element]["click_coordinates"] = [x, y]
-    
-    # Set use_coordinates_first to true if not already set
-    if "use_coordinates_first" not in self.elements[self.current_element]:
-        self.elements[self.current_element]["use_coordinates_first"] = True
-    
-    self.root.deiconify()  # Restore window
-    self.update_element_info()  # Update UI to show new coordinates
-    
-    # Also update the canvas to show the coordinates
-    current_tab = self.notebook.index("current")
-    if current_tab == 1:  # Define tab
-        self.draw_coordinate_markers(self.define_canvas)
-    
-    self.show_status(f"Captured click coordinates for {self.current_element}: ({x}, {y})")
+        self.root.iconify()  # Minimize window
+        self.show_status(f"Position mouse for {self.current_element} click and wait 3 seconds...")
+        time.sleep(3)  # Give user time to position mouse
+        
+        # Get mouse position
+        x, y = pyautogui.position()
+        
+        # Update element configuration
+        if self.current_element not in self.elements:
+            self.elements[self.current_element] = {
+                "region": None, 
+                "reference_paths": [], 
+                "confidence": 0.7
+            }
+        
+        self.elements[self.current_element]["click_coordinates"] = [x, y]
+        
+        # Set use_coordinates_first to true if not already set
+        if "use_coordinates_first" not in self.elements[self.current_element]:
+            self.elements[self.current_element]["use_coordinates_first"] = True
+        
+        self.root.deiconify()  # Restore window
+        self.update_element_info()  # Update UI to show new coordinates
+        
+        # Also update the canvas to show the coordinates
+        current_tab = self.notebook.index("current")
+        if current_tab == 1:  # Define tab
+            self.draw_coordinate_markers(self.define_canvas)
+        
+        self.show_status(f"Captured click coordinates for {self.current_element}: ({x}, {y})")
 
-def toggle_coordinate_preference(self):
-    """Toggle whether to use coordinates first or visual recognition first."""
-    if not self.current_element or self.current_element not in self.elements:
-        messagebox.showwarning("No Element", "Please select a valid element first.")
-        return
-    
-    # Toggle the preference
-    current = self.elements[self.current_element].get("use_coordinates_first", False)
-    self.elements[self.current_element]["use_coordinates_first"] = not current
-    
-    # Update the UI
-    self.update_element_info()
-    self.show_status(f"Set {self.current_element} to {'use coordinates first' if not current else 'use visual recognition first'}")
+    def toggle_coordinate_preference(self):
+        """Toggle whether to use coordinates first or visual recognition first."""
+        if not self.current_element or self.current_element not in self.elements:
+            messagebox.showwarning("No Element", "Please select a valid element first.")
+            return
+        
+        # Toggle the preference
+        current = self.elements[self.current_element].get("use_coordinates_first", False)
+        self.elements[self.current_element]["use_coordinates_first"] = not current
+        
+        # Update the UI
+        self.update_element_info()
+        self.show_status(f"Set {self.current_element} to {'use coordinates first' if not current else 'use visual recognition first'}")
 
-def draw_coordinate_markers(self, canvas):
-    """Draw markers for click coordinates on the canvas."""
-    if not self.screenshot:
-        return
-    
-    # Clear previous markers
-    canvas.delete("coordinate_marker")
-    
-    # Draw each element's coordinates
-    for name, config in self.elements.items():
-        if "click_coordinates" in config and config["click_coordinates"]:
-            try:
-                x, y = config["click_coordinates"]
-                
-                # Scale to canvas size
-                canvas_x = x * self.scale
-                canvas_y = y * self.scale
-                
-                # Draw a crosshair
-                size = 10
-                canvas.create_line(
-                    canvas_x - size, canvas_y, 
-                    canvas_x + size, canvas_y, 
-                    fill="red", width=2, tags="coordinate_marker"
-                )
-                canvas.create_line(
-                    canvas_x, canvas_y - size, 
-                    canvas_x, canvas_y + size, 
-                    fill="red", width=2, tags="coordinate_marker"
-                )
-                
-                # Draw a circle
-                canvas.create_oval(
-                    canvas_x - size, canvas_y - size,
-                    canvas_x + size, canvas_y + size,
-                    outline="red", width=2, tags="coordinate_marker"
-                )
-                
-                # Add label
-                canvas.create_text(
-                    canvas_x + size + 5, canvas_y,
-                    text=f"{name} ({x}, {y})",
-                    fill="red", anchor=tk.W, tags="coordinate_marker"
-                )
-            except Exception as e:
-                logging.error(f"Error drawing coordinate marker for {name}: {e}")
+    def draw_coordinate_markers(self, canvas):
+        """Draw markers for click coordinates on the canvas."""
+        if not self.screenshot:
+            return
+        
+        # Clear previous markers
+        canvas.delete("coordinate_marker")
+        
+        # Draw each element's coordinates
+        for name, config in self.elements.items():
+            if "click_coordinates" in config and config["click_coordinates"]:
+                try:
+                    x, y = config["click_coordinates"]
+                    
+                    # Scale to canvas size
+                    canvas_x = x * self.scale
+                    canvas_y = y * self.scale
+                    
+                    # Draw a crosshair
+                    size = 10
+                    canvas.create_line(
+                        canvas_x - size, canvas_y, 
+                        canvas_x + size, canvas_y, 
+                        fill="red", width=2, tags="coordinate_marker"
+                    )
+                    canvas.create_line(
+                        canvas_x, canvas_y - size, 
+                        canvas_x, canvas_y + size, 
+                        fill="red", width=2, tags="coordinate_marker"
+                    )
+                    
+                    # Draw a circle
+                    canvas.create_oval(
+                        canvas_x - size, canvas_y - size,
+                        canvas_x + size, canvas_y + size,
+                        outline="red", width=2, tags="coordinate_marker"
+                    )
+                    
+                    # Add label
+                    canvas.create_text(
+                        canvas_x + size + 5, canvas_y,
+                        text=f"{name} ({x}, {y})",
+                        fill="red", anchor=tk.W, tags="coordinate_marker"
+                    )
+                except Exception as e:
+                    logging.error(f"Error drawing coordinate marker for {name}: {e}")
 
 
 def main():

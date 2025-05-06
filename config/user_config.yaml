@@ -56,6 +56,30 @@ sessions:
     - Create a README.md based on the structure and purpose of this repo.
     - Could this readme.md be improved?
 ui_elements:
+  Initial_prompt_box:
+    confidence: 0.7
+    reference_paths:
+    - assets/reference_images/Initial_prompt_box/Initial_prompt_box_1746565836.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565836_gray.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565836_contrast.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565836_thresh.png
+    - assets/reference_images/Initial_prompt_box/Initial_prompt_box_1746565868.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565868_gray.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565868_contrast.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565868_thresh.png
+    - assets/reference_images/Initial_prompt_box/Initial_prompt_box_1746565916.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565916_gray.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565916_contrast.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565916_thresh.png
+    - assets/reference_images/Initial_prompt_box/Initial_prompt_box_1746565921.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565921_gray.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565921_contrast.png
+    - assets/reference_images/Initial_prompt_box\Initial_prompt_box_1746565921_thresh.png
+    region:
+    - 626
+    - 567
+    - 803
+    - 185
   extended_thought:
     click_coordinates:
     - 450
@@ -132,6 +156,18 @@ ui_elements:
     - 1149
     - 138
     use_coordinates_first: true
+  final_prompt_box:
+    confidence: 0.7
+    reference_paths:
+    - assets/reference_images/final_prompt_box/final_prompt_box_1746565980.png
+    - assets/reference_images/final_prompt_box\final_prompt_box_1746565980_gray.png
+    - assets/reference_images/final_prompt_box\final_prompt_box_1746565980_contrast.png
+    - assets/reference_images/final_prompt_box\final_prompt_box_1746565980_thresh.png
+    region:
+    - 914
+    - 1133
+    - 1185
+    - 213
   limit_reached:
     confidence: 0.7
     reference_paths:

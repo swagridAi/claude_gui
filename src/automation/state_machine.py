@@ -190,26 +190,38 @@ class SimpleAutomationMachine:
             # If this is the first prompt, click the initial_prompt_box
             if self.current_prompt_index == 0:
                 logging.info("First prompt - using initial_prompt_box")
-                prompt_box = find_element(self.ui_elements.get("Initial_prompt_box"))
-                if not prompt_box:
-                    log_with_screenshot("Initial prompt box not found", level=logging.ERROR, stage_name="INITIAL_PROMPT_BOX_NOT_FOUND")
+                # FIXED: Pass the UIElement object directly to click_element
+                initial_prompt_element = self.ui_elements.get("Initial_prompt_box")
+                if not initial_prompt_element:
+                    log_with_screenshot("Initial prompt box element not defined", level=logging.ERROR, stage_name="INITIAL_PROMPT_BOX_NOT_FOUND")
                     self.failure_type = FailureType.UI_NOT_FOUND
-                    raise Exception("Initial prompt box not found")
-                
-                log_with_screenshot("Initial prompt box found", stage_name="INITIAL_PROMPT_BOX_FOUND", region=prompt_box)
-                click_element(prompt_box)
+                    raise Exception("Initial prompt box element not defined")
+                    
+                # Use direct click_element with the UIElement object to prioritize coordinates
+                success = click_element(initial_prompt_element)
+                if not success:
+                    log_with_screenshot("Failed to click initial prompt box", level=logging.ERROR, stage_name="INITIAL_PROMPT_BOX_CLICK_FAILED")
+                    self.failure_type = FailureType.UI_NOT_FOUND
+                    raise Exception("Failed to click initial prompt box")
+                    
                 log_with_screenshot("After clicking initial prompt box", stage_name="AFTER_INITIAL_PROMPT_BOX_CLICK")
             else:
                 # For subsequent prompts, use the final_prompt_box
                 logging.info(f"Subsequent prompt - using final_prompt_box")
-                prompt_box = find_element(self.ui_elements.get("final_prompt_box"))
-                if not prompt_box:
-                    log_with_screenshot("Final prompt box not found", level=logging.ERROR, stage_name="FINAL_PROMPT_BOX_NOT_FOUND")
+                # FIXED: Pass the UIElement object directly to click_element
+                final_prompt_element = self.ui_elements.get("final_prompt_box")
+                if not final_prompt_element:
+                    log_with_screenshot("Final prompt box element not defined", level=logging.ERROR, stage_name="FINAL_PROMPT_BOX_NOT_FOUND") 
                     self.failure_type = FailureType.UI_NOT_FOUND
-                    raise Exception("Final prompt box not found")
-                
-                log_with_screenshot("Final prompt box found", stage_name="FINAL_PROMPT_BOX_FOUND", region=prompt_box)
-                click_element(prompt_box)
+                    raise Exception("Final prompt box element not defined")
+                    
+                # Use direct click_element with the UIElement object to prioritize coordinates
+                success = click_element(final_prompt_element)
+                if not success:
+                    log_with_screenshot("Failed to click final prompt box", level=logging.ERROR, stage_name="FINAL_PROMPT_BOX_CLICK_FAILED")
+                    self.failure_type = FailureType.UI_NOT_FOUND
+                    raise Exception("Failed to click final prompt box")
+                    
                 log_with_screenshot("After clicking final prompt box", stage_name="AFTER_FINAL_PROMPT_BOX_CLICK")
             
             # Send the prompt text
@@ -239,12 +251,15 @@ class SimpleAutomationMachine:
             log_with_screenshot("Completed 5-minute wait period", stage_name="WAIT_COMPLETED")
             
             # Check for message limit reached notification
-            limit_reached = find_element(self.ui_elements.get("limit_reached"))
-            if limit_reached:
-                logging.warning("Message limit reached, cannot send more prompts")
-                log_with_screenshot("Message limit reached", stage_name="LIMIT_REACHED", region=limit_reached)
-                self.state = AutomationState.COMPLETE
-                return
+            # FIXED: Pass the UIElement object directly to find_element
+            limit_element = self.ui_elements.get("limit_reached")
+            if limit_element:
+                limit_reached = find_element(limit_element)
+                if limit_reached:
+                    logging.warning("Message limit reached, cannot send more prompts")
+                    log_with_screenshot("Message limit reached", stage_name="LIMIT_REACHED", region=limit_reached)
+                    self.state = AutomationState.COMPLETE
+                    return
             
             # Move to next prompt
             self.current_prompt_index += 1
@@ -256,6 +271,7 @@ class SimpleAutomationMachine:
                 self.failure_type = FailureType.UNKNOWN
             self.last_error = str(e)
             raise
+
 
     def _handle_error(self, error):
         """Handle errors and decide whether to retry."""

@@ -184,42 +184,49 @@ class SimpleAutomationMachine:
         log_with_screenshot(f"Before sending prompt {self.current_prompt_index + 1}", stage_name="BEFORE_PROMPT")
         
         try:
-            # If this is the first prompt, click the initial_prompt_box
+            # Determine which prompt box to use (initial or final)
             if self.current_prompt_index == 0:
                 logging.info("First prompt - using initial_prompt_box")
-                # FIXED: Pass the UIElement object directly to click_element
-                initial_prompt_element = self.ui_elements.get("Initial_prompt_box")
-                if not initial_prompt_element:
-                    log_with_screenshot("Initial prompt box element not defined", level=logging.ERROR, stage_name="INITIAL_PROMPT_BOX_NOT_FOUND")
-                    self.failure_type = FailureType.UI_NOT_FOUND
-                    raise Exception("Initial prompt box element not defined")
-                    
-                # Use direct click_element with the UIElement object to prioritize coordinates
-                success = click_element(initial_prompt_element)
-                if not success:
-                    log_with_screenshot("Failed to click initial prompt box", level=logging.ERROR, stage_name="INITIAL_PROMPT_BOX_CLICK_FAILED")
-                    self.failure_type = FailureType.UI_NOT_FOUND
-                    raise Exception("Failed to click initial prompt box")
-                    
-                log_with_screenshot("After clicking initial prompt box", stage_name="AFTER_INITIAL_PROMPT_BOX_CLICK")
+                prompt_element = self.ui_elements.get("Initial_prompt_box")
+                prompt_element_name = "Initial_prompt_box"
             else:
-                # For subsequent prompts, use the final_prompt_box
                 logging.info(f"Subsequent prompt - using final_prompt_box")
-                # FIXED: Pass the UIElement object directly to click_element
-                final_prompt_element = self.ui_elements.get("final_prompt_box")
-                if not final_prompt_element:
-                    log_with_screenshot("Final prompt box element not defined", level=logging.ERROR, stage_name="FINAL_PROMPT_BOX_NOT_FOUND") 
-                    self.failure_type = FailureType.UI_NOT_FOUND
-                    raise Exception("Final prompt box element not defined")
-                    
-                # Use direct click_element with the UIElement object to prioritize coordinates
-                success = click_element(final_prompt_element)
+                prompt_element = self.ui_elements.get("final_prompt_box")
+                prompt_element_name = "final_prompt_box"
+            
+            # Check if the required element exists
+            if not prompt_element:
+                log_with_screenshot(f"{prompt_element_name} element not defined", level=logging.ERROR, 
+                                stage_name=f"{prompt_element_name.upper()}_NOT_FOUND")
+                self.failure_type = FailureType.UI_NOT_FOUND
+                raise Exception(f"{prompt_element_name} element not defined")
+            
+            # DIRECT COORDINATES APPROACH: Use coordinates directly if available
+            if prompt_element.click_coordinates and (prompt_element.use_coordinates_first or 
+                                                self.config.get("automation_settings", {}).get("prefer_coordinates", True)):
+                from src.automation.interaction import click_at_coordinates
+                x, y = prompt_element.click_coordinates
+                logging.info(f"Using direct coordinates for {prompt_element_name}: ({x}, {y})")
+                success = click_at_coordinates(x, y, element_name=prompt_element_name)
+                
                 if not success:
-                    log_with_screenshot("Failed to click final prompt box", level=logging.ERROR, stage_name="FINAL_PROMPT_BOX_CLICK_FAILED")
-                    self.failure_type = FailureType.UI_NOT_FOUND
-                    raise Exception("Failed to click final prompt box")
-                    
-                log_with_screenshot("After clicking final prompt box", stage_name="AFTER_FINAL_PROMPT_BOX_CLICK")
+                    logging.warning(f"Direct coordinate click failed, falling back to visual recognition")
+                    # Fall back to visual recognition if direct click fails
+                    success = click_element(prompt_element)
+            else:
+                # VISUAL RECOGNITION APPROACH: Use traditional element finding if no coordinates
+                logging.info(f"Using visual recognition to find {prompt_element_name}")
+                success = click_element(prompt_element)
+            
+            # Check if the click was successful
+            if not success:
+                log_with_screenshot(f"Failed to click {prompt_element_name}", level=logging.ERROR, 
+                                stage_name=f"{prompt_element_name.upper()}_CLICK_FAILED")
+                self.failure_type = FailureType.UI_NOT_FOUND
+                raise Exception(f"Failed to click {prompt_element_name}")
+            
+            log_with_screenshot(f"After clicking {prompt_element_name}", 
+                            stage_name=f"AFTER_{prompt_element_name.upper()}_CLICK")
             
             # Send the prompt text
             send_text(current_prompt)
@@ -248,9 +255,10 @@ class SimpleAutomationMachine:
             log_with_screenshot("Completed 5-minute wait period", stage_name="WAIT_COMPLETED")
             
             # Check for message limit reached notification
-            # FIXED: Pass the UIElement object directly to find_element
             limit_element = self.ui_elements.get("limit_reached")
             if limit_element:
+                # For limit checking, prefer coordinates first is less important than accuracy
+                # So we'll use visual recognition here
                 limit_reached = find_element(limit_element)
                 if limit_reached:
                     logging.warning("Message limit reached, cannot send more prompts")
@@ -268,7 +276,6 @@ class SimpleAutomationMachine:
                 self.failure_type = FailureType.UNKNOWN
             self.last_error = str(e)
             raise
-
 
     def _handle_error(self, error):
         """Handle errors and decide whether to retry."""

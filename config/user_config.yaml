@@ -128,6 +128,7 @@ ui_elements:
     - 567
     - 803
     - 185
+    use_coordinates_first: true
   extended_thought:
     click_coordinates:
     - 450
@@ -396,6 +397,7 @@ ui_elements:
     - 1138
     - 760
     - 199
+    use_coordinates_first: true
   limit_reached:
     confidence: 0.9
     reference_paths:
@@ -520,6 +522,7 @@ ui_elements:
     - 1044
     - 1124
     - 89
+    use_coordinates_first: true
   prompt_box:
     click_coordinates:
     - 800
@@ -1062,6 +1065,7 @@ ui_elements:
     - 269
     - 1627
     - 853
+    use_coordinates_first: true
   search_options_button:
     click_coordinates:
     - 290
@@ -1276,3 +1280,4 @@ ui_elements:
     - 1239
     - 94
     - 87
+    use_coordinates_first: true

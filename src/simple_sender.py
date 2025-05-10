@@ -3,7 +3,8 @@
 Simple Claude Prompt Sender
 
 A minimal script that sends prompts to Claude without image recognition.
-Just launches the browser, waits, types prompts and presses Enter.
+Launches the browser, waits, types prompts and presses Enter.
+Now iterates through all sessions by default.
 """
 
 import subprocess
@@ -181,46 +182,100 @@ def close_browser():
     except Exception as e:
         logging.error(f"Error closing browser: {e}")
 
+def get_all_sessions(config):
+    """Get all available sessions from the config."""
+    sessions = config.get("sessions", {})
+    return list(sessions.keys())
+
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Simple Claude Prompt Sender")
     parser.add_argument("--config", help="Path to config file", default="config/user_config.yaml")
-    parser.add_argument("--session", help="Specific session to run", default="default")
+    parser.add_argument("--session", help="Specific session to run (default: run all)", default=None)
+    parser.add_argument("--run-one", action="store_true", help="Run only the specified session, not all")
     parser.add_argument("--delay", type=int, help="Delay between prompts in seconds", default=180)
+    parser.add_argument("--session-delay", type=int, help="Delay between sessions in seconds", default=5)
     args = parser.parse_args()
     
     # Load configuration
     config = load_config(args.config)
     
-    # Determine URL and prompts based on session
-    url = config.get("claude_url", "https://claude.ai")
-    prompts = config.get("prompts", [])
-    profile_dir = config.get("browser_profile")
+    # Determine which sessions to run
+    sessions_to_run = []
     
-    # Handle session-specific configuration
-    if args.session != "default" and "sessions" in config:
-        sessions = config.get("sessions", {})
+    if args.session and args.run_one:
+        # Run only the specified session
+        sessions_to_run.append(args.session)
+    elif args.session:
+        # Use specified session as the first one, then run all others
+        sessions = get_all_sessions(config)
         if args.session in sessions:
-            session_config = sessions[args.session]
-            session_url = session_config.get("claude_url")
-            session_prompts = session_config.get("prompts")
-            
-            if session_url:
-                url = session_url
-            if session_prompts:
-                prompts = session_prompts
+            # Move the specified session to the front
+            sessions.remove(args.session)
+            sessions_to_run = [args.session] + sessions
+        else:
+            # If specified session doesn't exist, run all
+            sessions_to_run = sessions
+    else:
+        # Run all sessions by default
+        sessions_to_run = get_all_sessions(config)
     
-    # Launch browser
-    if not launch_browser(url, profile_dir):
-        logging.error("Failed to launch browser. Exiting.")
+    if not sessions_to_run:
+        # If no sessions defined, use default global prompts
+        logging.info("No sessions defined in config. Using global prompts.")
+        url = config.get("claude_url", "https://claude.ai")
+        prompts = config.get("prompts", [])
+        profile_dir = config.get("browser_profile")
+        
+        # Launch browser
+        if not launch_browser(url, profile_dir):
+            logging.error("Failed to launch browser. Exiting.")
+            return
+        
+        try:
+            # Send prompts
+            send_prompts(prompts, "default", args.delay)
+        finally:
+            # Close browser
+            close_browser()
+        
         return
     
-    try:
-        # Send prompts
-        send_prompts(prompts, args.session, args.delay)
-    finally:
-        # Close browser
-        close_browser()
+    # Run each session
+    for i, session_id in enumerate(sessions_to_run):
+        logging.info(f"Starting session {i+1}/{len(sessions_to_run)}: {session_id}")
+        
+        # Get session config
+        session_config = config.get("sessions", {}).get(session_id, {})
+        session_url = session_config.get("claude_url", config.get("claude_url", "https://claude.ai"))
+        session_prompts = session_config.get("prompts", [])
+        profile_dir = config.get("browser_profile")
+        
+        if not session_prompts:
+            logging.warning(f"No prompts found for session '{session_id}'. Skipping.")
+            continue
+        
+        # Launch browser
+        if not launch_browser(session_url, profile_dir):
+            logging.error(f"Failed to launch browser for session '{session_id}'. Skipping.")
+            continue
+        
+        try:
+            # Send prompts
+            send_prompts(session_prompts, session_id, args.delay)
+        except Exception as e:
+            logging.error(f"Error in session '{session_id}': {e}")
+        finally:
+            # Close browser
+            close_browser()
+        
+        # Wait between sessions if there are more to process
+        if i < len(sessions_to_run) - 1:
+            delay = args.session_delay
+            logging.info(f"Waiting {delay} seconds before next session...")
+            time.sleep(delay)
+    
+    logging.info(f"All {len(sessions_to_run)} sessions completed.")
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 automation_settings:
   prefer_coordinates: true
 browser_profile: C:\Temp\ClaudeProfile
-claude_url: https://claude.ai/project/019699e5-0fdf-75f1-9190-3b4cc593bc9e
+claude_url: https://claude.ai/project/0196b7f9-6e76-776a-8c6b-b8231944ae8e
 coordinate_settings:
   fallback_to_visual: true
   jitter: 2
@@ -38,23 +38,16 @@ retry_delay: 2
 retry_jitter: 0.5
 sessions:
   session1:
-    claude_url: https://claude.ai/project/019699e5-0fdf-75f1-9190-3b4cc593bc9e
-    name: Research Questions
-    prompts:
-    - 'Analyze the following repository (or files) and identify: - Areas of code duplication
-      (e.g., repeated blocks, similar functions, redundant modules) - Opportunities
-      to refactor into shared functions, utilities, base classes, or config files
-      - Ways to make the codebase more DRY (Don''t Repeat Yourself) without overcomplicating
-      maintainability.'
-    - Evaluate whether the entire code repository is functional, integrated properly,
-      and free from major issues. Return a structured report.
-    - Identify functions or files that are overly complex or too long.
-  session2:
-    claude_url: https://claude.ai/project/019699e5-0fdf-75f1-9190-3b4cc593bc9e
+    claude_url: https://claude.ai/project/0196b7f9-6e76-776a-8c6b-b8231944ae8e
     name: Code Tasks
     prompts:
     - Create a README.md based on the structure and purpose of this repo.
     - Could this readme.md be improved?
+  session2:
+    claude_url: https://claude.ai/project/0196b7f9-6e76-776a-8c6b-b8231944ae8e
+    name: Code Tasks
+    prompts:
+    - What are some future state ideas this program should consider?
 ui_elements:
   Initial_prompt_box:
     confidence: 0.7

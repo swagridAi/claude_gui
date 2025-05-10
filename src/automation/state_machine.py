@@ -63,11 +63,14 @@ class SimpleAutomationMachine:
     def _execute_current_state(self):
         """Execute the current state and transition to the next state."""
         try:
+            # Store the original state for logging
+            original_state = self.state
+            
             # Log the state transition with screenshot
             log_with_screenshot(
-                f"Entering state: {self.state.name}", 
+                f"Entering state: {original_state.name}", 
                 level=logging.INFO,
-                stage_name=self.state.name
+                stage_name=original_state.name
             )
             
             if self.state == AutomationState.INITIALIZE:
@@ -85,15 +88,15 @@ class SimpleAutomationMachine:
             elif self.state == AutomationState.RETRY:
                 self._handle_retry()
             
-            # Log successful state completion with screenshot
+            # Log successful state completion with screenshot using the ORIGINAL state
             log_with_screenshot(
-                f"Successfully completed state: {self.state.name}", 
+                f"Successfully completed state: {original_state.name}", 
                 level=logging.INFO,
-                stage_name=f"{self.state.name}_COMPLETE"
+                stage_name=f"{original_state.name}_COMPLETE"
             )
             
             # Reset retry count on successful state execution (only for non-retry states)
-            if self.state != AutomationState.RETRY:
+            if original_state != AutomationState.RETRY:
                 self.retry_count = 0
                 
         except Exception as e:
@@ -104,7 +107,7 @@ class SimpleAutomationMachine:
                 stage_name=f"{self.state.name}_ERROR"
             )
             self._handle_error(e)
-    
+
     def _handle_initialize(self):
         """Initialize the automation process."""
         # Load UI elements from config
@@ -124,6 +127,7 @@ class SimpleAutomationMachine:
                 click_coordinates=element_config.get("click_coordinates"),  # MISSING
                 use_coordinates_first=element_config.get("use_coordinates_first", True)  # MISSING
             )
+        self.state = AutomationState.BROWSER_LAUNCH
 
     def _handle_browser_launch(self):
         """Launch the browser and navigate to Claude."""
@@ -163,6 +167,7 @@ class SimpleAutomationMachine:
             input("Please complete login/CAPTCHA and press Enter to continue...")
             self.state = AutomationState.SEND_PROMPTS
         """
+        return
     
     def _handle_send_prompts(self):
         """Send all prompts in sequence."""

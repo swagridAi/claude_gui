@@ -107,8 +107,6 @@ class SimpleAutomationMachine:
     
     def _handle_initialize(self):
         """Initialize the automation process."""
-        logging.info("Initializing automation")
-        
         # Load UI elements from config
         for element_name, element_config in self.config.get("ui_elements", {}).items():
             # Support both relative and absolute regions
@@ -122,17 +120,11 @@ class SimpleAutomationMachine:
                 region=region,
                 relative_region=relative_region,
                 parent=parent,
-                confidence=element_config.get("confidence", 0.8)
+                confidence=element_config.get("confidence", 0.8),
+                click_coordinates=element_config.get("click_coordinates"),  # MISSING
+                use_coordinates_first=element_config.get("use_coordinates_first", True)  # MISSING
             )
-        
-        # Register UI elements with region manager
-        self.region_manager.set_ui_elements(self.ui_elements)
-        
-        logging.info(f"Loaded {len(self.ui_elements)} UI elements")
-        logging.info(f"Prepared {len(self.prompts)} prompts to send")
-        
-        self.state = AutomationState.BROWSER_LAUNCH
-    
+
     def _handle_browser_launch(self):
         """Launch the browser and navigate to Claude."""
         logging.info("Launching browser")

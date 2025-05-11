@@ -1,0 +1,112 @@
+session6:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the config/default_config.yaml. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for config/default_config.yaml. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to config/default_config.yaml. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session7:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the config/user_config.yaml. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for config/user_config.yaml. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to config/user_config.yaml. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session8:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/utils/config_manager.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/utils/config_manager.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/utils/config_manager.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session9:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/utils/reference_manager.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/utils/reference_manager.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/utils/reference_manager.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session10:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/utils/session_tracker.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/utils/session_tracker.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/utils/session_tracker.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session11:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/models/ui_element.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/models/ui_element.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/models/ui_element.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session12:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/automation/recognition.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/automation/recognition.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/automation/recognition.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session13:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/automation/state_machine.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/automation/state_machine.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/automation/state_machine.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session14:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/main.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/main.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/main.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session15:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/simple_sender.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/simple_sender.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/simple_sender.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session16:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/utils/config_facade.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/utils/config_facade.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/utils/config_facade.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session17:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/utils/session_manager.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/utils/session_manager.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/utils/session_manager.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session18:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the src/utils/config_sync.py. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for src/utils/config_sync.py. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to src/utils/config_sync.py. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+
+session19:
+  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  name: Code Tasks
+  prompts:
+  - With reference to Configuration System Refactoring Guide assess the config/ui_elements/*.yaml. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
+  - Based on your assessment, propose a detailed refactoring plan for config/ui_elements/*.yaml. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
+  - Apply the refactor to config/ui_elements/*.yaml. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
+

@@ -1,0 +1,10 @@
+Assess whether this resume point begins with a strong and specific action verb and suggest a more impactful one if needed Point {point}
+Check whether the point clearly communicates an outcome or result and rewrite it to highlight accomplishments instead of just duties if needed Point {point}
+Evaluate whether this point includes specific metrics or numbers and suggest meaningful quantification if it does not Point {point}
+Review how well this point aligns with responsibilities and language found in typical job descriptions for the role and recommend stronger alignment Point {point}
+Identify repeated words or vague language in this point and suggest more precise and varied wording Point {point}
+Assess whether the length of this point is between 15 and 30 words and revise it for clarity if it is too short or too long Point {point}
+Check for any spelling errors or verb tense inconsistencies in this resume point and correct them Point {point}
+Identify any clichés or overused buzzwords in this resume point and recommend more meaningful alternatives Point {point}
+Check whether this point uses personal pronouns such as I my or we and revise it to maintain a formal third person tone Point {point}
+Rewrite this resume point to maximize its impact by applying all of the following improvements without using personal pronouns ensure a strong action verb include relevant methodologies highlight accomplishments use quantifiable metrics ensure alignment with job descriptions remove vague phrases eliminate redundancy maintain consistent verb tense avoid buzzwords and keep the length between 15 and 30 words Point {point}

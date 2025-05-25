@@ -269,7 +269,7 @@ def main():
     parser.add_argument("--config", help="Path to config file", default="config/user_config.yaml")
     parser.add_argument("--session", help="Specific session to run (default: run all)", default=None)
     parser.add_argument("--run-one", action="store_true", help="Run only the specified session, not all")
-    parser.add_argument("--delay", type=int, help="Delay between prompts in seconds", default=180)
+    parser.add_argument("--delay", type=int, help="Delay between prompts in seconds", default=100)
     parser.add_argument("--session-delay", type=int, help="Delay between sessions in seconds", default=10)
     args = parser.parse_args()
     

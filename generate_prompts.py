@@ -2,13 +2,16 @@ import csv
 
 template = """
 session{i}:
-  claude_url: https://claude.ai/project/0196bd44-e4b5-75a9-bf40-0433b7b78507
+  claude_url: https://claude.ai/project/0196f2ac-2f4b-7714-808e-f71ecaaca3f8
   name: Code Tasks
   prompts:
-  - With reference to Simple Sender Module Refactoring Brief assess the {file}. Briefly describe its purpose and how it fits into the overall project, the major functions or classes it contains. Do not refactor yet—just return your assessment.
-  - Based on your assessment, propose a detailed refactoring plan for {file}. Include specific improvements such as function extraction, renaming, logic simplification, or restructuring; explain how these changes improve maintainability or readability; and note any dependencies or potential side effects. Wait for my approval before proceeding.
-  - Apply the refactor to {file}. Output the complete refactored code in one block with minimal inline comments where necessary to explain any non-obvious changes. Do not modify other files or make assumptions about external dependencies unless instructed.
-""".strip()
+  - Please       Using the Resume Point Evaluation Framework, please analyze this specific point from my resume. Before analyzing this resume point, first review the EY-Parthenon job description and identify their 3 most critical success factors and 3 most common rejection reasons for candidates. Use this context to inform your evaluation. Consider that this candidate is transitioning from corporate strategy to management consulting. Weight your analysis to address the specific concerns and advantages this transition presents. This resume point is being evaluated against other candidates who likely have traditional MBB/Big 4 consulting backgrounds. Frame your competitive analysis with this benchmark in mind.
+  - Please       Using the Resume Point Evaluation Framework, please analyze this specific point from my resume {file}               .     Please work through each section of the framework systematically and provide your analysis, ratings, and recommendations.
+  - Please       For each rating you provide, give specific textual evidence from the resume point and explain exactly why it merits that score. Avoid generic explanations.
+  - Please       For your optimization recommendations, provide before/after examples showing the exact language changes, not just general advice.
+ """.strip()
+
+
 
 def generate_sessions_to_file(csv_path, output_path):
     with open(csv_path, newline='') as csvfile, open(output_path, 'w') as outfile:
@@ -20,3 +23,5 @@ def generate_sessions_to_file(csv_path, output_path):
 
 # Run it
 generate_sessions_to_file(r'C:\Users\User\python_code\claude_gui_prod\prompt_input.csv', 'sessions_output.txt')
+
+

@@ -2,7 +2,7 @@
 echo Running Claude Automation - Sessions 7 to 12
 cd /d "%~dp0"
 
-for %%i in (9) do (
+for %%i in (18 19 20 21) do (
     echo Running Session %%i...
     python -m src.simple_sender --session session%%i --run-one
     echo Session %%i completed
